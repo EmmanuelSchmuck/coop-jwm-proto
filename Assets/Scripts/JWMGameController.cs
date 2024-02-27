@@ -4,7 +4,7 @@ using UnityEngine;
 using Toolbox;
 using System.Linq;
 
-public class JWMGameController : MonoBehaviour
+public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private int sequenceLength;
@@ -43,5 +43,20 @@ public class JWMGameController : MonoBehaviour
         }
 
         stimulusDisplay.Initialize(shapeSequence);
+    }
+
+    public void WIP_OnResponseColumnClicked(ResponseColumn column)
+	{
+        // assume this is from player A
+
+        int? selectedSymbolIndex = playerA_Keyboard.SelectedSymbolIndex;
+
+        if (selectedSymbolIndex == null) return;
+
+        column.SetSymbol((int)selectedSymbolIndex);
+
+
+        playerA_Keyboard.ResetSelection();
+
     }
 }

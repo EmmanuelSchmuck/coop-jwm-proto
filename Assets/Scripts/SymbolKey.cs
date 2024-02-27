@@ -6,15 +6,17 @@ using UnityEngine.UI;
 public class SymbolKey : MonoBehaviour
 {
 	[SerializeField] private Image iconImage;
-	private int symbolIndex;
+	[SerializeField] private Button button;
+	public int SymbolIndex { get; private set; }
+	public event System.Action<SymbolKey> Clicked;
     public void Initialize(int symbolIndex, Sprite symbolIcon)
 	{
 		iconImage.sprite = symbolIcon;
-		this.symbolIndex = symbolIndex;
+		this.SymbolIndex = symbolIndex;
 	}
 
 	public void OnButtonClick()
 	{
-
+		Clicked?.Invoke(this);
 	}
 }
