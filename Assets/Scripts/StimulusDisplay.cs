@@ -5,7 +5,6 @@ using UnityEngine;
 public class StimulusDisplay : MonoBehaviour
 {
 	[SerializeField] private StimulusCard stimulusCardPrefab;
-	[SerializeField] private RectTransform cardContainer;
 
 	public void Initialize(List<Sprite> cardIconSequence)
 	{
@@ -13,7 +12,7 @@ public class StimulusDisplay : MonoBehaviour
 
 		for (int i = 0; i < cardIconSequence.Count; i++)
 		{
-			StimulusCard card = Instantiate(stimulusCardPrefab, cardContainer);
+			StimulusCard card = Instantiate(stimulusCardPrefab, this.transform);
 			card.Initialize(cardIconSequence[i]);
 		}
 
@@ -21,9 +20,9 @@ public class StimulusDisplay : MonoBehaviour
 
 	void Cleanup()
 	{
-		for (int i = 0; i < cardContainer.childCount; i++)
+		for (int i = 0; i < transform.childCount; i++)
 		{
-			Destroy(cardContainer.GetChild(i).gameObject);
+			Destroy(transform.GetChild(i).gameObject);
 		}
 	}
 }

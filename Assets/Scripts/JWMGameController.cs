@@ -11,29 +11,31 @@ public class JWMGameController : MonoBehaviour
     [SerializeField] private List<Sprite> cardShapePool;
     [Header("References")]
     [SerializeField] private StimulusDisplay stimulusDisplay;
+    [SerializeField] private SymbolKeyboard playerA_Keyboard;
+    [SerializeField] private SymbolKeyboard playerB_Keyboard;
+    [SerializeField] private ResponsePanel playerA_ResponsePanel;
+    [SerializeField] private ResponsePanel playerB_ResponsePanel;
 
     private void Start()
     {
-        StartGame();
+        playerA_Keyboard.Initialize(cardShapePool);
+        playerB_Keyboard.Initialize(cardShapePool);
+        playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
+        playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
 
-        
-    }
-
-    private void StartGame()
-	{
         List<Sprite> shapeSequence = new List<Sprite>();
-        
+
         Sprite lastShape = null;
-        
-        for(int i = 0; i<sequenceLength;i++)
-		{
+
+        for (int i = 0; i < sequenceLength; i++)
+        {
             Sprite shape;
 
             do
-			{
+            {
                 shape = cardShapePool.Random();
             }
-            while (lastShape == shape) ;
+            while (lastShape == shape);
 
             shapeSequence.Add(shape);
 
@@ -41,11 +43,5 @@ public class JWMGameController : MonoBehaviour
         }
 
         stimulusDisplay.Initialize(shapeSequence);
-    }
-
-
-    private void Update()
-    {
-        
     }
 }
