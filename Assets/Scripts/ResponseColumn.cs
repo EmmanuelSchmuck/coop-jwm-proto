@@ -9,12 +9,19 @@ public class ResponseColumn : MonoBehaviour
 	private List<Sprite> cardShapes;
 	[SerializeField] private Image symbolImage;
 	[SerializeField] private Image checkImage;
+	[SerializeField] private Image coverImage;
 
 	public void Initialize(List<Sprite> cardShapes)
 	{
 		SymbolIndex = null;
 		this.cardShapes = cardShapes;
 		checkImage.enabled = false;
+		SetCoverVisible(false);
+	}
+
+	public void SetCoverVisible(bool visible)
+	{
+		coverImage.enabled = visible;
 	}
 
 	public void ShowCorrectFeedback(bool isCorrect)

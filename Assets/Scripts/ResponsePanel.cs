@@ -38,6 +38,14 @@ public class ResponsePanel : MonoBehaviour
 		ResponseValidated?.Invoke();
 	}
 
+	public void SetCoversVisible(bool visible)
+	{
+		foreach (var column in columns)
+		{
+			column.SetCoverVisible(visible);
+		}
+	}
+
 	public void ShowCorrectFeedback(int[] correctIndices)
 	{
 		for(int i = 0;i<columns.Count;i++)

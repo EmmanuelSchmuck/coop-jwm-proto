@@ -10,4 +10,9 @@ public class StimulusCard : MonoBehaviour
 	{
 		iconImage.sprite = icon;
 	}
+
+	public void SetVisible(bool visible)
+	{
+		iconImage.enabled = visible;
+	}
 }

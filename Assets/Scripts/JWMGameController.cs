@@ -28,6 +28,11 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_ResponsePanel.ResponseValidated += CheckForRoundEnd;
         playerB_ResponsePanel.ResponseValidated += CheckForRoundEnd;
 
+        StartCoroutine(PlayRound());
+    }
+
+    private IEnumerator PlayRound()
+	{
         List<Sprite> shapeSequence = new List<Sprite>();
         correctIndexSequence = new int[sequenceLength];
 
@@ -51,8 +56,21 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         }
 
         stimulusDisplay.Initialize(shapeSequence);
+        stimulusDisplay.DoDisplayAnimation();
 
-        playerB_ResponsePanel.SetSymbols(correctIndexSequence);
+        int[] playerB_indices = new int[sequenceLength];
+
+        float correctProbability = 0.75f;
+
+        for (int i = 0; i < sequenceLength; i++)
+        {
+            playerB_indices[i] = Random.value < correctProbability ? correctIndexSequence[i] : Random.Range(0, 9);
+        }
+
+        yield return new WaitForSeconds(10f);
+
+        playerB_ResponsePanel.SetSymbols(playerB_indices);
+        // playerB_ResponsePanel.SetCoversVisible(true);
         playerB_ResponsePanel.SetValidated();
     }
 
@@ -65,6 +83,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             Debug.Log("Round ended, showing correct / incorrect feedback");
             playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
             playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+
+            stimulusDisplay.ShowStimulus();
 		}
 
     }
