@@ -8,11 +8,18 @@ public class ResponseColumn : MonoBehaviour
 	public int? SymbolIndex { get; private set; }
 	private List<Sprite> cardShapes;
 	[SerializeField] private Image symbolImage;
+	[SerializeField] private Image checkImage;
 
 	public void Initialize(List<Sprite> cardShapes)
 	{
 		SymbolIndex = null;
 		this.cardShapes = cardShapes;
+		checkImage.enabled = false;
+	}
+
+	public void ShowCorrectFeedback(bool isCorrect)
+	{
+		checkImage.enabled = isCorrect;
 	}
 
 	public void OnButtonClick()
@@ -21,8 +28,6 @@ public class ResponseColumn : MonoBehaviour
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)
 
 		JWMGameController.Instance.WIP_OnResponseColumnClicked(this);
-
-		
 	}
 
 	public void SetSymbol(int symbolIndex)

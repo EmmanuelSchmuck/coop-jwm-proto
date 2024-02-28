@@ -8,6 +8,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private int sequenceLength;
+    [SerializeField] private bool allowSymbolRepetition;
     [SerializeField] private List<Sprite> cardShapePool;
     [Header("References")]
     [SerializeField] private StimulusDisplay stimulusDisplay;
@@ -15,6 +16,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private SymbolKeyboard playerB_Keyboard;
     [SerializeField] private ResponsePanel playerA_ResponsePanel;
     [SerializeField] private ResponsePanel playerB_ResponsePanel;
+    private int[] correctIndexSequence;
 
     private void Start()
     {
@@ -23,7 +25,11 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
         playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
 
+        playerA_ResponsePanel.ResponseValidated += CheckForRoundEnd;
+        playerB_ResponsePanel.ResponseValidated += CheckForRoundEnd;
+
         List<Sprite> shapeSequence = new List<Sprite>();
+        correctIndexSequence = new int[sequenceLength];
 
         Sprite lastShape = null;
 
@@ -35,14 +41,32 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             {
                 shape = cardShapePool.Random();
             }
-            while (lastShape == shape);
+            while (!allowSymbolRepetition && lastShape == shape);
 
             shapeSequence.Add(shape);
+
+            correctIndexSequence[i] = cardShapePool.IndexOf(shape);
 
             lastShape = shape;
         }
 
         stimulusDisplay.Initialize(shapeSequence);
+
+        playerB_ResponsePanel.SetSymbols(correctIndexSequence);
+        playerB_ResponsePanel.SetValidated();
+    }
+
+    private void CheckForRoundEnd()
+	{
+        bool bothPlayersHaveValidated = playerA_ResponsePanel.IsValidated && playerB_ResponsePanel.IsValidated;
+
+        if(bothPlayersHaveValidated)
+		{
+            Debug.Log("Round ended, showing correct / incorrect feedback");
+            playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+            playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+		}
+
     }
 
     public void WIP_OnResponseColumnClicked(ResponseColumn column)
@@ -55,8 +79,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.SetSymbol((int)selectedSymbolIndex);
 
+        playerA_ResponsePanel.CheckIfCanValidate();
 
-        playerA_Keyboard.ResetSelection();
+        // playerA_Keyboard.ResetSelection();
 
     }
 }
