@@ -14,6 +14,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
+	[SerializeField] private Sprite questionMarkSymbol;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	public int CoinCount { get; private set; }
@@ -28,9 +29,9 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		coinZone = GetComponentInChildren<CoinZone>();
 		coinZone.Initialize(this);
 
-		Cleanup();
+		coins = new List<GameObject>();
 
-		coins = new List<GameObject>(); // in cleanup ?
+		Cleanup();
 	}
 
 	public void OnPointerClick2()
@@ -68,6 +69,22 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		
 	}
 
+	public void SetCoins(int amount) // to do: refactor this + add & remove coin
+	{
+		foreach(var coin in coins)
+		{
+			Destroy(coin);
+		}
+
+		coins.Clear();
+
+		CoinCount = amount;
+		for (int i = 0; i < amount; i++)
+		{
+			coins.Add(Instantiate(coinPrefab, coinContainer));
+		}
+	}
+
 	public void RemoveCoin()
 	{
 		if (coins.Count <= 0) throw new System.Exception("No coin to remove !");
@@ -93,6 +110,12 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		{
 			Destroy(coinContainer.GetChild(i).gameObject);
 		}
+
+		ShowCorrectFeedback(false);
+
+		SetSymbol(null);
+
+		SetCoins(0);	
 	}
 
 	public void SetCoverVisible(bool visible)
@@ -113,9 +136,9 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		JWMGameController.Instance.WIP_OnResponseColumnSymbolClicked(this);
 	}
 
-	public void SetSymbol(int symbolIndex)
+	public void SetSymbol(int? symbolIndex)
 	{
-		symbolImage.sprite = cardShapes[symbolIndex];
+		symbolImage.sprite = symbolIndex == null ? questionMarkSymbol : cardShapes[(int)symbolIndex];
 		this.SymbolIndex = symbolIndex;
 	}
 }

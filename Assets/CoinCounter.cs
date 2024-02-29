@@ -30,4 +30,9 @@ public class CoinCounter : MonoBehaviour
 		CoinCount += amount;
 		UpdateText();
 	}
+	public void SetCoin(int amount)
+	{
+		CoinCount = amount;
+		UpdateText();
+	}
 }

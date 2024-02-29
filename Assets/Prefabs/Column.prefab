@@ -1026,6 +1026,7 @@ MonoBehaviour:
   coinContainer: {fileID: 7323536546891435968}
   coinPrefab: {fileID: 6348372582123319558, guid: 75fa8ed29a6c47c4eb67cb1670f4837f, type: 3}
   coinButtons: {fileID: 3784929335024018278}
+  questionMarkSymbol: {fileID: 21300000, guid: 6d2ba1339d2642249b8e4bab188e927e, type: 3}
 --- !u!114 &4298993516502658711
 MonoBehaviour:
   m_ObjectHideFlags: 0

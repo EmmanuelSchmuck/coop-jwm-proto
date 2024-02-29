@@ -15,6 +15,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private List<Sprite> cardShapePool;
     [SerializeField] private AnimationCurve recallCurve;
     [SerializeField] private float roundStartDelay;
+    [SerializeField] private int scoreMultiplier;
     [Header("References")]
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private SymbolKeyboard playerA_Keyboard;
@@ -23,25 +24,34 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private ResponsePanel playerB_ResponsePanel;
     [SerializeField] private CoinCounter playerA_CoinCounter;
     [SerializeField] private CoinCounter playerB_CoinCounter;
+    [SerializeField] private TMPro.TextMeshProUGUI playerA_ScoreText;
+    [SerializeField] private TMPro.TextMeshProUGUI playerB_ScoreText;
+    
     private int[] correctIndexSequence;
+
+    private int playerA_score, playerB_score;
 
     private void Start()
     {
         playerA_Keyboard.Initialize(cardShapePool);
         playerB_Keyboard.Initialize(cardShapePool);
-        playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
-        playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
+
+        SetPlayerAScore(0);
+        SetPlayerBScore(0);
 
         playerA_ResponsePanel.ResponseValidated += CheckForRoundEnd;
         playerB_ResponsePanel.ResponseValidated += CheckForRoundEnd;
 
-        StartCoroutine(PlayRound());
+        StartCoroutine(StartRound());
     }
 
-    private IEnumerator PlayRound()
+    private IEnumerator StartRound()
     {
-        playerA_CoinCounter.AddCoin(coinPerRound);
-        playerB_CoinCounter.AddCoin(coinPerRound);
+        playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
+        playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
+
+        playerA_CoinCounter.SetCoin(coinPerRound);
+        playerB_CoinCounter.SetCoin(coinPerRound);
 
         List<Sprite> shapeSequence = new List<Sprite>();
         correctIndexSequence = new int[sequenceLength];
@@ -73,7 +83,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         int[] playerB_indices = new int[sequenceLength];
         float[] playerB_coinAmountSequenceFloat = new float[sequenceLength];
-        int[] playerB_coinAmountSequence = new int[sequenceLength];
 
         for (int i = 0; i < sequenceLength; i++)
         {
@@ -84,7 +93,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             playerB_coinAmountSequenceFloat[i] = correctProbability * coinPerRound / sequenceLength;
         }
 
-        playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat);
+        int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat);
 
         yield return new WaitForSeconds(sequenceLength * displayDurationPerSymbol);
 
@@ -108,12 +117,48 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         if (bothPlayersHaveValidated)
         {
-            Debug.Log("Round ended, showing correct / incorrect feedback");
-            playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
-            playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
-
-            stimulusDisplay.ShowStimulus();
+            StartCoroutine(EndRound());
         }
+    }
+
+    private IEnumerator EndRound()
+	{
+        Debug.Log("Round ended, showing correct / incorrect feedback");
+        playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+        playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+
+        stimulusDisplay.ShowStimulus();
+
+        yield return new WaitForSeconds(1f);
+
+        //int playerA_score = 0, playerB_score = 0;
+
+        foreach (var column in playerA_ResponsePanel.GetCorrectColumns(correctIndexSequence))
+        {
+            playerA_score += (1 + column.CoinCount) * scoreMultiplier;
+        }
+
+        foreach (var column in playerB_ResponsePanel.GetCorrectColumns(correctIndexSequence))
+        {
+            playerB_score += 1 + column.CoinCount * scoreMultiplier;
+        }
+
+        SetPlayerAScore(playerA_score);
+        SetPlayerBScore(playerB_score);
+
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(StartRound());
+    }
+
+    private void SetPlayerAScore(int value)
+	{
+        playerA_ScoreText.text = $"Score: {value}";
+	}
+
+    private void SetPlayerBScore(int value)
+    {
+        playerB_ScoreText.text = $"Score: {value}";
     }
 
     private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: also compute coinSequenceFloat here

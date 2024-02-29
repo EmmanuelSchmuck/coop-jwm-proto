@@ -8,8 +8,9 @@ public class ResponsePanel : MonoBehaviour
 {
     [SerializeField] private ResponseColumn columnPrefab;
 	[SerializeField] private Button validateButton;
+
 	public bool IsValidated { get; private set; }
-	private bool canValidate;
+
 	private List<ResponseColumn> columns;
 	public event System.Action ResponseValidated;
 	private ResponseColumn hoveredColumn;
@@ -48,6 +49,7 @@ public class ResponsePanel : MonoBehaviour
 	public void SetValidated()
 	{
 		IsValidated = true;
+		validateButton.gameObject.SetActive(false);
 		ResponseValidated?.Invoke();
 	}
 
@@ -67,12 +69,17 @@ public class ResponsePanel : MonoBehaviour
 		}
 	}
 
+	public IEnumerable<ResponseColumn> GetCorrectColumns(int[] correctIndices)
+	{
+		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
+	}
+
 	public void CheckIfCanValidate()
 	{
 		bool allCoinsUsed = true;
 		bool allSymbolsChosen = columns.All(c => c.SymbolIndex != null);
 
-		canValidate = allCoinsUsed && allSymbolsChosen;
+		bool canValidate = allCoinsUsed && allSymbolsChosen;
 
 		validateButton.gameObject.SetActive(canValidate);
 	}
@@ -97,6 +104,10 @@ public class ResponsePanel : MonoBehaviour
 
 	private void Cleanup()
 	{
+		IsValidated = false;
+
+		hoveredColumn = null;
+
 		validateButton.gameObject.SetActive(false);
 
 		foreach (var column in transform.GetComponentsInChildren<ResponseColumn>())
