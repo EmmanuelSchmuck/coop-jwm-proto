@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class ResponseColumn : MonoBehaviour
+public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	public int? SymbolIndex { get; private set; }
 	private List<Sprite> cardShapes;
@@ -13,6 +14,7 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
+	private CoinZone coinZone;
 	private List<GameObject> coins;
 	public int CoinCount { get; private set; }
 
@@ -23,18 +25,30 @@ public class ResponseColumn : MonoBehaviour
 		checkImage.enabled = false;
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
+		coinZone = GetComponentInChildren<CoinZone>();
+		coinZone.Initialize(this);
 
 		Cleanup();
 
 		coins = new List<GameObject>(); // in cleanup ?
 	}
 
-	public void OnMousePointerEnter()
+	public void OnPointerClick2()
+	{
+
+	}
+
+	public void OnPointerClick(BaseEventData eventData = null)
+	{
+
+	}
+
+	public void OnPointerEnter(PointerEventData eventData)
 	{
 		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseEnter(this);
 	}
 
-	public void OnMousePointerLeave()
+	public void OnPointerExit(PointerEventData eventData)
 	{
 		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseLeave(this);
 	}
