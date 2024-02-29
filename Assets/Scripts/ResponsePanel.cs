@@ -64,6 +64,11 @@ public class ResponsePanel : MonoBehaviour
 		validateButton.gameObject.SetActive(canValidate);
 	}
 
+	public void AddCoinsInColumn(int amount, int columnIndex)
+	{
+		columns[columnIndex].AddCoin(amount);
+	}
+
 	public void SetSymbolInColumn(int symbolIndex, int columnIndex)
 	{
 		columns[columnIndex].SetSymbol(symbolIndex);

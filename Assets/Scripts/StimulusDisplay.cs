@@ -23,9 +23,9 @@ public class StimulusDisplay : MonoBehaviour
 
 	}
 
-	public void DoDisplayAnimation()
+	public void DoDisplayAnimation(float displayDurationPerSymbol)
 	{
-		StartCoroutine(DisplayAnimation());
+		StartCoroutine(DisplayAnimation(displayDurationPerSymbol));
 	}
 
 	public void ShowStimulus()
@@ -36,15 +36,15 @@ public class StimulusDisplay : MonoBehaviour
 		}
 	}
 
-	private IEnumerator DisplayAnimation()
+	private IEnumerator DisplayAnimation(float displayDurationPerSymbol)
 	{
-		yield return new WaitForSeconds(1f);
+		//yield return new WaitForSeconds(1f);
 
 		foreach(var card in cards)
 		{
 			card.SetVisible(true);
 
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSeconds(displayDurationPerSymbol);
 
 			card.SetVisible(false);
 		}

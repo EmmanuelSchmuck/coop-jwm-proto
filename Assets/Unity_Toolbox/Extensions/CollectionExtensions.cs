@@ -7,6 +7,40 @@ namespace Toolbox
 {
     public static class CollectionExtensions
     {
+        public static IEnumerable<int> OldIndicesIfSorted<T>(this IEnumerable<T> source) where T : System.IComparable<T>
+        {
+            return source
+                .Select((item, index) => new { item, index })
+                .OrderBy(a => a.item)
+                .Select(a => a.index);
+        }
+
+        public static IEnumerable<int> NewIndicesIfSorted<T>(this IEnumerable<T> source) where T : System.IComparable<T>
+        {
+            return source
+                .OldIndicesIfSorted()
+                .Select((oldIndex, index) => new { oldIndex, index })
+                .OrderBy(a => a.oldIndex)
+                .Select(a => a.index);
+        }
+
+        public static IEnumerable<int> OldIndicesIfSortedDescending<T>(this IEnumerable<T> source) where T : System.IComparable<T>
+        {
+            return source
+                .Select((item, index) => new { item, index })
+                .OrderBy(a => a.item)
+                .Select(a => a.index);
+        }
+
+        public static IEnumerable<int> NewIndicesIfSortedDescending<T>(this IEnumerable<T> source) where T : System.IComparable<T>
+        {
+            return source
+                .OldIndicesIfSortedDescending()
+                .Select((oldIndex, index) => new { oldIndex, index })
+                .OrderByDescending(a => a.oldIndex)
+                .Select(a => a.index);
+        }
+
         public static T Random<T>(this IEnumerable<T> source, System.Random rng = null)
         {
             rng ??= new System.Random();
