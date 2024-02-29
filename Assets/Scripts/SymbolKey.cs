@@ -15,6 +15,11 @@ public class SymbolKey : MonoBehaviour
 		this.SymbolIndex = symbolIndex;
 	}
 
+	public void SetInteractable(bool interactable)
+	{
+		button.interactable = interactable;
+	}
+
 	public void OnButtonClick()
 	{
 		Clicked?.Invoke(this);

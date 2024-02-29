@@ -26,6 +26,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private CoinCounter playerB_CoinCounter;
     [SerializeField] private TMPro.TextMeshProUGUI playerA_ScoreText;
     [SerializeField] private TMPro.TextMeshProUGUI playerB_ScoreText;
+
+    private bool roundStarted;
     
     private int[] correctIndexSequence;
 
@@ -42,16 +44,33 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_ResponsePanel.ResponseValidated += CheckForRoundEnd;
         playerB_ResponsePanel.ResponseValidated += CheckForRoundEnd;
 
-        StartCoroutine(StartRound());
+        StartCoroutine(StartRound(isFirstRound: true));
     }
 
-    private IEnumerator StartRound()
+    private void SetBoardInteractable(bool interactable)
+	{
+        playerA_Keyboard.Interactable = interactable;
+        playerB_Keyboard.Interactable = interactable;
+
+        playerA_ResponsePanel.SetInteractable(interactable);
+        playerB_ResponsePanel.SetInteractable(interactable);
+
+    }
+
+    private IEnumerator StartRound(bool isFirstRound = false)
     {
+        playerA_Keyboard.ResetSelection();
+        playerB_Keyboard.ResetSelection();
+
         playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
         playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
 
         playerA_CoinCounter.SetCoin(coinPerRound);
         playerB_CoinCounter.SetCoin(coinPerRound);
+
+        SetBoardInteractable(false);
+
+
 
         List<Sprite> shapeSequence = new List<Sprite>();
         correctIndexSequence = new int[sequenceLength];
@@ -77,6 +96,15 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Initialize(shapeSequence);
 
+        if(isFirstRound)
+		{
+            roundStarted = false;
+
+            playerA_ResponsePanel.SetStartRoundButtonVisible(true);
+
+            yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
+        }
+
         yield return new WaitForSeconds(roundStartDelay);
 
         stimulusDisplay.DoDisplayAnimation(displayDurationPerSymbol);
@@ -96,6 +124,10 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat);
 
         yield return new WaitForSeconds(sequenceLength * displayDurationPerSymbol);
+
+        // end of stimulus display
+
+        SetBoardInteractable(true);
 
         playerB_ResponsePanel.SetSymbols(playerB_indices);
 
@@ -124,6 +156,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     private IEnumerator EndRound()
 	{
         Debug.Log("Round ended, showing correct / incorrect feedback");
+
+        SetBoardInteractable(false);
+
         playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
         playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
 
@@ -140,13 +175,19 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         foreach (var column in playerB_ResponsePanel.GetCorrectColumns(correctIndexSequence))
         {
-            playerB_score += 1 + column.CoinCount * scoreMultiplier;
+            playerB_score += (1 + column.CoinCount) * scoreMultiplier;
         }
 
         SetPlayerAScore(playerA_score);
         SetPlayerBScore(playerB_score);
 
         yield return new WaitForSeconds(2f);
+
+        roundStarted = false;
+
+        playerA_ResponsePanel.SetStartRoundButtonVisible(true);
+
+        yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
 
         StartCoroutine(StartRound());
     }
@@ -161,7 +202,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerB_ScoreText.text = $"Score: {value}";
     }
 
-    private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: also compute coinSequenceFloat here
+    private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: refactor + fix, also compute coinSequenceFloat here
     {
 
         float normalizationFactor = coinPerRound / coinSequenceFloat.Sum();
@@ -184,7 +225,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
 
 
-        int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray();
+        int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
 
         s = "";
         foreach (var f in sortedFloatIndices)
@@ -230,6 +271,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.AddCoin();
 
+        playerA_ResponsePanel.CheckIfCanValidate(coinPerRound); // could just check if coin counter == 0
+
     }
 
     public void WIP_OnResponseColumnRemoveCoinClicked(ResponseColumn column)
@@ -251,7 +294,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.SetSymbol((int)selectedSymbolIndex);
 
-        playerA_ResponsePanel.CheckIfCanValidate();
+        playerA_ResponsePanel.CheckIfCanValidate(coinPerRound);
 
         // playerA_Keyboard.ResetSelection();
 
@@ -265,5 +308,12 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     public void WIP_OnResponseColumnCoinZoneMouseLeave(ResponseColumn column)
     {
         playerA_ResponsePanel.OnColumnHoverLeave(column);
+    }
+
+    public void WIP_OnStartRoundButtonClick()
+    {
+        playerA_ResponsePanel.SetStartRoundButtonVisible(false);
+
+        roundStarted = true;
     }
 }

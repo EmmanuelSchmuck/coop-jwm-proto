@@ -7,6 +7,9 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 {
     private ResponseColumn parent;
 
+    public bool Interactable { get; set; }
+
+
     public void Initialize(ResponseColumn parent)
 	{
         this.parent = parent;
@@ -14,6 +17,8 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
     
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!Interactable) return;
+
         if (eventData.button == PointerEventData.InputButton.Left)
             JWMGameController.Instance.WIP_OnResponseColumnAddCoinClicked(parent);
         else if (eventData.button == PointerEventData.InputButton.Right)
@@ -22,11 +27,15 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!Interactable) return;
+
         JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseEnter(parent);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        //if (!Interactable) return;
+
         JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseLeave(parent);
     }
 }

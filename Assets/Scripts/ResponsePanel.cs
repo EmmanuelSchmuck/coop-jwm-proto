@@ -8,6 +8,7 @@ public class ResponsePanel : MonoBehaviour
 {
     [SerializeField] private ResponseColumn columnPrefab;
 	[SerializeField] private Button validateButton;
+	[SerializeField] private Button startRoundButton;
 
 	public bool IsValidated { get; private set; }
 
@@ -39,6 +40,24 @@ public class ResponsePanel : MonoBehaviour
 	public void OnColumnHoverLeave(ResponseColumn column)
 	{
 		column.SetCoinButtonsVisible(false);
+	}
+
+	public void SetStartRoundButtonVisible(bool visible)
+	{
+		startRoundButton.gameObject.SetActive(visible);
+	}
+
+	public void SetInteractable(bool interactable) // only affect columns, not other buttons
+	{
+		foreach(var column in columns)
+		{
+			column.Interactable = interactable;
+		}
+	}
+
+	public void OnStartRoundButtonClick()
+	{
+		JWMGameController.Instance.WIP_OnStartRoundButtonClick();
 	}
 
 	public void OnValidateButtonClick()
@@ -74,10 +93,12 @@ public class ResponsePanel : MonoBehaviour
 		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
 	}
 
-	public void CheckIfCanValidate()
+	public void CheckIfCanValidate(int coinsPerRound)
 	{
-		bool allCoinsUsed = true;
+		bool allCoinsUsed = columns.Select(c => c.CoinCount).Sum() == coinsPerRound;
 		bool allSymbolsChosen = columns.All(c => c.SymbolIndex != null);
+
+		Debug.Log($"coin sum = {columns.Select(c => c.CoinCount).Sum()}, total coin per round = {coinsPerRound}");
 
 		bool canValidate = allCoinsUsed && allSymbolsChosen;
 

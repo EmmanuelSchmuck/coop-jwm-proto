@@ -6,6 +6,20 @@ using UnityEngine.UI;
 public class SymbolKeyboard : MonoBehaviour
 {
     public int? SelectedSymbolIndex { get; private set; }
+    public bool Interactable
+    {
+        get => interactable;
+        set
+        {
+            interactable = value;
+            foreach (var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
+            {
+                symbolKey.SetInteractable(interactable);
+            }
+        }
+    }
+
+    private bool interactable;
 
     private SymbolKey selectedKey; // used ?
     public void Initialize(List<Sprite> cardShapes)
@@ -25,6 +39,7 @@ public class SymbolKeyboard : MonoBehaviour
 
     private void OnKeyClicked(SymbolKey key)
 	{
+        if (!Interactable) return;
         selectedKey = key;
         SelectedSymbolIndex = key.SymbolIndex;
     }

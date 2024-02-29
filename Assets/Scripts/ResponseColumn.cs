@@ -18,6 +18,15 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	public int CoinCount { get; private set; }
+	public bool Interactable {
+		get => interactable;
+		set
+		{
+			interactable = value;
+			coinZone.Interactable = value;
+		}
+	}
+	private bool interactable;
 
 	public void Initialize(List<Sprite> cardShapes)
 	{
@@ -32,26 +41,6 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		coins = new List<GameObject>();
 
 		Cleanup();
-	}
-
-	public void OnPointerClick2()
-	{
-
-	}
-
-	public void OnPointerClick(BaseEventData eventData = null)
-	{
-
-	}
-
-	public void OnPointerEnter(PointerEventData eventData)
-	{
-		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseEnter(this);
-	}
-
-	public void OnPointerExit(PointerEventData eventData)
-	{
-		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseLeave(this);
 	}
 
 	public void SetCoinButtonsVisible(bool visible)
@@ -96,11 +85,15 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 	public void OnAddCoinButtonClick()
 	{
+		if (!Interactable) return;
+
 		JWMGameController.Instance.WIP_OnResponseColumnAddCoinClicked(this);
 	}
 
 	public void OnRemoveCoinButtonClick()
 	{
+		if (!Interactable) return;
+
 		JWMGameController.Instance.WIP_OnResponseColumnRemoveCoinClicked(this);
 	}
 
@@ -130,6 +123,8 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 	public void OnSymbolButtonClick()
 	{
+		if (!Interactable) return;
+
 		// if symbolkeyboard has non-null selectedSymbolIndex, set this column symbolIndex and update the symbol icon
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)
 
