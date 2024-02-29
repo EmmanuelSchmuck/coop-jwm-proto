@@ -12,6 +12,7 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private Image coverImage;
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
+	[SerializeField] private Transform coinButtons;
 	private List<GameObject> coins;
 	public int CoinCount { get; private set; }
 
@@ -21,10 +22,26 @@ public class ResponseColumn : MonoBehaviour
 		this.cardShapes = cardShapes;
 		checkImage.enabled = false;
 		SetCoverVisible(false);
+		SetCoinButtonsVisible(false);
 
 		Cleanup();
 
 		coins = new List<GameObject>(); // in cleanup ?
+	}
+
+	public void OnMousePointerEnter()
+	{
+		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseEnter(this);
+	}
+
+	public void OnMousePointerLeave()
+	{
+		JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseLeave(this);
+	}
+
+	public void SetCoinButtonsVisible(bool visible)
+	{
+		coinButtons.gameObject.SetActive(visible);
 	}
 
 	public void AddCoin(int amount = 1)

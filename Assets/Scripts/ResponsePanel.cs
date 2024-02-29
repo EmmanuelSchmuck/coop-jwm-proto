@@ -12,6 +12,7 @@ public class ResponsePanel : MonoBehaviour
 	private bool canValidate;
 	private List<ResponseColumn> columns;
 	public event System.Action ResponseValidated;
+	private ResponseColumn hoveredColumn;
     
     public void Initialize(int sequenceLength, List<Sprite> cardShapes)
 	{
@@ -25,6 +26,18 @@ public class ResponsePanel : MonoBehaviour
 			columns.Add(column);
 			column.Initialize(cardShapes);
 		}
+	}
+
+	public void OnColumnHoverEnter(ResponseColumn column)
+	{
+		hoveredColumn?.SetCoinButtonsVisible(false);
+		hoveredColumn = column;
+		hoveredColumn.SetCoinButtonsVisible(true);
+	}
+
+	public void OnColumnHoverLeave(ResponseColumn column)
+	{
+		column.SetCoinButtonsVisible(false);
 	}
 
 	public void OnValidateButtonClick()
