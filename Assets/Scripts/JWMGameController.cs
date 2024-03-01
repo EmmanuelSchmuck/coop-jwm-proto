@@ -7,11 +7,7 @@ using System.Linq;
 public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
-    [SerializeField] private int sequenceLength = 6;
-    [SerializeField] private float displayDurationPerSymbol = 1f;
-    [SerializeField] private bool allowSymbolRepetition = false;
-    [SerializeField] private int coinPerRound = 10;
-    [SerializeField] private int maxCoinPerSymbol = 3;
+    [SerializeField] private JWMGameConfig debugConfig;
     [SerializeField] private List<Sprite> cardShapePool;
     [SerializeField] private AnimationCurve recallCurve;
     [SerializeField] private float roundStartDelay;
@@ -33,8 +29,14 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private int playerA_score, playerB_score;
 
+    private const string parentSceneName = "Config";
+
+    private JWMGameConfig gameConfig;
+
     private void Start()
     {
+        gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
+
         playerA_Keyboard.Initialize(cardShapePool);
         playerB_Keyboard.Initialize(cardShapePool);
 
@@ -47,7 +49,15 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         StartCoroutine(StartRound(isFirstRound: true));
     }
 
-    private void SetBoardInteractable(bool interactable)
+	private void Update()
+	{
+		if(Input.GetKeyDown(KeyCode.Escape))
+		{
+            UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
+		}
+	}
+
+	private void SetBoardInteractable(bool interactable)
 	{
         playerA_Keyboard.Interactable = interactable;
         playerB_Keyboard.Interactable = interactable;
@@ -62,22 +72,22 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_Keyboard.ResetSelection();
         playerB_Keyboard.ResetSelection();
 
-        playerA_ResponsePanel.Initialize(sequenceLength, cardShapePool);
-        playerB_ResponsePanel.Initialize(sequenceLength, cardShapePool);
+        playerA_ResponsePanel.Initialize(gameConfig.sequenceLength, cardShapePool);
+        playerB_ResponsePanel.Initialize(gameConfig.sequenceLength, cardShapePool);
 
-        playerA_CoinCounter.SetCoin(coinPerRound);
-        playerB_CoinCounter.SetCoin(coinPerRound);
+        playerA_CoinCounter.SetCoin(gameConfig.coinPerRound);
+        playerB_CoinCounter.SetCoin(gameConfig.coinPerRound);
 
         SetBoardInteractable(false);
 
 
 
         List<Sprite> shapeSequence = new List<Sprite>();
-        correctIndexSequence = new int[sequenceLength];
+        correctIndexSequence = new int[gameConfig.sequenceLength];
 
         Sprite lastShape = null;
 
-        for (int i = 0; i < sequenceLength; i++)
+        for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
             Sprite shape;
 
@@ -85,7 +95,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             {
                 shape = cardShapePool.Random();
             }
-            while (!allowSymbolRepetition && lastShape == shape);
+            while (!gameConfig.allowSymbolRepetition && lastShape == shape);
 
             shapeSequence.Add(shape);
 
@@ -107,23 +117,23 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return new WaitForSeconds(roundStartDelay);
 
-        stimulusDisplay.DoDisplayAnimation(displayDurationPerSymbol);
+        stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
 
-        int[] playerB_indices = new int[sequenceLength];
-        float[] playerB_coinAmountSequenceFloat = new float[sequenceLength];
+        int[] playerB_indices = new int[gameConfig.sequenceLength];
+        float[] playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
 
-        for (int i = 0; i < sequenceLength; i++)
+        for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
-            float correctProbability = Mathf.Clamp01(recallCurve.Evaluate((float)i / Mathf.Max(1, sequenceLength - 1)));
+            float correctProbability = Mathf.Clamp01(recallCurve.Evaluate((float)i / Mathf.Max(1, gameConfig.sequenceLength - 1)));
 
             playerB_indices[i] = Random.value < correctProbability ? correctIndexSequence[i] : Random.Range(0, 9);
 
-            playerB_coinAmountSequenceFloat[i] = correctProbability * coinPerRound / sequenceLength;
+            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.coinPerRound / gameConfig.sequenceLength;
         }
 
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat);
 
-        yield return new WaitForSeconds(sequenceLength * displayDurationPerSymbol);
+        yield return new WaitForSeconds(gameConfig.sequenceLength * gameConfig.displayDurationPerSymbol);
 
         // end of stimulus display
 
@@ -133,7 +143,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return new WaitForSeconds(1f);
 
-        for (int i = 0; i < sequenceLength; i++)
+        for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
             int coinAmount = playerB_coinAmountSequence[i];
             playerB_ResponsePanel.AddCoinsInColumn(coinAmount, i);
@@ -205,9 +215,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: refactor + fix, also compute coinSequenceFloat here
     {
 
-        float normalizationFactor = coinPerRound / coinSequenceFloat.Sum();
+        float normalizationFactor = gameConfig.coinPerRound / coinSequenceFloat.Sum();
 
-        coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(maxCoinPerSymbol, x * normalizationFactor)).ToArray();
+        coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(gameConfig.maxCoinPerSymbol, x * normalizationFactor)).ToArray();
 
         string s = "";
         foreach (var f in coinSequenceFloat)
@@ -216,8 +226,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         }
         Debug.Log($"float sequence = {s}, sum = {coinSequenceFloat.Sum()}");
 
-        int[] coinSequenceInt = new int[sequenceLength];
-        int remainingCoins = coinPerRound;
+        int[] coinSequenceInt = new int[gameConfig.sequenceLength];
+        int remainingCoins = gameConfig.coinPerRound;
 
         float avgFloat = coinSequenceFloat.Average();
 
@@ -243,7 +253,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             Debug.Log($"remaining coins = {remainingCoins}");
 
-            for (int i = 0; i < sequenceLength; i++)
+            for (int i = 0; i < gameConfig.sequenceLength; i++)
             {
                 //int floatIndex = sortedFloatIndices[i];
                 float floatValue = coinSequenceFloat[i];
@@ -251,7 +261,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
                 //Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}");
 
                 int amount = Mathf.Min(remainingCoins, floatValue > avgFloat ? Mathf.FloorToInt(floatValue) : Mathf.FloorToInt(floatValue));
-                amount = Mathf.Min(maxCoinPerSymbol - coinSequenceInt[i], amount);
+                amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[i], amount);
                 amount = Mathf.Max(0, amount);
                 coinSequenceInt[i] += amount;
                 remainingCoins -= amount;
@@ -264,17 +274,22 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         for(int i = 0; i < remainingCoins; i++)
 		{
             bool success = false;
+            int attempts = 0;
+            int maxAttempts = 100;
 
-            while(! success)
+            while(! success && attempts < maxAttempts)
 			{
+                attempts++;
                 int index = Random.Range(0, coinSequenceInt.Length);
-                if(coinSequenceInt[index] < maxCoinPerSymbol)
+                if(coinSequenceInt[index] < gameConfig.maxCoinPerSymbol)
 				{
                     success = true;
                     coinSequenceInt[index]++;
 
                 }
 			}
+
+            if (attempts == maxAttempts) Debug.LogError("Cannot place coins!");
 
         }
 
@@ -284,7 +299,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
     {
-        if (column.CoinCount >= maxCoinPerSymbol) return;
+        if (column.CoinCount >= gameConfig.maxCoinPerSymbol) return;
 
         if (playerA_CoinCounter.CoinCount <= 0) return;
 
@@ -292,7 +307,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.AddCoin();
 
-        playerA_ResponsePanel.CheckIfCanValidate(coinPerRound); // could just check if coin counter == 0
+        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.maxCoinPerSymbol);
 
     }
 
@@ -315,7 +330,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.SetSymbol((int)selectedSymbolIndex);
 
-        playerA_ResponsePanel.CheckIfCanValidate(coinPerRound);
+        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.coinPerRound);
 
         // playerA_Keyboard.ResetSelection();
 

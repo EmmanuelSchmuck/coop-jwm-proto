@@ -93,14 +93,12 @@ public class ResponsePanel : MonoBehaviour
 		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
 	}
 
-	public void CheckIfCanValidate(int coinsPerRound)
+	public void CheckIfCanValidate(int maxCoinsPerColumn)
 	{
-		bool allCoinsUsed = columns.Select(c => c.CoinCount).Sum() == coinsPerRound;
+		bool allColumnsFullOfCoins = columns.All(c => c.CoinCount == maxCoinsPerColumn);
 		bool allSymbolsChosen = columns.All(c => c.SymbolIndex != null);
 
-		Debug.Log($"coin sum = {columns.Select(c => c.CoinCount).Sum()}, total coin per round = {coinsPerRound}");
-
-		bool canValidate = allCoinsUsed && allSymbolsChosen;
+		bool canValidate = allColumnsFullOfCoins && allSymbolsChosen;
 
 		validateButton.gameObject.SetActive(canValidate);
 	}
