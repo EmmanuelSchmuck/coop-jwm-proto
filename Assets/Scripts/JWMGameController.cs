@@ -307,7 +307,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         column.AddCoin();
 
-        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.maxCoinPerSymbol);
+        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.coinPerRound);
 
     }
 

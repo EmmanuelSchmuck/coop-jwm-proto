@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class ConfigPanel : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class ConfigPanel : MonoBehaviour
     [SerializeField] private TMPro.TMP_InputField coinPerRoundInputField;
     [SerializeField] private TMPro.TMP_InputField maxCoinPerCardInputField;
     [SerializeField] private Toggle allowSymbolRepetitionToggle;
+    [SerializeField] private TMPro.TMP_Dropdown rewardDependancyDropdown;
     public JWMGameConfig config;
     // Start is called before the first frame update
     void Start()
@@ -29,7 +31,9 @@ public class ConfigPanel : MonoBehaviour
         allowSymbolRepetitionToggle.isOn = config.allowSymbolRepetition;
         allowSymbolRepetitionToggle.onValueChanged.AddListener(delegate { OnAllowSymbolRepetitionValueChanged(); });
 
+        rewardDependancyDropdown.options = new List<TMPro.TMP_Dropdown.OptionData>() { };
 
+        rewardDependancyDropdown.AddOptions(EnumUtils.GetValues<GameMode>().Select(x => x.ToString()).ToList());
     }
 
     private void OnAllowSymbolRepetitionValueChanged()

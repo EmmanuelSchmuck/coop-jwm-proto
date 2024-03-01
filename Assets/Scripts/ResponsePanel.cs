@@ -93,9 +93,9 @@ public class ResponsePanel : MonoBehaviour
 		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
 	}
 
-	public void CheckIfCanValidate(int maxCoinsPerColumn)
+	public void CheckIfCanValidate(int coinPerRound)
 	{
-		bool allColumnsFullOfCoins = columns.All(c => c.CoinCount == maxCoinsPerColumn);
+		bool allColumnsFullOfCoins = columns.Select(c => c.CoinCount).Sum() == coinPerRound;
 		bool allSymbolsChosen = columns.All(c => c.SymbolIndex != null);
 
 		bool canValidate = allColumnsFullOfCoins && allSymbolsChosen;
