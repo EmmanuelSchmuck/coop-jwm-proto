@@ -4306,10 +4306,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a62c2b67a0d45534abfbde329b5ad553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sequenceLength: 6
+  sequenceLength: 5
   displayDurationPerSymbol: 1
   allowSymbolRepetition: 0
-  coinPerRound: 12
+  coinPerRound: 10
   maxCoinPerSymbol: 3
   cardShapePool:
   - {fileID: 21300000, guid: 25e22b31f23d04b49bef1682fd42f643, type: 3}
@@ -4327,26 +4327,53 @@ MonoBehaviour:
     - serializedVersion: 3
       time: -0.0067481995
       value: 1.0023499
-      inSlope: -1.1527697
-      outSlope: -1.1527697
+      inSlope: -0.011901735
+      outSlope: -0.011901735
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.49204892
-      value: 0.42735165
-      inSlope: -0.012700319
-      outSlope: -0.012700319
-      tangentMode: 34
+      time: 0.1991433
+      value: 0.9998994
+      inSlope: 0.01037508
+      outSlope: 0.01037508
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.20179762
+    - serializedVersion: 3
+      time: 0.33707178
+      value: 0.21024954
+      inSlope: -0.00012480358
+      outSlope: -0.00012480358
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.117964864
+    - serializedVersion: 3
+      time: 0.6232507
+      value: 0.20816016
+      inSlope: -0.099848
+      outSlope: -0.099848
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.23057206
+    - serializedVersion: 3
+      time: 0.7997508
+      value: 1.0002319
+      inSlope: -0.039851304
+      outSlope: -0.039851304
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 1
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1.127369
-      outSlope: 1.127369
+      inSlope: -0.0011578677
+      outSlope: -0.0011578677
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334

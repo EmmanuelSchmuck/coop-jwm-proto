@@ -219,20 +219,22 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         int[] coinSequenceInt = new int[sequenceLength];
         int remainingCoins = coinPerRound;
 
+        float avgFloat = coinSequenceFloat.Average();
+
         // var sortedFloats = coinSequenceFloat.OrderByDescending(x => x).ToList();
 
         // indices of elements in coinSequenceFloat, sorted by descending value
         // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
 
 
-        int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
+        //int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
 
-        s = "";
-        foreach (var f in sortedFloatIndices)
-        {
-            s += f + " - ";
-        }
-        Debug.Log("sorted float indices = " + s);
+        //s = "";
+        //foreach (var f in sortedFloatIndices)
+        //{
+        //    s += f + " - ";
+        //}
+        //Debug.Log("sorted float indices = " + s);
 
         do
         {
@@ -243,19 +245,38 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             for (int i = 0; i < sequenceLength; i++)
             {
-                int floatIndex = sortedFloatIndices[i];
-                float floatValue = coinSequenceFloat[floatIndex];
+                //int floatIndex = sortedFloatIndices[i];
+                float floatValue = coinSequenceFloat[i];
 
-                Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}");
+                //Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}");
 
-                int amount = Mathf.Min(remainingCoins, Mathf.CeilToInt(floatValue));
-                coinSequenceInt[floatIndex] += amount;
+                int amount = Mathf.Min(remainingCoins, floatValue > avgFloat ? Mathf.FloorToInt(floatValue) : Mathf.FloorToInt(floatValue));
+                amount = Mathf.Min(maxCoinPerSymbol - coinSequenceInt[i], amount);
+                amount = Mathf.Max(0, amount);
+                coinSequenceInt[i] += amount;
                 remainingCoins -= amount;
                 if (remainingCoins == 0) break;
 
             }
 
-        } while (remainingCoins > 0);
+        } while (false); // remainingCoins > 0);
+
+        for(int i = 0; i < remainingCoins; i++)
+		{
+            bool success = false;
+
+            while(! success)
+			{
+                int index = Random.Range(0, coinSequenceInt.Length);
+                if(coinSequenceInt[index] < maxCoinPerSymbol)
+				{
+                    success = true;
+                    coinSequenceInt[index]++;
+
+                }
+			}
+
+        }
 
         return coinSequenceInt;
     }
