@@ -20,22 +20,21 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
         if (!Interactable) return;
 
         if (eventData.button == PointerEventData.InputButton.Left)
-            JWMGameController.Instance.WIP_OnResponseColumnAddCoinClicked(parent);
+            parent.OnAddCoinButtonClick();
+
         else if (eventData.button == PointerEventData.InputButton.Right)
-            JWMGameController.Instance.WIP_OnResponseColumnRemoveCoinClicked(parent);
+            parent.OnRemoveCoinButtonClick();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!Interactable) return;
 
-        JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseEnter(parent);
+        parent.OnCoinZoneHoverEnter();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        //if (!Interactable) return;
-
-        JWMGameController.Instance.WIP_OnResponseColumnCoinZoneMouseLeave(parent);
+        parent.OnCoinZoneHoverLeave();
     }
 }

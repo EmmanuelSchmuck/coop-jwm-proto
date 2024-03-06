@@ -13,21 +13,50 @@ public class ResponsePanel : MonoBehaviour
 	public bool IsValidated { get; private set; }
 
 	private List<ResponseColumn> columns;
-	public event System.Action ResponseValidated;
+	
 	private ResponseColumn hoveredColumn;
+	private PlayerBoard board;
     
-    public void Initialize(int sequenceLength, List<Sprite> cardShapes)
+    public void Initialize(int sequenceLength, List<Sprite> cardShapes, PlayerBoard board)
 	{
 		Cleanup();
 
 		columns = new List<ResponseColumn>();
 
+		this.board = board;
+
 		for (int i = 0; i < sequenceLength; i++)
 		{
 			ResponseColumn column = Instantiate(columnPrefab, this.transform);
 			columns.Add(column);
-			column.Initialize(cardShapes);
+			column.Initialize(cardShapes, this);
 		}
+	}
+
+	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
+	{
+		// assume this is from player A
+
+		int? selectedSymbolIndex = board.SelectedSymbolIndex;
+
+		if (selectedSymbolIndex == null) return;
+
+		column.SetSymbol((int)selectedSymbolIndex);
+
+		CheckIfCanValidate(board.GameConfig.coinPerRound);
+
+		// playerA_Keyboard.ResetSelection();
+
+	}
+
+	public void OnResponseColumnAddCoin(ResponseColumn column)
+	{
+		board.WIP_OnResponseColumnAddCoinClicked(column);
+	}
+
+	public void OnResponseColumnRemoveCoin(ResponseColumn column)
+	{
+		board.WIP_OnResponseColumnRemoveCoinClicked(column);
 	}
 
 	public void OnColumnHoverEnter(ResponseColumn column)
@@ -57,7 +86,7 @@ public class ResponsePanel : MonoBehaviour
 
 	public void OnStartRoundButtonClick()
 	{
-		JWMGameController.Instance.WIP_OnStartRoundButtonClick();
+		board.WIP_OnStartRoundButtonClick();
 	}
 
 	public void OnValidateButtonClick()
@@ -69,7 +98,7 @@ public class ResponsePanel : MonoBehaviour
 	{
 		IsValidated = true;
 		validateButton.gameObject.SetActive(false);
-		ResponseValidated?.Invoke();
+		board.OnResponseValidated();
 	}
 
 	public void SetCoversVisible(bool visible)

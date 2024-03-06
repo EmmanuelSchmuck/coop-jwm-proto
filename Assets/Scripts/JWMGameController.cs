@@ -13,21 +13,13 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private float roundStartDelay;
     [SerializeField] private int scoreMultiplier;
     [Header("References")]
+    [SerializeField] private PlayerBoard playerA_Board;
+    [SerializeField] private PlayerBoard playerB_Board;
     [SerializeField] private StimulusDisplay stimulusDisplay;
-    [SerializeField] private SymbolKeyboard playerA_Keyboard;
-    [SerializeField] private SymbolKeyboard playerB_Keyboard;
-    [SerializeField] private ResponsePanel playerA_ResponsePanel;
-    [SerializeField] private ResponsePanel playerB_ResponsePanel;
-    [SerializeField] private CoinCounter playerA_CoinCounter;
-    [SerializeField] private CoinCounter playerB_CoinCounter;
-    [SerializeField] private TMPro.TextMeshProUGUI playerA_ScoreText;
-    [SerializeField] private TMPro.TextMeshProUGUI playerB_ScoreText;
 
     private bool roundStarted;
     
     private int[] correctIndexSequence;
-
-    private int playerA_score, playerB_score;
 
     private const string parentSceneName = "Config";
 
@@ -37,14 +29,11 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     {
         gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
 
-        playerA_Keyboard.Initialize(cardShapePool);
-        playerB_Keyboard.Initialize(cardShapePool);
+        playerA_Board.Initialize(cardShapePool);
+        playerB_Board.Initialize(cardShapePool);
 
-        SetPlayerAScore(0);
-        SetPlayerBScore(0);
-
-        playerA_ResponsePanel.ResponseValidated += CheckForRoundEnd;
-        playerB_ResponsePanel.ResponseValidated += CheckForRoundEnd;
+        playerA_Board.ResponseValidated += CheckForRoundEnd;
+        playerB_Board.ResponseValidated += CheckForRoundEnd;
 
         StartCoroutine(StartRound(isFirstRound: true));
     }
@@ -59,28 +48,16 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
 	private void SetBoardInteractable(bool interactable)
 	{
-        playerA_Keyboard.Interactable = interactable;
-        playerB_Keyboard.Interactable = interactable;
-
-        playerA_ResponsePanel.SetInteractable(interactable);
-        playerB_ResponsePanel.SetInteractable(interactable);
-
+        playerA_Board.SetInteractable(interactable);
+        playerB_Board.SetInteractable(interactable);
     }
 
     private IEnumerator StartRound(bool isFirstRound = false)
     {
-        playerA_Keyboard.ResetSelection();
-        playerB_Keyboard.ResetSelection();
-
-        playerA_ResponsePanel.Initialize(gameConfig.sequenceLength, cardShapePool);
-        playerB_ResponsePanel.Initialize(gameConfig.sequenceLength, cardShapePool);
-
-        playerA_CoinCounter.SetCoin(gameConfig.coinPerRound);
-        playerB_CoinCounter.SetCoin(gameConfig.coinPerRound);
+        playerA_Board.OnRoundStart(cardShapePool, gameConfig, isFirstRound);
+        playerB_Board.OnRoundStart(cardShapePool, gameConfig, isFirstRound);
 
         SetBoardInteractable(false);
-
-
 
         List<Sprite> shapeSequence = new List<Sprite>();
         correctIndexSequence = new int[gameConfig.sequenceLength];
@@ -110,8 +87,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 		{
             roundStarted = false;
 
-            playerA_ResponsePanel.SetStartRoundButtonVisible(true);
-
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
 
@@ -139,23 +114,23 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         SetBoardInteractable(true);
 
-        playerB_ResponsePanel.SetSymbols(playerB_indices);
+        playerB_Board.ResponsePanel.SetSymbols(playerB_indices);
 
         yield return new WaitForSeconds(1f);
 
         for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
             int coinAmount = playerB_coinAmountSequence[i];
-            playerB_ResponsePanel.AddCoinsInColumn(coinAmount, i);
-            playerB_CoinCounter.RemoveCoin(coinAmount);
+            playerB_Board.ResponsePanel.AddCoinsInColumn(coinAmount, i);
+            playerB_Board.CoinCounter.RemoveCoin(coinAmount);
         }
         // playerB_ResponsePanel.SetCoversVisible(true);
-        playerB_ResponsePanel.SetValidated();
+        playerB_Board.ResponsePanel.SetValidated();
     }
 
     private void CheckForRoundEnd()
     {
-        bool bothPlayersHaveValidated = playerA_ResponsePanel.IsValidated && playerB_ResponsePanel.IsValidated;
+        bool bothPlayersHaveValidated = playerA_Board.ResponsePanel.IsValidated && playerB_Board.ResponsePanel.IsValidated;
 
         if (bothPlayersHaveValidated)
         {
@@ -163,53 +138,31 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         }
     }
 
-    private IEnumerator EndRound()
-	{
+    private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd
+    {
         Debug.Log("Round ended, showing correct / incorrect feedback");
 
         SetBoardInteractable(false);
 
-        playerA_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
-        playerB_ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+        playerA_Board.ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
+        playerB_Board.ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
 
         stimulusDisplay.ShowStimulus();
 
         yield return new WaitForSeconds(1f);
 
-        //int playerA_score = 0, playerB_score = 0;
-
-        foreach (var column in playerA_ResponsePanel.GetCorrectColumns(correctIndexSequence))
-        {
-            playerA_score += (1 + column.CoinCount) * scoreMultiplier;
-        }
-
-        foreach (var column in playerB_ResponsePanel.GetCorrectColumns(correctIndexSequence))
-        {
-            playerB_score += (1 + column.CoinCount) * scoreMultiplier;
-        }
-
-        SetPlayerAScore(playerA_score);
-        SetPlayerBScore(playerB_score);
+        playerA_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
+        playerB_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
 
         yield return new WaitForSeconds(2f);
 
         roundStarted = false;
 
-        playerA_ResponsePanel.SetStartRoundButtonVisible(true);
+        playerA_Board.ResponsePanel.SetStartRoundButtonVisible(true);
 
         yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
 
         StartCoroutine(StartRound());
-    }
-
-    private void SetPlayerAScore(int value)
-	{
-        playerA_ScoreText.text = $"Score: {value}";
-	}
-
-    private void SetPlayerBScore(int value)
-    {
-        playerB_ScoreText.text = $"Score: {value}";
     }
 
     private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: refactor + fix, also compute coinSequenceFloat here
@@ -296,60 +249,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         return coinSequenceInt;
     }
 
-
-    public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
-    {
-        if (column.CoinCount >= gameConfig.maxCoinPerSymbol) return;
-
-        if (playerA_CoinCounter.CoinCount <= 0) return;
-
-        playerA_CoinCounter.RemoveCoin();
-
-        column.AddCoin();
-
-        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.coinPerRound);
-
-    }
-
-    public void WIP_OnResponseColumnRemoveCoinClicked(ResponseColumn column)
-    {
-        if (column.CoinCount <= 0) return;
-
-        playerA_CoinCounter.AddCoin();
-
-        column.RemoveCoin();
-    }
-
-    public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
-    {
-        // assume this is from player A
-
-        int? selectedSymbolIndex = playerA_Keyboard.SelectedSymbolIndex;
-
-        if (selectedSymbolIndex == null) return;
-
-        column.SetSymbol((int)selectedSymbolIndex);
-
-        playerA_ResponsePanel.CheckIfCanValidate(gameConfig.coinPerRound);
-
-        // playerA_Keyboard.ResetSelection();
-
-    }
-
-    public void WIP_OnResponseColumnCoinZoneMouseEnter(ResponseColumn column)
-    {
-        playerA_ResponsePanel.OnColumnHoverEnter(column);
-    }
-
-    public void WIP_OnResponseColumnCoinZoneMouseLeave(ResponseColumn column)
-    {
-        playerA_ResponsePanel.OnColumnHoverLeave(column);
-    }
-
     public void WIP_OnStartRoundButtonClick()
     {
-        playerA_ResponsePanel.SetStartRoundButtonVisible(false);
-
         roundStarted = true;
     }
 }

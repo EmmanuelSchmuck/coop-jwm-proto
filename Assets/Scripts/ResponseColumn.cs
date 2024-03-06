@@ -17,6 +17,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	[SerializeField] private Sprite questionMarkSymbol;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
+	private ResponsePanel responsePanel;
 	public int CoinCount { get; private set; }
 	public bool Interactable {
 		get => interactable;
@@ -28,8 +29,9 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	}
 	private bool interactable;
 
-	public void Initialize(List<Sprite> cardShapes)
+	public void Initialize(List<Sprite> cardShapes, ResponsePanel responsePanel)
 	{
+		this.responsePanel = responsePanel;
 		SymbolIndex = null;
 		this.cardShapes = cardShapes;
 		checkImage.enabled = false;
@@ -87,14 +89,14 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	{
 		if (!Interactable) return;
 
-		JWMGameController.Instance.WIP_OnResponseColumnAddCoinClicked(this);
+		responsePanel.OnResponseColumnAddCoin(this);
 	}
 
 	public void OnRemoveCoinButtonClick()
 	{
 		if (!Interactable) return;
 
-		JWMGameController.Instance.WIP_OnResponseColumnRemoveCoinClicked(this);
+		responsePanel.OnResponseColumnRemoveCoin(this);
 	}
 
 	private void Cleanup()
@@ -121,6 +123,17 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		checkImage.enabled = isCorrect;
 	}
 
+	public void OnCoinZoneHoverEnter()
+	{
+		responsePanel.OnColumnHoverEnter(this);
+	}
+
+	public void OnCoinZoneHoverLeave()
+	{
+		responsePanel.OnColumnHoverLeave(this);
+	}
+
+
 	public void OnSymbolButtonClick()
 	{
 		if (!Interactable) return;
@@ -128,7 +141,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		// if symbolkeyboard has non-null selectedSymbolIndex, set this column symbolIndex and update the symbol icon
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)
 
-		JWMGameController.Instance.WIP_OnResponseColumnSymbolClicked(this);
+		responsePanel.WIP_OnResponseColumnSymbolClicked(this);
 	}
 
 	public void SetSymbol(int? symbolIndex)
