@@ -10,6 +10,7 @@ public class JWMGameConfig
     public bool allowSymbolRepetition = false;
     public int coinPerRound = 10;
     public int maxCoinPerSymbol = 3;
+    public AnimationCurve recallCurve;
 
     public int ClampSequenceLength(int value) => Mathf.Clamp(value, 4, 10);
     public float ClampDisplayDurationPerSymbol(float value) => Mathf.Clamp(value, 0.5f, 3f);

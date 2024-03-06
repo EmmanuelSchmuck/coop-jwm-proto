@@ -9,7 +9,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
     [SerializeField] private List<Sprite> cardShapePool;
-    [SerializeField] private AnimationCurve recallCurve;
     [SerializeField] private float roundStartDelay;
     [SerializeField] private int scoreMultiplier;
     [Header("References")]
@@ -29,8 +28,12 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     {
         gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
 
+        gameConfig.recallCurve = debugConfig.recallCurve; // WIP
+
         playerA_Board.Initialize(cardShapePool);
         playerB_Board.Initialize(cardShapePool);
+
+        playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
         playerA_Board.ResponseValidated += CheckForRoundEnd;
         playerB_Board.ResponseValidated += CheckForRoundEnd;
@@ -42,9 +45,14 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 	{
 		if(Input.GetKeyDown(KeyCode.Escape))
 		{
-            UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
+            ExitToMenu();
 		}
 	}
+
+    private void ExitToMenu()
+	{
+        UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
+    }
 
 	private void SetBoardInteractable(bool interactable)
 	{
@@ -54,11 +62,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator StartRound(bool isFirstRound = false)
     {
-        playerA_Board.OnRoundStart(cardShapePool, gameConfig, isFirstRound);
-        playerB_Board.OnRoundStart(cardShapePool, gameConfig, isFirstRound);
-
-        SetBoardInteractable(false);
-
         List<Sprite> shapeSequence = new List<Sprite>();
         correctIndexSequence = new int[gameConfig.sequenceLength];
 
@@ -81,6 +84,13 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             lastShape = shape;
         }
 
+        RoundInfo roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
+        
+        playerA_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
+        playerB_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
+
+        SetBoardInteractable(false);
+
         stimulusDisplay.Initialize(shapeSequence);
 
         if(isFirstRound)
@@ -94,38 +104,11 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
 
-        int[] playerB_indices = new int[gameConfig.sequenceLength];
-        float[] playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
-
-        for (int i = 0; i < gameConfig.sequenceLength; i++)
-        {
-            float correctProbability = Mathf.Clamp01(recallCurve.Evaluate((float)i / Mathf.Max(1, gameConfig.sequenceLength - 1)));
-
-            playerB_indices[i] = Random.value < correctProbability ? correctIndexSequence[i] : Random.Range(0, 9);
-
-            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.coinPerRound / gameConfig.sequenceLength;
-        }
-
-        int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat);
-
         yield return new WaitForSeconds(gameConfig.sequenceLength * gameConfig.displayDurationPerSymbol);
 
         // end of stimulus display
 
         SetBoardInteractable(true);
-
-        playerB_Board.ResponsePanel.SetSymbols(playerB_indices);
-
-        yield return new WaitForSeconds(1f);
-
-        for (int i = 0; i < gameConfig.sequenceLength; i++)
-        {
-            int coinAmount = playerB_coinAmountSequence[i];
-            playerB_Board.ResponsePanel.AddCoinsInColumn(coinAmount, i);
-            playerB_Board.CoinCounter.RemoveCoin(coinAmount);
-        }
-        // playerB_ResponsePanel.SetCoversVisible(true);
-        playerB_Board.ResponsePanel.SetValidated();
     }
 
     private void CheckForRoundEnd()
@@ -158,99 +141,24 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         roundStarted = false;
 
+        // to do: refactor; should not have to call this here
         playerA_Board.ResponsePanel.SetStartRoundButtonVisible(true);
 
-        yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
+        // to do: move this into StartRound ?
+        yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
 
         StartCoroutine(StartRound());
     }
 
-    private int[] ComputeCoinSequence(float[] coinSequenceFloat) // to do: refactor + fix, also compute coinSequenceFloat here
+    
+
+    public void CheckForRoundStart()
     {
+        bool readyToStart = true; // to do: check for both players to be ready;
 
-        float normalizationFactor = gameConfig.coinPerRound / coinSequenceFloat.Sum();
-
-        coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(gameConfig.maxCoinPerSymbol, x * normalizationFactor)).ToArray();
-
-        string s = "";
-        foreach (var f in coinSequenceFloat)
-        {
-            s += f + " - ";
-        }
-        Debug.Log($"float sequence = {s}, sum = {coinSequenceFloat.Sum()}");
-
-        int[] coinSequenceInt = new int[gameConfig.sequenceLength];
-        int remainingCoins = gameConfig.coinPerRound;
-
-        float avgFloat = coinSequenceFloat.Average();
-
-        // var sortedFloats = coinSequenceFloat.OrderByDescending(x => x).ToList();
-
-        // indices of elements in coinSequenceFloat, sorted by descending value
-        // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
-
-
-        //int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
-
-        //s = "";
-        //foreach (var f in sortedFloatIndices)
-        //{
-        //    s += f + " - ";
-        //}
-        //Debug.Log("sorted float indices = " + s);
-
-        do
-        {
-            // iterate over coinSequenceFloat, in descending value order; assign coins to highest value in priority
-            // if we still have coins, repeat process
-
-            Debug.Log($"remaining coins = {remainingCoins}");
-
-            for (int i = 0; i < gameConfig.sequenceLength; i++)
-            {
-                //int floatIndex = sortedFloatIndices[i];
-                float floatValue = coinSequenceFloat[i];
-
-                //Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}");
-
-                int amount = Mathf.Min(remainingCoins, floatValue > avgFloat ? Mathf.FloorToInt(floatValue) : Mathf.FloorToInt(floatValue));
-                amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[i], amount);
-                amount = Mathf.Max(0, amount);
-                coinSequenceInt[i] += amount;
-                remainingCoins -= amount;
-                if (remainingCoins == 0) break;
-
-            }
-
-        } while (false); // remainingCoins > 0);
-
-        for(int i = 0; i < remainingCoins; i++)
+        if(readyToStart)
 		{
-            bool success = false;
-            int attempts = 0;
-            int maxAttempts = 100;
-
-            while(! success && attempts < maxAttempts)
-			{
-                attempts++;
-                int index = Random.Range(0, coinSequenceInt.Length);
-                if(coinSequenceInt[index] < gameConfig.maxCoinPerSymbol)
-				{
-                    success = true;
-                    coinSequenceInt[index]++;
-
-                }
-			}
-
-            if (attempts == maxAttempts) Debug.LogError("Cannot place coins!");
-
-        }
-
-        return coinSequenceInt;
-    }
-
-    public void WIP_OnStartRoundButtonClick()
-    {
-        roundStarted = true;
+            roundStarted = true;
+        }  
     }
 }

@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class PlayerBoard : MonoBehaviour
 {
+    [SerializeField] private bool DEBUG_isHumanPlayer;
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinCounter coinCounter;
     [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
     public CoinCounter CoinCounter => coinCounter;
@@ -17,6 +19,8 @@ public class PlayerBoard : MonoBehaviour
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
 
     public event System.Action ResponseValidated;
+    public event System.Action StartRoundButtonClicked;
+    public event System.Action<RoundInfo> RoundStarted;
 
     public void Initialize(List<Sprite> cardShapePool)
 	{
@@ -28,20 +32,22 @@ public class PlayerBoard : MonoBehaviour
         ResponseValidated?.Invoke();
     }
 
-    public void OnRoundStart(List<Sprite> cardShapePool, JWMGameConfig gameConfig, bool isFirstRound)
+    public void OnRoundStart(List<Sprite> cardShapePool, RoundInfo roundInfo, bool isFirstRound)
 	{
-        this.GameConfig = gameConfig;
+        this.GameConfig = roundInfo.gameConfig;
 
         symbolKeyboard.ResetSelection();
 
-        responsePanel.Initialize(gameConfig.sequenceLength, cardShapePool, this);
+        responsePanel.Initialize(GameConfig.sequenceLength, cardShapePool, this);
 
-        coinCounter.SetCoin(gameConfig.coinPerRound);
+        coinCounter.SetCoin(GameConfig.coinPerRound);
 
-        if(isFirstRound)
+        if(isFirstRound && DEBUG_isHumanPlayer)
 		{
             responsePanel.SetStartRoundButtonVisible(true);
         }
+
+        RoundStarted?.Invoke(roundInfo);
     }
 
     public void OnRoundEnd(int[] correctIndexSequence, int scoreMultiplier)
@@ -60,7 +66,7 @@ public class PlayerBoard : MonoBehaviour
     {
         responsePanel.SetStartRoundButtonVisible(false);
 
-        JWMGameController.Instance.WIP_OnStartRoundButtonClick();
+        StartRoundButtonClicked?.Invoke();
     }
 
     public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
