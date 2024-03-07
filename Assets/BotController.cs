@@ -9,15 +9,15 @@ public class BotController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        target.RoundStarted += OnRoundStart;
+        target.StimulusDisplayed += OnStimulusDisplayed;
     }
 
-    void OnRoundStart(RoundInfo roundInfo)
+    void OnStimulusDisplayed(RoundInfo roundInfo)
 	{
-        StartCoroutine(RoundStartRoutine(roundInfo));
-    }
+        StartCoroutine(AfterStimulusDisplayRoutine(roundInfo));
+	}
 
-    private IEnumerator RoundStartRoutine(RoundInfo roundInfo)
+    private IEnumerator AfterStimulusDisplayRoutine(RoundInfo roundInfo)
 	{
         JWMGameConfig gameConfig = roundInfo.gameConfig;
 
@@ -34,8 +34,6 @@ public class BotController : MonoBehaviour
         }
 
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
-
-        yield return new WaitForSeconds(gameConfig.sequenceLength * gameConfig.displayDurationPerSymbol);
 
         yield return new WaitForSeconds(1f);
 

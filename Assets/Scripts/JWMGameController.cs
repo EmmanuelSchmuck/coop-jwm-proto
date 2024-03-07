@@ -8,8 +8,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
-    [SerializeField] private List<Sprite> cardShapePool;
-    [SerializeField] private float roundStartDelay;
+    [SerializeField] private Sprite[] cardShapePool;
     [SerializeField] private int scoreMultiplier;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
@@ -54,44 +53,40 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
     }
 
-	private void SetBoardInteractable(bool interactable)
+    private int[] GenerateCorrectIndicesSequence(Sprite[] cardShapePool)
 	{
-        playerA_Board.SetInteractable(interactable);
-        playerB_Board.SetInteractable(interactable);
+        int[] correctIndexSequence = new int[gameConfig.sequenceLength];
+
+        int lastShapeIndex = -1;
+
+        for (int i = 0; i < gameConfig.sequenceLength; i++)
+        {
+            int shapeIndex;
+
+            do
+            {
+                shapeIndex = Random.Range(0, cardShapePool.Length);
+            }
+            while (!gameConfig.allowSymbolRepetition && shapeIndex == lastShapeIndex);
+
+            correctIndexSequence[i] = shapeIndex;
+
+            lastShapeIndex = shapeIndex;
+        }
+
+        return correctIndexSequence;
     }
 
     private IEnumerator StartRound(bool isFirstRound = false)
     {
-        List<Sprite> shapeSequence = new List<Sprite>();
-        correctIndexSequence = new int[gameConfig.sequenceLength];
-
-        Sprite lastShape = null;
-
-        for (int i = 0; i < gameConfig.sequenceLength; i++)
-        {
-            Sprite shape;
-
-            do
-            {
-                shape = cardShapePool.Random();
-            }
-            while (!gameConfig.allowSymbolRepetition && lastShape == shape);
-
-            shapeSequence.Add(shape);
-
-            correctIndexSequence[i] = cardShapePool.IndexOf(shape);
-
-            lastShape = shape;
-        }
+        correctIndexSequence = GenerateCorrectIndicesSequence(cardShapePool);
 
         RoundInfo roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
         
         playerA_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
         playerB_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
 
-        SetBoardInteractable(false);
-
-        stimulusDisplay.Initialize(shapeSequence);
+        stimulusDisplay.Initialize(cardShapePool, correctIndexSequence);
 
         if(isFirstRound)
 		{
@@ -100,15 +95,16 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
 
-        yield return new WaitForSeconds(roundStartDelay);
+        yield return new WaitForSeconds(JWMGameConfig.roundStartDelay);
 
         stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
 
         yield return new WaitForSeconds(gameConfig.sequenceLength * gameConfig.displayDurationPerSymbol);
 
-        // end of stimulus display
+        playerA_Board.OnStimulusDisplayCompleted(roundInfo);
+        playerB_Board.OnStimulusDisplayCompleted(roundInfo);
 
-        SetBoardInteractable(true);
+        // end of stimulus display
     }
 
     private void CheckForRoundEnd()
@@ -123,34 +119,20 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd
     {
-        Debug.Log("Round ended, showing correct / incorrect feedback");
-
-        SetBoardInteractable(false);
-
-        playerA_Board.ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
-        playerB_Board.ResponsePanel.ShowCorrectFeedback(correctIndexSequence);
-
-        stimulusDisplay.ShowStimulus();
-
-        yield return new WaitForSeconds(1f);
-
         playerA_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
         playerB_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
+        stimulusDisplay.ShowStimulus();
 
-        yield return new WaitForSeconds(2f);
+        // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
+        // should have: feedback then score then end round, all in here
 
         roundStarted = false;
-
-        // to do: refactor; should not have to call this here
-        playerA_Board.ResponsePanel.SetStartRoundButtonVisible(true);
 
         // to do: move this into StartRound ?
         yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
 
         StartCoroutine(StartRound());
     }
-
-    
 
     public void CheckForRoundStart()
     {

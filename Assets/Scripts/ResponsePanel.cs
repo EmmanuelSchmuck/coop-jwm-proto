@@ -17,7 +17,7 @@ public class ResponsePanel : MonoBehaviour
 	private ResponseColumn hoveredColumn;
 	private PlayerBoard board;
     
-    public void Initialize(int sequenceLength, List<Sprite> cardShapes, PlayerBoard board)
+    public void Initialize(int sequenceLength, Sprite[] cardShapes, PlayerBoard board)
 	{
 		Cleanup();
 

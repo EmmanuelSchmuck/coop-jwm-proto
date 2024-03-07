@@ -7,6 +7,7 @@ public class JWMGameConfig
 {
     public int sequenceLength = 6;
     public float displayDurationPerSymbol = 1f;
+    public const float roundStartDelay = 1f;
     public bool allowSymbolRepetition = false;
     public int coinPerRound = 10;
     public int maxCoinPerSymbol = 3;

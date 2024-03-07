@@ -20,9 +20,7 @@ public class SymbolKeyboard : MonoBehaviour
     }
 
     private bool interactable;
-
-    private SymbolKey selectedKey; // used ?
-    public void Initialize(List<Sprite> cardShapes)
+    public void Initialize(Sprite[] cardShapes)
 	{
         int i = 0;
         foreach(var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
@@ -40,13 +38,11 @@ public class SymbolKeyboard : MonoBehaviour
     private void OnKeyClicked(SymbolKey key)
 	{
         if (!Interactable) return;
-        selectedKey = key;
         SelectedSymbolIndex = key.SymbolIndex;
     }
 
     public void ResetSelection()
 	{
-        selectedKey = null;
         SelectedSymbolIndex = null;
     }
 }

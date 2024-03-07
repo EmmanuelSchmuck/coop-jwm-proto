@@ -7,16 +7,16 @@ public class StimulusDisplay : MonoBehaviour
 	[SerializeField] private StimulusCard stimulusCardPrefab;
 	private List<StimulusCard> cards;
 
-	public void Initialize(List<Sprite> cardIconSequence)
+	public void Initialize(Sprite[] cardShapePool, int[] correctIndices)
 	{
 		Cleanup();
 
 		cards = new List<StimulusCard>();
 
-		for (int i = 0; i < cardIconSequence.Count; i++)
+		for (int i = 0; i < correctIndices.Length; i++)
 		{
 			StimulusCard card = Instantiate(stimulusCardPrefab, this.transform);
-			card.Initialize(cardIconSequence[i]);
+			card.Initialize(cardShapePool[correctIndices[i]]);
 			card.SetVisible(false);
 			cards.Add(card);
 		}

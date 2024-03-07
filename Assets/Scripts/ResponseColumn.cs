@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	public int? SymbolIndex { get; private set; }
-	private List<Sprite> cardShapes;
+	private Sprite[] cardShapes;
 	[SerializeField] private Image symbolImage;
 	[SerializeField] private Image checkImage;
 	[SerializeField] private Image coverImage;
@@ -29,7 +29,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	}
 	private bool interactable;
 
-	public void Initialize(List<Sprite> cardShapes, ResponsePanel responsePanel)
+	public void Initialize(Sprite[] cardShapes, ResponsePanel responsePanel)
 	{
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;

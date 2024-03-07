@@ -21,8 +21,9 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action ResponseValidated;
     public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
+    public event System.Action<RoundInfo> StimulusDisplayed;
 
-    public void Initialize(List<Sprite> cardShapePool)
+    public void Initialize(Sprite[] cardShapePool)
 	{
         symbolKeyboard.Initialize(cardShapePool);
         SetScore(0);
@@ -32,7 +33,7 @@ public class PlayerBoard : MonoBehaviour
         ResponseValidated?.Invoke();
     }
 
-    public void OnRoundStart(List<Sprite> cardShapePool, RoundInfo roundInfo, bool isFirstRound)
+    public void OnRoundStart(Sprite[] cardShapePool, RoundInfo roundInfo, bool isFirstRound)
 	{
         this.GameConfig = roundInfo.gameConfig;
 
@@ -47,11 +48,22 @@ public class PlayerBoard : MonoBehaviour
             responsePanel.SetStartRoundButtonVisible(true);
         }
 
+        SetInteractable(false);
+
         RoundStarted?.Invoke(roundInfo);
+    }
+
+    public void OnStimulusDisplayCompleted(RoundInfo roundInfo)
+	{
+        SetInteractable(true);
+
+        StimulusDisplayed?.Invoke(roundInfo);
     }
 
     public void OnRoundEnd(int[] correctIndexSequence, int scoreMultiplier)
 	{
+        responsePanel.ShowCorrectFeedback(correctIndexSequence);
+
         int round_score = 0;
 
         foreach (var column in responsePanel.GetCorrectColumns(correctIndexSequence))
@@ -60,6 +72,17 @@ public class PlayerBoard : MonoBehaviour
         }
 
         IncrementScore(round_score);
+
+        StartCoroutine(OnRoundEndRoutine());
+    }
+
+    private IEnumerator OnRoundEndRoutine()
+	{
+        SetInteractable(false);
+
+        yield return new WaitForSeconds(2f);
+
+        if (DEBUG_isHumanPlayer) responsePanel.SetStartRoundButtonVisible(true);
     }
 
     public void WIP_OnStartRoundButtonClick()
