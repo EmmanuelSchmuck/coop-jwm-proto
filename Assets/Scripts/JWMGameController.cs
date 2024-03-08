@@ -9,7 +9,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
     //[SerializeField] private Sprite[] cardShapePool;
-    [SerializeField] private int scoreMultiplier;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
     [SerializeField] private PlayerBoard playerB_Board;
@@ -22,6 +21,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     private const string parentSceneName = "Config";
 
     private JWMGameConfig gameConfig;
+    private RoundInfo roundInfo;
 
     private void Start()
     {
@@ -81,7 +81,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     {
         correctIndexSequence = GenerateCorrectIndicesSequence(JWMGameConfig.SYMBOL_POOL_SIZE);
 
-        RoundInfo roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
+        roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
         
         playerA_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
         playerB_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
@@ -119,9 +119,19 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd
     {
-        playerA_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
-        playerB_Board.OnRoundEnd(correctIndexSequence, scoreMultiplier);
-        stimulusDisplay.ShowStimulus();
+        yield return stimulusDisplay.RevealAnimation(2f);
+
+        yield return new WaitForSeconds(1f);
+
+        playerA_Board.OnRoundEnd(roundInfo);
+
+        yield return new WaitForSeconds(1f);
+
+        playerB_Board.OnRoundEnd(roundInfo);
+
+        yield return new WaitForSeconds(1f);
+
+        UpdatePlayerScores();
 
         // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
         // should have: feedback then score then end round, all in here
@@ -132,6 +142,34 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
 
         StartCoroutine(StartRound());
+    }
+
+    private void UpdatePlayerScores()
+	{
+        int playerA_Score = playerA_Board.ComputeRawRoundScore(roundInfo);
+        int playerB_Score = playerB_Board.ComputeRawRoundScore(roundInfo);
+
+        PlayerBoard bestPlayer = playerA_Score > playerB_Score ? playerA_Board : playerB_Board;
+        PlayerBoard worstPlayer = playerA_Score > playerB_Score ? playerB_Board : playerA_Board;
+        int bestScore = Mathf.Max(playerA_Score, playerB_Score);
+
+        switch (gameConfig.gameMode)
+		{
+            case GameMode.ActivePresence:
+                playerA_Board.IncrementScore(playerA_Score);
+                playerB_Board.IncrementScore(playerB_Score);
+                break;
+            case GameMode.NegativeReward:
+                bestPlayer.IncrementScore(bestScore);
+                worstPlayer.IncrementScore(0); // to display animation even if 0
+                break;
+            case GameMode.PositiveReward:
+                bestPlayer.IncrementScore(bestScore);
+                worstPlayer.IncrementScore(bestScore);
+                break;
+            default: break;
+		}
+
     }
 
     public void CheckForRoundStart()

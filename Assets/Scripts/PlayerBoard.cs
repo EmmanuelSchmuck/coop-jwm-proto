@@ -62,18 +62,9 @@ public class PlayerBoard : MonoBehaviour
         StimulusDisplayed?.Invoke(roundInfo);
     }
 
-    public void OnRoundEnd(int[] correctIndexSequence, int scoreMultiplier)
+    public void OnRoundEnd(RoundInfo roundInfo)
 	{
-        responsePanel.ShowCorrectFeedback(correctIndexSequence);
-
-        int round_score = 0;
-
-        foreach (var column in responsePanel.GetCorrectColumns(correctIndexSequence))
-        {
-            round_score += (1 + column.CoinCount) * scoreMultiplier;
-        }
-
-        IncrementScore(round_score);
+        responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
 
         StartCoroutine(OnRoundEndRoutine());
     }
@@ -85,6 +76,18 @@ public class PlayerBoard : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         if (DEBUG_isHumanPlayer) responsePanel.SetStartRoundButtonVisible(true);
+    }
+
+    public int ComputeRawRoundScore(RoundInfo roundInfo)
+    {
+        int round_score = 0;
+
+        foreach (var column in responsePanel.GetCorrectColumns(roundInfo.correctIndexSequence))
+        {
+            round_score += (1 + column.CoinCount);
+        }
+
+        return round_score;
     }
 
     public void WIP_OnStartRoundButtonClick()

@@ -34,11 +34,20 @@ public class ConfigPanel : MonoBehaviour
         rewardDependancyDropdown.options = new List<TMPro.TMP_Dropdown.OptionData>() { };
 
         rewardDependancyDropdown.AddOptions(EnumUtils.GetValues<GameMode>().Select(x => x.ToString()).ToList());
+
+        rewardDependancyDropdown.onValueChanged.AddListener(delegate { OnGamerModeInputChanged(); });
     }
 
     private void OnAllowSymbolRepetitionValueChanged()
 	{
         config.allowSymbolRepetition = allowSymbolRepetitionToggle.isOn;
+    }
+
+    private void OnGamerModeInputChanged()
+    {
+        int value = rewardDependancyDropdown.value;
+        config.gameMode = (GameMode)value;
+        
     }
 
     private void OnSequenceLengthInputChanged()

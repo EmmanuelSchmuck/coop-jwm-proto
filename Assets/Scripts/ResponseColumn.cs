@@ -8,8 +8,8 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 {
 	public int? SymbolIndex { get; private set; }
 	
-	[SerializeField] private Image checkImage;
-	
+	[SerializeField] private Check check;
+
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
@@ -32,7 +32,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	{
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
-		checkImage.enabled = false;
+		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
 		coinZone = GetComponentInChildren<CoinZone>();
@@ -104,7 +104,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 			Destroy(coinContainer.GetChild(i).gameObject);
 		}
 
-		ShowCorrectFeedback(false);
+		check.Hide();
 
 		//SetCoverVisible(true);
 
@@ -118,7 +118,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 	public void ShowCorrectFeedback(bool isCorrect)
 	{
-		checkImage.enabled = isCorrect;
+		check.Show(isCorrect);
 	}
 
 	public void OnCoinZoneHoverEnter()

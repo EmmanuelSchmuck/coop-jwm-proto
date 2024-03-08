@@ -36,6 +36,17 @@ public class StimulusDisplay : MonoBehaviour
 		}
 	}
 
+	public IEnumerator RevealAnimation(float animationDuration)
+	{
+		float durationPerCard = animationDuration / cards.Count;
+		foreach (var card in cards)
+		{
+			card.SetVisible(true);
+
+			yield return new WaitForSeconds(durationPerCard);
+		}
+	}
+
 	private IEnumerator DisplayAnimation(float displayDurationPerSymbol)
 	{
 		//yield return new WaitForSeconds(1f);
