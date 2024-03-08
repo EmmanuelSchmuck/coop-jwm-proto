@@ -8,10 +8,11 @@ public class StimulusCard : MonoBehaviour
 	[SerializeField] private TMPro.TextMeshProUGUI symbolText;
 	[SerializeField] private Image coverImage;
 	[SerializeField] private GameObject questionMark;
-    public void Initialize(string symbol)
+	private readonly char[] fontSymbolChars = new char[] {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' };
+    public void Initialize(int? symbolIndex)
 	{
-		questionMark.SetActive(symbol == null);
-		symbolText.text = symbol ?? "";
+		questionMark.SetActive(symbolIndex == null);
+		symbolText.text = symbolIndex == null ? "" : fontSymbolChars[(int)symbolIndex].ToString();
 	}
 
 	public void SetVisible(bool visible)

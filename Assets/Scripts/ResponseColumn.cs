@@ -7,7 +7,6 @@ using UnityEngine.EventSystems;
 public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	public int? SymbolIndex { get; private set; }
-	private string[] cardShapes;
 	
 	[SerializeField] private Image checkImage;
 	
@@ -29,11 +28,10 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	}
 	private bool interactable;
 
-	public void Initialize(string[] cardShapes, ResponsePanel responsePanel)
+	public void Initialize(ResponsePanel responsePanel)
 	{
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
-		this.cardShapes = cardShapes;
 		checkImage.enabled = false;
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
@@ -108,7 +106,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 		ShowCorrectFeedback(false);
 
-		SetCoverVisible(true);
+		//SetCoverVisible(true);
 
 		SetCoins(0);	
 	}
@@ -146,7 +144,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 	public void SetSymbol(int symbolIndex)
 	{
-		card.Initialize(cardShapes[(int)symbolIndex]);
+		card.Initialize(symbolIndex);
 
 		this.SymbolIndex = symbolIndex;
 	}

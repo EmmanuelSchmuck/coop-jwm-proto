@@ -8,7 +8,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
-    [SerializeField] private string[] cardShapePool;
+    //[SerializeField] private Sprite[] cardShapePool;
     [SerializeField] private int scoreMultiplier;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
@@ -29,8 +29,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         gameConfig.recallCurve = debugConfig.recallCurve; // WIP
 
-        playerA_Board.Initialize(cardShapePool);
-        playerB_Board.Initialize(cardShapePool);
+        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
+        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
@@ -53,7 +53,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
     }
 
-    private int[] GenerateCorrectIndicesSequence(string[] cardShapePool)
+    private int[] GenerateCorrectIndicesSequence(int symbolPoolSize)
 	{
         int[] correctIndexSequence = new int[gameConfig.sequenceLength];
 
@@ -65,7 +65,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             do
             {
-                shapeIndex = Random.Range(0, cardShapePool.Length);
+                shapeIndex = Random.Range(0, symbolPoolSize);
             }
             while (!gameConfig.allowSymbolRepetition && shapeIndex == lastShapeIndex);
 
@@ -79,14 +79,14 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator StartRound(bool isFirstRound = false)
     {
-        correctIndexSequence = GenerateCorrectIndicesSequence(cardShapePool);
+        correctIndexSequence = GenerateCorrectIndicesSequence(JWMGameConfig.SYMBOL_POOL_SIZE);
 
         RoundInfo roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
         
-        playerA_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
-        playerB_Board.OnRoundStart(cardShapePool, roundInfo, isFirstRound);
+        playerA_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
+        playerB_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
 
-        stimulusDisplay.Initialize(cardShapePool, correctIndexSequence);
+        stimulusDisplay.Initialize(correctIndexSequence);
 
         if(isFirstRound)
 		{
@@ -95,7 +95,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
 
-        yield return new WaitForSeconds(JWMGameConfig.roundStartDelay);
+        yield return new WaitForSeconds(1f);
 
         stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
 

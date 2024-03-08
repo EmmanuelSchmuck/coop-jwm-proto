@@ -9,10 +9,10 @@ public class SymbolKey : MonoBehaviour
 	[SerializeField] private Button button;
 	public int SymbolIndex { get; private set; }
 	public event System.Action<SymbolKey> Clicked;
-    public void Initialize(int symbolIndex, string symbolIcon)
+    public void Initialize(int symbolIndex)
 	{
 		//iconImage.sprite = symbolIcon;
-		card.Initialize(symbolIcon);
+		card.Initialize(symbolIndex);
 		this.SymbolIndex = symbolIndex;
 	}
 

@@ -7,7 +7,7 @@ public class StimulusDisplay : MonoBehaviour
 	[SerializeField] private StimulusCard stimulusCardPrefab;
 	private List<StimulusCard> cards;
 
-	public void Initialize(string[] cardShapePool, int[] correctIndices)
+	public void Initialize(int[] correctIndices)
 	{
 		Cleanup();
 
@@ -16,7 +16,7 @@ public class StimulusDisplay : MonoBehaviour
 		for (int i = 0; i < correctIndices.Length; i++)
 		{
 			StimulusCard card = Instantiate(stimulusCardPrefab, this.transform);
-			card.Initialize(cardShapePool[correctIndices[i]]);
+			card.Initialize(correctIndices[i]);
 			card.SetVisible(false);
 			cards.Add(card);
 		}

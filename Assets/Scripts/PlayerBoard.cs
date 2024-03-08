@@ -23,9 +23,9 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action<RoundInfo> RoundStarted;
     public event System.Action<RoundInfo> StimulusDisplayed;
 
-    public void Initialize(string[] cardShapePool)
+    public void Initialize(int symbolPoolSize)
 	{
-        symbolKeyboard.Initialize(cardShapePool);
+        symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0);
 	}
     public void OnResponseValidated()
@@ -33,13 +33,13 @@ public class PlayerBoard : MonoBehaviour
         ResponseValidated?.Invoke();
     }
 
-    public void OnRoundStart(string[] cardShapePool, RoundInfo roundInfo, bool isFirstRound)
+    public void OnRoundStart(int symbolPoolSize, RoundInfo roundInfo, bool isFirstRound)
 	{
         this.GameConfig = roundInfo.gameConfig;
 
         symbolKeyboard.ResetSelection();
 
-        responsePanel.Initialize(GameConfig.sequenceLength, cardShapePool, this);
+        responsePanel.Initialize(GameConfig.sequenceLength, this);
 
         coinCounter.SetCoin(GameConfig.coinPerRound);
 

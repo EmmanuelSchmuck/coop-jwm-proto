@@ -17,7 +17,7 @@ public class ResponsePanel : MonoBehaviour
 	private ResponseColumn hoveredColumn;
 	private PlayerBoard board;
     
-    public void Initialize(int sequenceLength, string[] cardShapes, PlayerBoard board)
+    public void Initialize(int sequenceLength, PlayerBoard board)
 	{
 		Cleanup();
 
@@ -29,7 +29,7 @@ public class ResponsePanel : MonoBehaviour
 		{
 			ResponseColumn column = Instantiate(columnPrefab, this.transform);
 			columns.Add(column);
-			column.Initialize(cardShapes, this);
+			column.Initialize(this);
 		}
 	}
 
