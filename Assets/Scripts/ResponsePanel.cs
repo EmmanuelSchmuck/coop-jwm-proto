@@ -17,7 +17,7 @@ public class ResponsePanel : MonoBehaviour
 	private ResponseColumn hoveredColumn;
 	private PlayerBoard board;
     
-    public void Initialize(int sequenceLength, Sprite[] cardShapes, PlayerBoard board)
+    public void Initialize(int sequenceLength, string[] cardShapes, PlayerBoard board)
 	{
 		Cleanup();
 
@@ -99,14 +99,6 @@ public class ResponsePanel : MonoBehaviour
 		IsValidated = true;
 		validateButton.gameObject.SetActive(false);
 		board.OnResponseValidated();
-	}
-
-	public void SetCoversVisible(bool visible)
-	{
-		foreach (var column in columns)
-		{
-			column.SetCoverVisible(visible);
-		}
 	}
 
 	public void ShowCorrectFeedback(int[] correctIndices)

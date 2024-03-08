@@ -23,7 +23,7 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action<RoundInfo> RoundStarted;
     public event System.Action<RoundInfo> StimulusDisplayed;
 
-    public void Initialize(Sprite[] cardShapePool)
+    public void Initialize(string[] cardShapePool)
 	{
         symbolKeyboard.Initialize(cardShapePool);
         SetScore(0);
@@ -33,7 +33,7 @@ public class PlayerBoard : MonoBehaviour
         ResponseValidated?.Invoke();
     }
 
-    public void OnRoundStart(Sprite[] cardShapePool, RoundInfo roundInfo, bool isFirstRound)
+    public void OnRoundStart(string[] cardShapePool, RoundInfo roundInfo, bool isFirstRound)
 	{
         this.GameConfig = roundInfo.gameConfig;
 
@@ -56,6 +56,8 @@ public class PlayerBoard : MonoBehaviour
     public void OnStimulusDisplayCompleted(RoundInfo roundInfo)
 	{
         SetInteractable(true);
+
+        //responsePanel.set
 
         StimulusDisplayed?.Invoke(roundInfo);
     }

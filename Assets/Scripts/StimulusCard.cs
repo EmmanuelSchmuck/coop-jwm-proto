@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class StimulusCard : MonoBehaviour
 {
-	[SerializeField] private Image iconImage;
+	[SerializeField] private TMPro.TextMeshProUGUI symbolText;
 	[SerializeField] private Image coverImage;
-    public void Initialize(Sprite icon)
+	[SerializeField] private GameObject questionMark;
+    public void Initialize(string symbol)
 	{
-		iconImage.sprite = icon;
+		questionMark.SetActive(symbol == null);
+		symbolText.text = symbol ?? "";
 	}
 
 	public void SetVisible(bool visible)

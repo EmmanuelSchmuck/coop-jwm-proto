@@ -7,14 +7,14 @@ using UnityEngine.EventSystems;
 public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	public int? SymbolIndex { get; private set; }
-	private Sprite[] cardShapes;
-	[SerializeField] private Image symbolImage;
+	private string[] cardShapes;
+	
 	[SerializeField] private Image checkImage;
-	[SerializeField] private Image coverImage;
+	
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
-	[SerializeField] private Sprite questionMarkSymbol;
+	[SerializeField] private StimulusCard card;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
@@ -29,7 +29,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	}
 	private bool interactable;
 
-	public void Initialize(Sprite[] cardShapes, ResponsePanel responsePanel)
+	public void Initialize(string[] cardShapes, ResponsePanel responsePanel)
 	{
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
@@ -108,14 +108,14 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 		ShowCorrectFeedback(false);
 
-		SetSymbol(null);
+		SetCoverVisible(true);
 
 		SetCoins(0);	
 	}
 
-	public void SetCoverVisible(bool visible)
+	public void SetCoverVisible(bool visible) // change this!
 	{
-		coverImage.enabled = visible;
+		card.SetVisible(!visible);
 	}
 
 	public void ShowCorrectFeedback(bool isCorrect)
@@ -144,9 +144,10 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		responsePanel.WIP_OnResponseColumnSymbolClicked(this);
 	}
 
-	public void SetSymbol(int? symbolIndex)
+	public void SetSymbol(int symbolIndex)
 	{
-		symbolImage.sprite = symbolIndex == null ? questionMarkSymbol : cardShapes[(int)symbolIndex];
+		card.Initialize(cardShapes[(int)symbolIndex]);
+
 		this.SymbolIndex = symbolIndex;
 	}
 }

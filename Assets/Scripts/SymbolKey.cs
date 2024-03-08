@@ -5,13 +5,14 @@ using UnityEngine.UI;
 
 public class SymbolKey : MonoBehaviour
 {
-	[SerializeField] private Image iconImage;
+	[SerializeField] private StimulusCard card;
 	[SerializeField] private Button button;
 	public int SymbolIndex { get; private set; }
 	public event System.Action<SymbolKey> Clicked;
-    public void Initialize(int symbolIndex, Sprite symbolIcon)
+    public void Initialize(int symbolIndex, string symbolIcon)
 	{
-		iconImage.sprite = symbolIcon;
+		//iconImage.sprite = symbolIcon;
+		card.Initialize(symbolIcon);
 		this.SymbolIndex = symbolIndex;
 	}
 

@@ -8,7 +8,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
-    [SerializeField] private Sprite[] cardShapePool;
+    [SerializeField] private string[] cardShapePool;
     [SerializeField] private int scoreMultiplier;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
@@ -53,7 +53,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         UnityEngine.SceneManagement.SceneManager.LoadScene(parentSceneName);
     }
 
-    private int[] GenerateCorrectIndicesSequence(Sprite[] cardShapePool)
+    private int[] GenerateCorrectIndicesSequence(string[] cardShapePool)
 	{
         int[] correctIndexSequence = new int[gameConfig.sequenceLength];
 

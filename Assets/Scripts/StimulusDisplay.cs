@@ -7,7 +7,7 @@ public class StimulusDisplay : MonoBehaviour
 	[SerializeField] private StimulusCard stimulusCardPrefab;
 	private List<StimulusCard> cards;
 
-	public void Initialize(Sprite[] cardShapePool, int[] correctIndices)
+	public void Initialize(string[] cardShapePool, int[] correctIndices)
 	{
 		Cleanup();
 

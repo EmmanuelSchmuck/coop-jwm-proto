@@ -20,11 +20,12 @@ public class SymbolKeyboard : MonoBehaviour
     }
 
     private bool interactable;
-    public void Initialize(Sprite[] cardShapes)
+    public void Initialize(string[] cardShapes)
 	{
         int i = 0;
         foreach(var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
         {
+            if (i > cardShapes.Length - 1) break;
             symbolKey.Initialize(symbolIndex: i, symbolIcon: cardShapes[i]);
 
             symbolKey.Clicked += OnKeyClicked;
