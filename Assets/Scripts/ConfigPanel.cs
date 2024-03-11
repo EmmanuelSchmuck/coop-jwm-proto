@@ -8,7 +8,6 @@ public class ConfigPanel : MonoBehaviour
 {
     [SerializeField] private TMPro.TMP_InputField sequenceLenghtInputField;
     [SerializeField] private TMPro.TMP_InputField displayDurationInputField;
-    [SerializeField] private TMPro.TMP_InputField coinPerRoundInputField;
     [SerializeField] private TMPro.TMP_InputField maxCoinPerCardInputField;
     [SerializeField] private Toggle allowSymbolRepetitionToggle;
     [SerializeField] private TMPro.TMP_Dropdown rewardDependancyDropdown;
@@ -21,9 +20,6 @@ public class ConfigPanel : MonoBehaviour
 
         displayDurationInputField.text = config.displayDurationPerSymbol.ToString();
         displayDurationInputField.onValueChanged.AddListener(delegate { OnDisplayDurationInputChanged(); });
-
-        coinPerRoundInputField.text = config.coinPerRound.ToString();
-        coinPerRoundInputField.onValueChanged.AddListener(delegate { OnCoinperRoundInputChanged(); });
 
         maxCoinPerCardInputField.text = config.maxCoinPerSymbol.ToString();
         maxCoinPerCardInputField.onValueChanged.AddListener(delegate { OnMaxCoinPerCardInputChanged(); });
@@ -69,17 +65,6 @@ public class ConfigPanel : MonoBehaviour
             int validatedResult = config.ClampMaxCoinPerSymbol(result);
             maxCoinPerCardInputField.text = validatedResult.ToString();
             config.maxCoinPerSymbol = validatedResult;
-        }
-    }
-
-    private void OnCoinperRoundInputChanged()
-    {
-        string text = coinPerRoundInputField.text;
-        if (int.TryParse(text, out int result))
-        {
-            int validatedResult = config.ClampCoinPerRound(result);
-            coinPerRoundInputField.text = validatedResult.ToString();
-            config.coinPerRound = validatedResult;
         }
     }
 

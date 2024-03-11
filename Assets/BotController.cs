@@ -30,7 +30,7 @@ public class BotController : MonoBehaviour
 
             playerB_indices[i] = Random.value < correctProbability ? roundInfo.correctIndexSequence[i] : Random.Range(0, 9);
 
-            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.coinPerRound / gameConfig.sequenceLength;
+            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
 
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
@@ -61,7 +61,7 @@ public class BotController : MonoBehaviour
     private int[] ComputeCoinSequence(float[] coinSequenceFloat, JWMGameConfig gameConfig) // to do: refactor + fix, also compute coinSequenceFloat here
     {
 
-        float normalizationFactor = gameConfig.coinPerRound / coinSequenceFloat.Sum();
+        float normalizationFactor = gameConfig.CoinPerRound / coinSequenceFloat.Sum();
 
         coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(gameConfig.maxCoinPerSymbol, x * normalizationFactor)).ToArray();
 
@@ -73,7 +73,7 @@ public class BotController : MonoBehaviour
         Debug.Log($"float sequence = {s}, sum = {coinSequenceFloat.Sum()}");
 
         int[] coinSequenceInt = new int[gameConfig.sequenceLength];
-        int remainingCoins = gameConfig.coinPerRound;
+        int remainingCoins = gameConfig.CoinPerRound;
 
         float avgFloat = coinSequenceFloat.Average();
 

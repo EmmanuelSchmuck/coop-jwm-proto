@@ -41,7 +41,7 @@ public class PlayerBoard : MonoBehaviour
 
         responsePanel.Initialize(GameConfig.sequenceLength, this);
 
-        coinCounter.SetCoin(GameConfig.coinPerRound);
+        coinCounter.SetCoin(GameConfig.CoinPerRound);
 
         if(isFirstRound && DEBUG_isHumanPlayer)
 		{
@@ -107,7 +107,7 @@ public class PlayerBoard : MonoBehaviour
 
         column.AddCoin();
 
-        responsePanel.CheckIfCanValidate(GameConfig.coinPerRound);
+        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
 
     }
 
@@ -119,7 +119,7 @@ public class PlayerBoard : MonoBehaviour
 
         column.RemoveCoin();
 
-        responsePanel.CheckIfCanValidate(GameConfig.coinPerRound);
+        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
     }
 
     public void SetInteractable(bool interactable)

@@ -2591,7 +2591,6 @@ RectTransform:
   - {fileID: 1652100597}
   - {fileID: 472035609}
   - {fileID: 869959262}
-  - {fileID: 1854182683}
   - {fileID: 1187962535}
   - {fileID: 1852254572}
   m_Father: {fileID: 77572157}
@@ -2653,16 +2652,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sequenceLenghtInputField: {fileID: 161774995}
   displayDurationInputField: {fileID: 1300944602}
-  coinPerRoundInputField: {fileID: 1854182684}
   maxCoinPerCardInputField: {fileID: 1187962536}
   allowSymbolRepetitionToggle: {fileID: 1561100929}
   rewardDependancyDropdown: {fileID: 205010750}
   config:
+    gameMode: 0
     sequenceLength: 6
     displayDurationPerSymbol: 1
     allowSymbolRepetition: 0
-    coinPerRound: 12
     maxCoinPerSymbol: 3
+    recallCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
 --- !u!114 &1685801865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2942,155 +2946,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
   m_PrefabInstance: {fileID: 1993020607}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &1854182682
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1685801861}
-    m_Modifications:
-    - target: {fileID: 555025219897023487, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 555025219897023487, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 555025219897023487, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 555025219897023487, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_Pivot.x
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_Pivot.y
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6049377698884361768, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_text
-      value: Coins Per Round
-      objectReference: {fileID: 0}
-    - target: {fileID: 6085469083955409483, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6085469083955409483, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6085469083955409483, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6085469083955409483, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9000267060201670307, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-      propertyPath: m_Name
-      value: CoinPerRound Input Line (2)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
---- !u!224 &1854182683 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 3410093276866592481, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-  m_PrefabInstance: {fileID: 1854182682}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1854182684 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2934056092927618385, guid: cee5e81b9dcd5ba4faa8a3c4b6f87db9, type: 3}
-  m_PrefabInstance: {fileID: 1854182682}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2da0c512f12947e489f739169773d7ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1855435978
 GameObject:
   m_ObjectHideFlags: 0

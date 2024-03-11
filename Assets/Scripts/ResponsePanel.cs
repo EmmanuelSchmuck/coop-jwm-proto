@@ -43,7 +43,7 @@ public class ResponsePanel : MonoBehaviour
 
 		column.SetSymbol((int)selectedSymbolIndex);
 
-		CheckIfCanValidate(board.GameConfig.coinPerRound);
+		CheckIfCanValidate(board.GameConfig.CoinPerRound);
 
 		// playerA_Keyboard.ResetSelection();
 
