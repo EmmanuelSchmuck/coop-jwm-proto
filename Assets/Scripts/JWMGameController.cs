@@ -153,17 +153,17 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         PlayerBoard worstPlayer = playerA_Score > playerB_Score ? playerB_Board : playerA_Board;
         int bestScore = Mathf.Max(playerA_Score, playerB_Score);
 
-        switch (gameConfig.gameMode)
+        switch (gameConfig.RewardDependency)
 		{
-            case GameMode.ActivePresence:
+            case Dependency.None:
                 playerA_Board.IncrementScore(playerA_Score);
                 playerB_Board.IncrementScore(playerB_Score);
                 break;
-            case GameMode.NegativeReward:
+            case Dependency.Negative:
                 bestPlayer.IncrementScore(bestScore);
                 worstPlayer.IncrementScore(0); // to display animation even if 0
                 break;
-            case GameMode.PositiveReward:
+            case Dependency.Positive:
                 bestPlayer.IncrementScore(bestScore);
                 worstPlayer.IncrementScore(bestScore);
                 break;

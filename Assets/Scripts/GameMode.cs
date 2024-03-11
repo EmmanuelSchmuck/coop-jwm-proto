@@ -4,13 +4,13 @@ using UnityEngine;
 
 public enum GameMode
 {
-    //SinglePlayer,
-    //PassivePresence,
+    SinglePlayer,
+    PassivePresence,
     ActivePresence,
     NegativeReward,
-    //NegativeAction,
-    //NegativeRewardAction,
+    NegativeAction,
+    NegativeRewardAction,
     PositiveReward,
-    //PositiveAction,
-    //PositiveRewardAction
+    PositiveAction,
+    PositiveRewardAction
 }

@@ -14,6 +14,18 @@ public class JWMGameConfig
     public AnimationCurve recallCurve;
     public const int SYMBOL_POOL_SIZE = 9;
     public int CoinPerRound => sequenceLength * 2;
+    public Dependency RewardDependency => gameMode switch
+    {
+        GameMode.PositiveReward | GameMode.PositiveRewardAction => Dependency.Positive,
+		GameMode.NegativeReward | GameMode.NegativeRewardAction => Dependency.Negative,
+        _ => Dependency.None
+    };
+    public Dependency ActionDependency => gameMode switch
+    {
+        GameMode.PositiveAction | GameMode.PositiveRewardAction => Dependency.Positive,
+        GameMode.NegativeAction | GameMode.NegativeRewardAction => Dependency.Negative,
+        _ => Dependency.None
+    };
 
     public int ClampSequenceLength(int value) => Mathf.Clamp(value, 4, 10);
     public float ClampDisplayDurationPerSymbol(float value) => Mathf.Clamp(value, 0.5f, 3f);
