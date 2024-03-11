@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Toolbox;
 
 public class BotController : MonoBehaviour
 {
+    [SerializeField] private bool fastMode;
     [SerializeField] private PlayerBoard target;
     // Start is called before the first frame update
     void Start()
@@ -35,20 +37,20 @@ public class BotController : MonoBehaviour
 
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
 
-        yield return new WaitForSeconds(1f);
+        if (!fastMode) yield return new WaitForSeconds(1f);
 
         for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
         {
-            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+            if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
             target.ResponsePanel.SetSymbolInColumn(playerB_indices[i], i);
         }
 
-        yield return new WaitForSeconds(1f);
+        if (!fastMode) yield return new WaitForSeconds(1f);
 
         for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
         {
-            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+            if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
             int coinAmount = playerB_coinAmountSequence[i];
             target.ResponsePanel.AddCoinsInColumn(coinAmount, i);
@@ -77,45 +79,51 @@ public class BotController : MonoBehaviour
 
         float avgFloat = coinSequenceFloat.Average();
 
+        //var sorted = coinSequenceFloat.Select(x, i =>)
+
         // var sortedFloats = coinSequenceFloat.OrderByDescending(x => x).ToList();
 
         // indices of elements in coinSequenceFloat, sorted by descending value
         // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
 
 
-        //int[] sortedFloatIndices = coinSequenceFloat.NewIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
+        int[] sortedFloatIndices = coinSequenceFloat.OldIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
 
-        //s = "";
-        //foreach (var f in sortedFloatIndices)
-        //{
-        //    s += f + " - ";
-        //}
-        //Debug.Log("sorted float indices = " + s);
+		s = "";
+		foreach (var f in sortedFloatIndices)
+		{
+			s += f + " - ";
+		}
+		Debug.Log("sorted float indices = " + s);
 
-        do
-        {
+        int loops = 0;
+		do
+		{
             // iterate over coinSequenceFloat, in descending value order; assign coins to highest value in priority
             // if we still have coins, repeat process
 
-            Debug.Log($"remaining coins = {remainingCoins}");
-
             for (int i = 0; i < gameConfig.sequenceLength; i++)
             {
-                //int floatIndex = sortedFloatIndices[i];
-                float floatValue = coinSequenceFloat[i];
+                int floatIndex = sortedFloatIndices[i];
+                float floatValue = coinSequenceFloat[floatIndex];
 
-                //Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}");
-
-                int amount = Mathf.Min(remainingCoins, floatValue > avgFloat ? Mathf.FloorToInt(floatValue) : Mathf.FloorToInt(floatValue));
-                amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[i], amount);
+                int amount = Mathf.Min(remainingCoins, Mathf.RoundToInt(floatValue));
+                amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[floatIndex], amount);
                 amount = Mathf.Max(0, amount);
-                coinSequenceInt[i] += amount;
+                coinSequenceInt[floatIndex] += amount;
                 remainingCoins -= amount;
+
+                Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}, amount = {amount}");
+
                 if (remainingCoins == 0) break;
 
             }
 
-        } while (false); // remainingCoins > 0);
+            Debug.Log($"remaining coins = {remainingCoins}");
+
+            loops++;
+
+        } while (remainingCoins > 0 && loops < 100);
 
         for (int i = 0; i < remainingCoins; i++)
         {

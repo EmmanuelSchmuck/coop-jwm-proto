@@ -28,7 +28,7 @@ namespace Toolbox
         {
             return source
                 .Select((item, index) => new { item, index })
-                .OrderBy(a => a.item)
+                .OrderByDescending(a => a.item)
                 .Select(a => a.index);
         }
 
