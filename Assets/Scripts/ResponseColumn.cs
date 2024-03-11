@@ -32,6 +32,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	{
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
+		card.Initialize(null);
 		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);

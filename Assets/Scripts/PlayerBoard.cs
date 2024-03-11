@@ -124,6 +124,8 @@ public class PlayerBoard : MonoBehaviour
 
     public void SetInteractable(bool interactable)
     {
+        if (!DEBUG_isHumanPlayer) interactable = false; // dirty, refactor at some point!
+
         symbolKeyboard.Interactable = interactable;
 
         responsePanel.SetInteractable(interactable);

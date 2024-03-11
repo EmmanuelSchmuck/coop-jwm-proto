@@ -2717,7 +2717,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.29436633, g: 0.40986383, b: 0.46226418, a: 1}
+  m_Color: {r: 0.5188679, g: 0.346423, b: 0.32062122, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4740,7 +4740,7 @@ MonoBehaviour:
   debugConfig:
     gameMode: 2
     sequenceLength: 6
-    displayDurationPerSymbol: 0.3
+    displayDurationPerSymbol: 0.7
     allowSymbolRepetition: 1
     maxCoinPerSymbol: 3
     recallCurve:
@@ -5340,7 +5340,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.039215688, g: 0.3372549, b: 0.21960786, a: 1}
+  m_Color: {r: 0.29411766, g: 0.23137257, b: 0.14901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -6474,7 +6474,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2509804, g: 0.19607845, b: 0.25882354, a: 1}
+  m_Color: {r: 0.2924528, g: 0.22590151, b: 0.14760591, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -6554,7 +6554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2509804, g: 0.19607845, b: 0.25882354, a: 1}
+  m_Color: {r: 0.2924528, g: 0.22590151, b: 0.14760591, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

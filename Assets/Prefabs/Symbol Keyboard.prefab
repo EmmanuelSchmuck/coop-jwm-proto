@@ -70,6 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd2d502682fe64b46af24b360abd97ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cover: {fileID: 5344968823282367656}
 --- !u!114 &5905277534275873845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,7 +84,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2509804, g: 0.19607845, b: 0.25882354, a: 1}
+  m_Color: {r: 0.29411766, g: 0.23137257, b: 0.14901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -197,7 +198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2509804, g: 0.19607845, b: 0.25882354, a: 1}
+  m_Color: {r: 0.29411766, g: 0.23137257, b: 0.14901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

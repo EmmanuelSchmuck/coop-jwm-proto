@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class SymbolKeyboard : MonoBehaviour
 {
+    [SerializeField] private GameObject cover;
     public int? SelectedSymbolIndex { get; private set; }
     public bool Interactable
     {
@@ -12,6 +13,7 @@ public class SymbolKeyboard : MonoBehaviour
         set
         {
             interactable = value;
+            cover.SetActive(!interactable);
             foreach (var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
             {
                 symbolKey.SetInteractable(interactable);
