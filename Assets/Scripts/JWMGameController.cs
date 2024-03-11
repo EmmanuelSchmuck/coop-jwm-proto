@@ -13,6 +13,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private PlayerBoard playerA_Board;
     [SerializeField] private PlayerBoard playerB_Board;
     [SerializeField] private StimulusDisplay stimulusDisplay;
+    [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
 
     private bool roundStarted;
     
@@ -28,6 +29,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
 
         gameConfig.recallCurve = debugConfig.recallCurve; // WIP
+
+        gameModeText.text = gameConfig.gameMode.ToString();
 
         playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
         playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
