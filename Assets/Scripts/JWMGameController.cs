@@ -40,6 +40,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_Board.ResponseValidated += CheckForRoundEnd;
         playerB_Board.ResponseValidated += CheckForRoundEnd;
 
+        playerA_Board.ResponseSymbolPicked += OnSymbolPicked;
+        playerB_Board.ResponseSymbolPicked += OnSymbolPicked;
+
         StartCoroutine(StartRound(isFirstRound: true));
     }
 
@@ -48,6 +51,20 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 		if(Input.GetKeyDown(KeyCode.Escape))
 		{
             ExitToMenu();
+		}
+	}
+
+    private void OnSymbolPicked(ResponseColumn responseColumn)
+	{
+        Debug.Log($"symbol picked, locking columns if action dep is negative; it is currently {gameConfig.ActionDependency}, and gameMode is {gameConfig.gameMode}");
+        switch(gameConfig.ActionDependency)
+		{
+            case Dependency.Negative:
+                playerA_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
+                playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
+                break;
+            default:
+                return;
 		}
 	}
 
@@ -155,6 +172,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         PlayerBoard bestPlayer = playerA_Score > playerB_Score ? playerA_Board : playerB_Board;
         PlayerBoard worstPlayer = playerA_Score > playerB_Score ? playerB_Board : playerA_Board;
         int bestScore = Mathf.Max(playerA_Score, playerB_Score);
+        int sumScore = playerA_Score + playerB_Score;
 
         switch (gameConfig.RewardDependency)
 		{
@@ -167,8 +185,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
                 worstPlayer.IncrementScore(0); // to display animation even if 0
                 break;
             case Dependency.Positive:
-                bestPlayer.IncrementScore(bestScore);
-                worstPlayer.IncrementScore(bestScore);
+                bestPlayer.IncrementScore(sumScore);
+                worstPlayer.IncrementScore(sumScore);
                 break;
             default: break;
 		}

@@ -16,14 +16,15 @@ public class JWMGameConfig
     public int CoinPerRound => sequenceLength * 2;
     public Dependency RewardDependency => gameMode switch
     {
-        GameMode.PositiveReward | GameMode.PositiveRewardAction => Dependency.Positive,
-		GameMode.NegativeReward | GameMode.NegativeRewardAction => Dependency.Negative,
+        GameMode.PositiveReward or GameMode.PositiveRewardAction => Dependency.Positive,
+		GameMode.NegativeReward or GameMode.NegativeRewardAction => Dependency.Negative,
         _ => Dependency.None
     };
+    // Positive ActionDependency is not defined for this game, we can only return Dependency.Negative or Dependency.None
     public Dependency ActionDependency => gameMode switch
     {
-        GameMode.PositiveAction | GameMode.PositiveRewardAction => Dependency.Positive,
-        GameMode.NegativeAction | GameMode.NegativeRewardAction => Dependency.Negative,
+        //GameMode.PositiveAction or GameMode.PositiveRewardAction => Dependency.Positive,
+        GameMode.NegativeAction or GameMode.NegativeRewardAction => Dependency.Negative,
         _ => Dependency.None
     };
 

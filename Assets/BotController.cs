@@ -8,16 +8,24 @@ public class BotController : MonoBehaviour
 {
     [SerializeField] private bool fastMode;
     [SerializeField] private PlayerBoard target;
+    [SerializeField] private PlayerBoard otherPlayer;
+    private bool canPickSymbol;
     // Start is called before the first frame update
     void Start()
     {
         target.StimulusDisplayed += OnStimulusDisplayed;
+        otherPlayer.ResponseSymbolPicked += OnOtherPlayerSymbolPicked;
     }
 
     void OnStimulusDisplayed(RoundInfo roundInfo)
 	{
         StartCoroutine(AfterStimulusDisplayRoutine(roundInfo));
 	}
+
+    void OnOtherPlayerSymbolPicked(ResponseColumn column)
+	{
+        canPickSymbol = true;
+    }
 
     private IEnumerator AfterStimulusDisplayRoutine(RoundInfo roundInfo)
 	{
@@ -39,12 +47,21 @@ public class BotController : MonoBehaviour
 
         if (!fastMode) yield return new WaitForSeconds(1f);
 
-        for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
-        {
-            if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        while(!target.ResponsePanel.AllSymbolsPickedOrLocked) // pick symbols, waiting between each symbol; either a small delay or until it's our turn
+		{
+            if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
-            target.ResponsePanel.SetSymbolInColumn(playerB_indices[i], i);
+            int columnIndex = target.ResponsePanel.Columns.First(c => c.SymbolIndex == null && !c.IsLocked).ColumnIndex;
+
+            target.ResponsePanel.SetSymbolInColumn(playerB_indices[columnIndex], columnIndex);
         }
+
+        //for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
+        //{
+        //    if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+
+        //    target.ResponsePanel.SetSymbolInColumn(playerB_indices[i], i);
+        //}
 
         if (!fastMode) yield return new WaitForSeconds(1f);
 
@@ -53,8 +70,13 @@ public class BotController : MonoBehaviour
             if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
             int coinAmount = playerB_coinAmountSequence[i];
-            target.ResponsePanel.AddCoinsInColumn(coinAmount, i);
-            target.CoinCounter.RemoveCoin(coinAmount);
+            for(int c = 0; c < coinAmount; c++)
+			{
+                if (!fastMode) yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
+                target.ResponsePanel.AddCoinsInColumn(1, i);
+                target.CoinCounter.RemoveCoin(1);
+            }
+            
         }
         // playerB_ResponsePanel.SetCoversVisible(true);
         target.ResponsePanel.SetValidated();

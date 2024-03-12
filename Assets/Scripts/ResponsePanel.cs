@@ -11,8 +11,10 @@ public class ResponsePanel : MonoBehaviour
 	[SerializeField] private Button startRoundButton;
 
 	public bool IsValidated { get; private set; }
+	public bool AllSymbolsPickedOrLocked => columns.All(c => c.SymbolIndex != null || c.IsLocked);
 
 	private List<ResponseColumn> columns;
+	public List<ResponseColumn> Columns => columns;
 	
 	private ResponseColumn hoveredColumn;
 	private PlayerBoard board;
@@ -29,21 +31,15 @@ public class ResponsePanel : MonoBehaviour
 		{
 			ResponseColumn column = Instantiate(columnPrefab, this.transform);
 			columns.Add(column);
-			column.Initialize(this);
+			column.Initialize(this, i);
 		}
 	}
 
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
 	{
-		// assume this is from player A
+		board.OnResponseSymbolPickAttempted(column);
 
-		int? selectedSymbolIndex = board.SelectedSymbolIndex;
-
-		if (selectedSymbolIndex == null) return;
-
-		column.SetSymbol((int)selectedSymbolIndex);
-
-		CheckIfCanValidate(board.GameConfig.CoinPerRound);
+		
 
 		// playerA_Keyboard.ResetSelection();
 
@@ -117,9 +113,8 @@ public class ResponsePanel : MonoBehaviour
 	public void CheckIfCanValidate(int coinPerRound)
 	{
 		bool allColumnsFullOfCoins = columns.Select(c => c.CoinCount).Sum() == coinPerRound;
-		bool allSymbolsChosen = columns.All(c => c.SymbolIndex != null);
 
-		bool canValidate = allColumnsFullOfCoins && allSymbolsChosen;
+		bool canValidate = allColumnsFullOfCoins && AllSymbolsPickedOrLocked;
 
 		validateButton.gameObject.SetActive(canValidate);
 	}
@@ -129,17 +124,15 @@ public class ResponsePanel : MonoBehaviour
 		columns[columnIndex].AddCoin(amount);
 	}
 
+	public void SetColumnLocked(int columnIndex)
+	{
+		Debug.Log("locking column");
+		columns[columnIndex].SetLocked();
+	}
+
 	public void SetSymbolInColumn(int symbolIndex, int columnIndex)
 	{
 		columns[columnIndex].SetSymbol(symbolIndex);
-	}
-
-	public void SetSymbols(int[] symbolIndices)
-	{
-		for(int i = 0; i<columns.Count;i++)
-		{
-			columns[i].SetSymbol(symbolIndices[i]);
-		}
 	}
 
 	private void Cleanup()

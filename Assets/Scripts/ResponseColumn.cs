@@ -4,19 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class ResponseColumn : MonoBehaviour
 {
 	public int? SymbolIndex { get; private set; }
-	
+	public int ColumnIndex { get; private set; }
+
 	[SerializeField] private Check check;
 
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
 	[SerializeField] private StimulusCard card;
+	[SerializeField] private GameObject DEBUG_lock;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
+	public bool IsLocked { get; private set; }
 	public int CoinCount { get; private set; }
 	public bool Interactable {
 		get => interactable;
@@ -28,8 +31,9 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 	}
 	private bool interactable;
 
-	public void Initialize(ResponsePanel responsePanel)
+	public void Initialize(ResponsePanel responsePanel, int columnIndex)
 	{
+		this.ColumnIndex = columnIndex;
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
 		card.Initialize(null);
@@ -42,6 +46,13 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		coins = new List<GameObject>();
 
 		Cleanup();
+	}
+
+	public void SetLocked(bool isLocked = true)
+	{
+		this.IsLocked = isLocked;
+		DEBUG_lock.SetActive(isLocked);
+		//if (IsLocked) Interactable = false;
 	}
 
 	public void SetCoinButtonsVisible(bool visible)
@@ -104,7 +115,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 		{
 			Destroy(coinContainer.GetChild(i).gameObject);
 		}
-
+		SetLocked(false);
 		check.Hide();
 
 		//SetCoverVisible(true);
@@ -135,7 +146,7 @@ public class ResponseColumn : MonoBehaviour // IPointerClickHandler, IPointerEnt
 
 	public void OnSymbolButtonClick()
 	{
-		if (!Interactable) return;
+		if (!Interactable || IsLocked) return;
 
 		// if symbolkeyboard has non-null selectedSymbolIndex, set this column symbolIndex and update the symbol icon
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)

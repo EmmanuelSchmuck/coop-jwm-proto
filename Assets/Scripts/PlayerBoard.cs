@@ -22,6 +22,7 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
     public event System.Action<RoundInfo> StimulusDisplayed;
+    public event System.Action<ResponseColumn> ResponseSymbolPicked;
 
     public void Initialize(int symbolPoolSize)
 	{
@@ -95,6 +96,19 @@ public class PlayerBoard : MonoBehaviour
         responsePanel.SetStartRoundButtonVisible(false);
 
         StartRoundButtonClicked?.Invoke();
+    }
+
+    public void OnResponseSymbolPickAttempted(ResponseColumn column) // rename this !
+	{
+        int? selectedSymbolIndex = SelectedSymbolIndex; // this needs to work for the bot as well; bot should use the keyboard
+
+        if (selectedSymbolIndex == null) return;
+
+        column.SetSymbol((int)selectedSymbolIndex);
+
+        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
+
+        ResponseSymbolPicked?.Invoke(column);
     }
 
     public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
