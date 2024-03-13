@@ -28,20 +28,14 @@ public class StimulusDisplay : MonoBehaviour
 		StartCoroutine(DisplayAnimation(displayDurationPerSymbol));
 	}
 
-	public void ShowStimulus()
-	{
-		foreach (var card in cards)
-		{
-			card.SetVisible(true);
-		}
-	}
-
 	public IEnumerator RevealAnimation(float animationDuration)
 	{
 		float durationPerCard = animationDuration / cards.Count;
 		foreach (var card in cards)
 		{
 			card.SetVisible(true);
+
+			SoundManager.Instance.PlaySound(SoundType.StimulusShow);
 
 			yield return new WaitForSeconds(durationPerCard);
 		}
@@ -55,8 +49,17 @@ public class StimulusDisplay : MonoBehaviour
 		{
 			card.SetVisible(true);
 
+			SoundManager.Instance.PlaySound(SoundType.StimulusShow);
+
 			yield return new WaitForSeconds(displayDurationPerSymbol);
 
+			card.SetVisible(false);
+		}
+	}
+	public void Hide()
+	{
+		foreach (var card in cards)
+		{
 			card.SetVisible(false);
 		}
 	}

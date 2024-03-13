@@ -115,6 +115,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
 
+        SoundManager.Instance.PlaySound(SoundType.RoundStart);
+
         yield return new WaitForSeconds(1f);
 
         stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
@@ -139,19 +141,24 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd
     {
-        yield return stimulusDisplay.RevealAnimation(2f);
+        yield return stimulusDisplay.RevealAnimation(1.5f);
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.3f);
 
-        playerA_Board.OnRoundEnd(roundInfo);
+        // to do : feedback presentation phase
+        yield return playerA_Board.ShowFeedback(roundInfo);
+        yield return playerB_Board.ShowFeedback(roundInfo);
 
-        yield return new WaitForSeconds(1f);
-
-        playerB_Board.OnRoundEnd(roundInfo);
-
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         UpdatePlayerScores();
+
+        yield return new WaitForSeconds(1f);
+
+        stimulusDisplay.Hide();
+
+        playerA_Board.OnRoundEnd(roundInfo);
+        playerB_Board.OnRoundEnd(roundInfo);
 
         // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
         // should have: feedback then score then end round, all in here

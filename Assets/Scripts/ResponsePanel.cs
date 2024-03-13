@@ -97,13 +97,13 @@ public class ResponsePanel : MonoBehaviour
 		board.OnResponseValidated();
 	}
 
-	public void ShowCorrectFeedback(int[] correctIndices)
-	{
-		for(int i = 0;i<columns.Count;i++)
-		{
-			columns[i].ShowCorrectFeedback(columns[i].SymbolIndex == correctIndices[i]);
-		}
-	}
+	//public void ShowCorrectFeedback(int[] correctIndices)
+	//{
+	//	for(int i = 0;i<columns.Count;i++)
+	//	{
+	//		columns[i].ShowCorrectFeedback(columns[i].SymbolIndex == correctIndices[i]);
+	//	}
+	//}
 
 	public IEnumerable<ResponseColumn> GetCorrectColumns(int[] correctIndices)
 	{

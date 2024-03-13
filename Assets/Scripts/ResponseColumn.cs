@@ -67,7 +67,8 @@ public class ResponseColumn : MonoBehaviour
 		{
 			coins.Add(Instantiate(coinPrefab, coinContainer));
 		}
-		
+		SoundManager.Instance.PlaySound(SoundType.AddCoin);
+
 	}
 
 	public void SetCoins(int amount) // to do: refactor this + add & remove coin
@@ -93,6 +94,7 @@ public class ResponseColumn : MonoBehaviour
 		coins.RemoveAt(0);
 		Destroy(coin);
 		CoinCount--;
+		SoundManager.Instance.PlaySound(SoundType.RemoveCoin);
 	}
 
 	public void OnAddCoinButtonClick()
@@ -109,12 +111,13 @@ public class ResponseColumn : MonoBehaviour
 		responsePanel.OnResponseColumnRemoveCoin(this);
 	}
 
-	private void Cleanup()
+	public void Cleanup()
 	{
 		for (int i = 0; i < coinContainer.childCount; i++)
 		{
 			Destroy(coinContainer.GetChild(i).gameObject);
 		}
+		card.Initialize(null);
 		SetLocked(false);
 		check.Hide();
 
@@ -131,6 +134,7 @@ public class ResponseColumn : MonoBehaviour
 	public void ShowCorrectFeedback(bool isCorrect)
 	{
 		check.Show(isCorrect);
+		SoundManager.Instance.PlaySound(isCorrect ? SoundType.FeedbackCorrect : SoundType.FeedbackError);
 	}
 
 	public void OnCoinZoneHoverEnter()
@@ -157,6 +161,8 @@ public class ResponseColumn : MonoBehaviour
 	public void SetSymbol(int symbolIndex)
 	{
 		card.Initialize(symbolIndex);
+
+		SoundManager.Instance.PlaySound(SoundType.SetSymbol);
 
 		this.SymbolIndex = symbolIndex;
 	}

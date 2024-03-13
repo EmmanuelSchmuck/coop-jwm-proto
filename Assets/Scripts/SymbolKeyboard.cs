@@ -40,6 +40,7 @@ public class SymbolKeyboard : MonoBehaviour
     private void OnKeyClicked(SymbolKey key)
 	{
         if (!Interactable) return;
+        SoundManager.Instance.PlaySound(SoundType.GenericClick);
         SelectedSymbolIndex = key.SymbolIndex;
     }
 

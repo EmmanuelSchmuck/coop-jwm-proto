@@ -9,7 +9,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinCounter coinCounter;
-    [SerializeField] private TMPro.TextMeshProUGUI scoreText;
+    [SerializeField] private ScoreCounter scoreCounter;
     
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
@@ -63,20 +63,27 @@ public class PlayerBoard : MonoBehaviour
         StimulusDisplayed?.Invoke(roundInfo);
     }
 
-    public void OnRoundEnd(RoundInfo roundInfo)
-	{
-        responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
+    public IEnumerator ShowFeedback(RoundInfo roundInfo)
+    {
+        //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
 
-        StartCoroutine(OnRoundEndRoutine());
-    }
-
-    private IEnumerator OnRoundEndRoutine()
-	{
         SetInteractable(false);
 
-        yield return new WaitForSeconds(2f);
+        for (int i = 0; i < responsePanel.Columns.Count; i++)
+        {
+            yield return new WaitForSeconds(0.3f);
+            responsePanel.Columns[i].ShowCorrectFeedback(responsePanel.Columns[i].SymbolIndex == roundInfo.correctIndexSequence[i]);
+        }
+    }
 
-        if (DEBUG_isHumanPlayer) responsePanel.SetStartRoundButtonVisible(true);
+    public void OnRoundEnd(RoundInfo roundInfo)
+	{
+        for (int i = 0; i < responsePanel.Columns.Count; i++)
+        {
+            responsePanel.Columns[i].Cleanup();
+        }
+
+        if (DEBUG_isHumanPlayer) responsePanel.SetStartRoundButtonVisible(true);   
     }
 
     public int ComputeRawRoundScore(RoundInfo roundInfo)
@@ -150,6 +157,6 @@ public class PlayerBoard : MonoBehaviour
     public void SetScore(int value)
     {
         score = value;
-        scoreText.text = $"Score: {score}";
+        scoreCounter.SetScore(value);  
     }
 }
