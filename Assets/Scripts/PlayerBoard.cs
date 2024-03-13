@@ -27,7 +27,7 @@ public class PlayerBoard : MonoBehaviour
     public void Initialize(int symbolPoolSize)
 	{
         symbolKeyboard.Initialize(symbolPoolSize);
-        SetScore(0);
+        SetScore(0, animate: false);
 	}
     public void OnResponseValidated()
 	{
@@ -154,9 +154,9 @@ public class PlayerBoard : MonoBehaviour
 
     public void IncrementScore(int value) => SetScore(score + value);
 
-    public void SetScore(int value)
+    public void SetScore(int value, bool animate = true)
     {
         score = value;
-        scoreCounter.SetScore(value);  
+        scoreCounter.SetScore(value, animate);  
     }
 }
