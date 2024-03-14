@@ -151,7 +151,13 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return new WaitForSeconds(0.5f);
 
-        UpdatePlayerScores();
+        var scores = UpdatePlayerScores();
+
+        playerA_Board.IncrementScore(scores.Item1);
+
+        yield return new WaitForSeconds(1.5f);
+
+        playerB_Board.IncrementScore(scores.Item2);
 
         yield return new WaitForSeconds(1f);
 
@@ -171,33 +177,38 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         StartCoroutine(StartRound());
     }
 
-    private void UpdatePlayerScores()
+    enum EndResult
+    {
+        BestPlayerIsA,
+        BestPlayerIsB,
+        Tie
+    }
+
+    private (int, int) UpdatePlayerScores()
 	{
         int playerA_Score = playerA_Board.ComputeRawRoundScore(roundInfo);
         int playerB_Score = playerB_Board.ComputeRawRoundScore(roundInfo);
 
-        PlayerBoard bestPlayer = playerA_Score > playerB_Score ? playerA_Board : playerB_Board;
-        PlayerBoard worstPlayer = playerA_Score > playerB_Score ? playerB_Board : playerA_Board;
-        int bestScore = Mathf.Max(playerA_Score, playerB_Score);
+        EndResult result = playerA_Score == playerB_Score ? EndResult.Tie
+            : playerA_Score > playerB_Score ? EndResult.BestPlayerIsA
+            : EndResult.BestPlayerIsB;
+
+        //int bestScore = Mathf.Max(playerA_Score, playerB_Score);
         int sumScore = playerA_Score + playerB_Score;
 
-        switch (gameConfig.RewardDependency)
-		{
-            case Dependency.None:
-                playerA_Board.IncrementScore(playerA_Score);
-                playerB_Board.IncrementScore(playerB_Score);
-                break;
-            case Dependency.Negative:
-                bestPlayer.IncrementScore(bestScore);
-                worstPlayer.IncrementScore(0); // to display animation even if 0
-                break;
-            case Dependency.Positive:
-                bestPlayer.IncrementScore(sumScore);
-                worstPlayer.IncrementScore(sumScore);
-                break;
-            default: break;
-		}
-
+        return gameConfig.RewardDependency switch
+        {
+            Dependency.None => (playerA_Score, playerB_Score),
+            Dependency.Positive => (sumScore, sumScore),
+            Dependency.Negative => result switch
+            {
+                EndResult.Tie => (playerA_Score, playerB_Score),
+                EndResult.BestPlayerIsA => (playerA_Score, 0),
+                EndResult.BestPlayerIsB => (0, playerB_Score),
+                _ => throw new System.NotImplementedException()
+            },
+            _ => throw new System.NotImplementedException()
+        };
     }
 
     public void CheckForRoundStart()

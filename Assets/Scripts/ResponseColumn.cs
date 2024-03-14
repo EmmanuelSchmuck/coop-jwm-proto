@@ -57,7 +57,8 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetCoinButtonsVisible(bool visible)
 	{
-		coinButtons.gameObject.SetActive(visible);
+		// for now, keep buttons hidden, we dont use them
+		coinButtons.gameObject.SetActive(false);
 	}
 
 	public void AddCoin(int amount = 1)

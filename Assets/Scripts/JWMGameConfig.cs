@@ -10,7 +10,7 @@ public class JWMGameConfig
     public float displayDurationPerSymbol = 1f;
     public bool allowSymbolRepetition = false;
     public int maxCoinPerSymbol = 3;
-    public const int SCORE_MULTIPLIER = 1;
+    //public const int SCORE_MULTIPLIER = 1;
     public AnimationCurve recallCurve;
     public const int SYMBOL_POOL_SIZE = 9;
     public int CoinPerRound => sequenceLength * 2;

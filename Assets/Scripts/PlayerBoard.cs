@@ -152,7 +152,11 @@ public class PlayerBoard : MonoBehaviour
         responsePanel.SetInteractable(interactable);
     }
 
-    public void IncrementScore(int value) => SetScore(score + value);
+    public void IncrementScore(int value)
+    {
+        SetScore(score + value);
+        SoundManager.Instance.PlaySound(SoundType.GainPoints);
+    }
 
     public void SetScore(int value, bool animate = true)
     {
