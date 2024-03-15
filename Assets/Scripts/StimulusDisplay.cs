@@ -23,11 +23,6 @@ public class StimulusDisplay : MonoBehaviour
 
 	}
 
-	public void DoDisplayAnimation(float displayDurationPerSymbol)
-	{
-		StartCoroutine(DisplayAnimation(displayDurationPerSymbol));
-	}
-
 	public IEnumerator RevealAnimation(float animationDuration)
 	{
 		float durationPerCard = animationDuration / cards.Count;
@@ -41,9 +36,9 @@ public class StimulusDisplay : MonoBehaviour
 		}
 	}
 
-	private IEnumerator DisplayAnimation(float displayDurationPerSymbol)
+	public IEnumerator DisplayAnimation(float displayDurationPerSymbol, float initialDelay)
 	{
-		//yield return new WaitForSeconds(1f);
+		yield return new WaitForSeconds(initialDelay);
 
 		foreach(var card in cards)
 		{

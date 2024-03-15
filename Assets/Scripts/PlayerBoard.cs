@@ -10,7 +10,8 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinCounter coinCounter;
     [SerializeField] private ScoreCounter scoreCounter;
-    
+    [SerializeField] private TMPro.TextMeshProUGUI instructionText;
+
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
     public CoinCounter CoinCounter => coinCounter;
@@ -18,20 +19,33 @@ public class PlayerBoard : MonoBehaviour
     public JWMGameConfig GameConfig { get; private set; }
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
 
-    public event System.Action ResponseValidated;
+    public event System.Action ResponseSumbitted;
     public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
-    public event System.Action<RoundInfo> StimulusDisplayed;
+    public event System.Action<RoundInfo> StimulusDisplayed; // rename: symbol pick phase started
+    public event System.Action<RoundInfo> CoinBettingStarted;
     public event System.Action<ResponseColumn> ResponseSymbolPicked;
+
+    private const string EMPTY = "";
+    private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember each symbol.";
+    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use the keyboard on left to assign symbols to each card.";
+    private const string COIN_BETTING_INSTRUCTION = "Right-click below each symbol to bet coins.";
 
     public void Initialize(int symbolPoolSize)
 	{
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
+        SetInstructionText(EMPTY);
 	}
     public void OnResponseValidated()
 	{
-        ResponseValidated?.Invoke();
+        ResponseSumbitted?.Invoke();
+    }
+
+    private void SetInstructionText(string text)
+    {
+        if (!DEBUG_isHumanPlayer) text = "";
+        instructionText.text = text;
     }
 
     public void OnRoundStart(int symbolPoolSize, RoundInfo roundInfo, bool isFirstRound)
@@ -54,9 +68,25 @@ public class PlayerBoard : MonoBehaviour
         RoundStarted?.Invoke(roundInfo);
     }
 
+    public void OnStimulusDisplayStart()
+    {
+        SetInstructionText(STIMULUS_DISPLAY_INSTRUCTION);
+    }
+
+    public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
+	{
+        SetInstructionText(COIN_BETTING_INSTRUCTION);
+        CoinBettingStarted?.Invoke(roundInfo);
+        // enable coin zones
+        responsePanel.SetCoinZoneInteractable(true);
+        responsePanel.SetValidated(false);
+	}
+
     public void OnStimulusDisplayCompleted(RoundInfo roundInfo)
 	{
-        SetInteractable(true);
+        SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
+        responsePanel.SetSymbolsInteractable(true);
+        symbolKeyboard.Interactable = true;
 
         //responsePanel.set
 
@@ -65,6 +95,7 @@ public class PlayerBoard : MonoBehaviour
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
     {
+        SetInstructionText(EMPTY);
         //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
 
         SetInteractable(false);
@@ -113,7 +144,11 @@ public class PlayerBoard : MonoBehaviour
 
         column.SetSymbol((int)selectedSymbolIndex);
 
-        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
+        
+        bool canValidate = responsePanel.AllSymbolsPicked;
+        responsePanel.SetCanValidate(canValidate);
+        SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
+        //responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
 
         ResponseSymbolPicked?.Invoke(column);
     }
@@ -128,7 +163,10 @@ public class PlayerBoard : MonoBehaviour
 
         column.AddCoin();
 
-        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
+        bool canValidate = GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
+        responsePanel.SetCanValidate(canValidate);
+
+        SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
 
     }
 
@@ -140,7 +178,10 @@ public class PlayerBoard : MonoBehaviour
 
         column.RemoveCoin();
 
-        responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
+        bool canValidate = GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
+        responsePanel.SetCanValidate(canValidate);
+
+        SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
     }
 
     public void SetInteractable(bool interactable)
@@ -149,7 +190,8 @@ public class PlayerBoard : MonoBehaviour
 
         symbolKeyboard.Interactable = interactable;
 
-        responsePanel.SetInteractable(interactable);
+        responsePanel.SetCoinZoneInteractable(interactable);
+        responsePanel.SetSymbolsInteractable(interactable);
     }
 
     public void IncrementScore(int value)

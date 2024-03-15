@@ -11,7 +11,9 @@ public class ResponsePanel : MonoBehaviour
 	[SerializeField] private Button startRoundButton;
 
 	public bool IsValidated { get; private set; }
-	public bool AllSymbolsPickedOrLocked => columns.All(c => c.SymbolIndex != null || c.IsLocked);
+	public bool AllSymbolsPicked => columns.All(c => c.SymbolIndex != null);
+	public bool AllColumnsLocked => columns.All(c => c.IsLocked);
+	public int CoinsInColumns => columns.Sum(c => c.CoinCount);
 
 	private List<ResponseColumn> columns;
 	public List<ResponseColumn> Columns => columns;
@@ -38,11 +40,6 @@ public class ResponsePanel : MonoBehaviour
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
 	{
 		board.OnResponseSymbolPickAttempted(column);
-
-		
-
-		// playerA_Keyboard.ResetSelection();
-
 	}
 
 	public void OnResponseColumnAddCoin(ResponseColumn column)
@@ -72,11 +69,18 @@ public class ResponsePanel : MonoBehaviour
 		startRoundButton.gameObject.SetActive(visible);
 	}
 
-	public void SetInteractable(bool interactable) // only affect columns, not other buttons
+	public void SetSymbolsInteractable(bool interactable) // only affect columns, not other buttons
 	{
 		foreach(var column in columns)
 		{
-			column.Interactable = interactable;
+			column.SymbolInteractable = interactable;
+		}
+	}
+	public void SetCoinZoneInteractable(bool interactable) // only affect columns, not other buttons
+	{
+		foreach (var column in columns)
+		{
+			column.CoinZoneInteractable = interactable;
 		}
 	}
 
@@ -87,14 +91,14 @@ public class ResponsePanel : MonoBehaviour
 
 	public void OnValidateButtonClick()
 	{
-		SetValidated();
+		SetValidated(true);
 	}
 
-	public void SetValidated()
+	public void SetValidated(bool validated) // refactor this!
 	{
-		IsValidated = true;
+		IsValidated = validated;
 		validateButton.gameObject.SetActive(false);
-		board.OnResponseValidated();
+		if(validated) board.OnResponseValidated();
 	}
 
 	//public void ShowCorrectFeedback(int[] correctIndices)
@@ -110,12 +114,9 @@ public class ResponsePanel : MonoBehaviour
 		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
 	}
 
-	public void CheckIfCanValidate(int coinPerRound)
+	public void SetCanValidate(bool canValidate)
 	{
-		bool allColumnsFullOfCoins = columns.Select(c => c.CoinCount).Sum() == coinPerRound;
-
-		bool canValidate = allColumnsFullOfCoins && AllSymbolsPickedOrLocked;
-
+		//IsValidated = validated;
 		validateButton.gameObject.SetActive(canValidate);
 	}
 

@@ -15,12 +15,18 @@ public class BotController : MonoBehaviour
     {
         target.StimulusDisplayed += OnStimulusDisplayed;
         otherPlayer.ResponseSymbolPicked += OnOtherPlayerSymbolPicked;
+        target.CoinBettingStarted += OnCoinBettingStarted;
     }
 
     void OnStimulusDisplayed(RoundInfo roundInfo)
 	{
         StartCoroutine(AfterStimulusDisplayRoutine(roundInfo));
 	}
+
+    void OnCoinBettingStarted(RoundInfo roundInfo)
+    {
+        StartCoroutine(CoinBettingRoutine(roundInfo));
+    }
 
     void OnOtherPlayerSymbolPicked(ResponseColumn column)
 	{
@@ -43,43 +49,70 @@ public class BotController : MonoBehaviour
             playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
 
-        int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
-
         if (!fastMode) yield return new WaitForSeconds(1f);
 
-        while(!target.ResponsePanel.AllSymbolsPickedOrLocked) // pick symbols, waiting between each symbol; either a small delay or until it's our turn
+
+		//      while(!target.ResponsePanel.AllSymbolsPickedOrLocked) // pick symbols, waiting between each symbol; either a small delay or until it's our turn
+		//{
+		//          if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+
+		//          int columnIndex = target.ResponsePanel.Columns.First(c => c.SymbolIndex == null && !c.IsLocked).ColumnIndex;
+
+		//          target.ResponsePanel.SetSymbolInColumn(playerB_indices[columnIndex], columnIndex);
+		//      }
+
+		for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
 		{
-            if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+			if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
-            int columnIndex = target.ResponsePanel.Columns.First(c => c.SymbolIndex == null && !c.IsLocked).ColumnIndex;
+			target.ResponsePanel.SetSymbolInColumn(playerB_indices[i], i);
+		}
 
-            target.ResponsePanel.SetSymbolInColumn(playerB_indices[columnIndex], columnIndex);
+		if (!fastMode) yield return new WaitForSeconds(0.5f);
+
+        yield return null;
+
+        // playerB_ResponsePanel.SetCoversVisible(true);
+        target.ResponsePanel.SetValidated(true);
+    }
+
+    private IEnumerator CoinBettingRoutine(RoundInfo roundInfo)
+	{
+        JWMGameConfig gameConfig = roundInfo.gameConfig;
+
+        int[] playerB_indices = new int[gameConfig.sequenceLength];
+        float[] playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
+
+        for (int i = 0; i < gameConfig.sequenceLength; i++)
+        {
+            float correctProbability = Mathf.Clamp01(gameConfig.recallCurve.Evaluate((float)i / Mathf.Max(1, gameConfig.sequenceLength - 1)));
+
+            playerB_indices[i] = Random.value < correctProbability ? roundInfo.correctIndexSequence[i] : Random.Range(0, 9);
+
+            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
 
-        //for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
-        //{
-        //    if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
 
-        //    target.ResponsePanel.SetSymbolInColumn(playerB_indices[i], i);
-        //}
-
-        if (!fastMode) yield return new WaitForSeconds(1f);
 
         for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
         {
             if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
             int coinAmount = playerB_coinAmountSequence[i];
-            for(int c = 0; c < coinAmount; c++)
-			{
+            for (int c = 0; c < coinAmount; c++)
+            {
                 if (!fastMode) yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
                 target.ResponsePanel.AddCoinsInColumn(1, i);
                 target.CoinCounter.RemoveCoin(1);
             }
-            
+
         }
+
+        yield return null;
+
         // playerB_ResponsePanel.SetCoversVisible(true);
-        target.ResponsePanel.SetValidated();
+        target.ResponsePanel.SetValidated(true);
     }
 
     private int[] ComputeCoinSequence(float[] coinSequenceFloat, JWMGameConfig gameConfig) // to do: refactor + fix, also compute coinSequenceFloat here

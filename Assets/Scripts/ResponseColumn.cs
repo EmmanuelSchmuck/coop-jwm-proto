@@ -21,15 +21,24 @@ public class ResponseColumn : MonoBehaviour
 	private ResponsePanel responsePanel;
 	public bool IsLocked { get; private set; }
 	public int CoinCount { get; private set; }
-	public bool Interactable {
-		get => interactable;
+	public bool CoinZoneInteractable {
+		get => coinZoneInteractable;
 		set
 		{
-			interactable = value;
+			coinZoneInteractable = value;
 			coinZone.Interactable = value;
 		}
 	}
-	private bool interactable;
+	private bool coinZoneInteractable;
+	public bool SymbolInteractable
+	{
+		get => symbolInteractable;
+		set
+		{
+			symbolInteractable = value;
+		}
+	}
+	private bool symbolInteractable;
 
 	public void Initialize(ResponsePanel responsePanel, int columnIndex)
 	{
@@ -100,14 +109,14 @@ public class ResponseColumn : MonoBehaviour
 
 	public void OnAddCoinButtonClick()
 	{
-		if (!Interactable) return;
+		if (!coinZoneInteractable) return;
 
 		responsePanel.OnResponseColumnAddCoin(this);
 	}
 
 	public void OnRemoveCoinButtonClick()
 	{
-		if (!Interactable) return;
+		if (!coinZoneInteractable) return;
 
 		responsePanel.OnResponseColumnRemoveCoin(this);
 	}
@@ -151,7 +160,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void OnSymbolButtonClick()
 	{
-		if (!Interactable || IsLocked) return;
+		if (!symbolInteractable || IsLocked) return;
 
 		// if symbolkeyboard has non-null selectedSymbolIndex, set this column symbolIndex and update the symbol icon
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)

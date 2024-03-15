@@ -15,6 +15,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
 
+
     private bool roundStarted;
     
     private int[] correctIndexSequence;
@@ -23,6 +24,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private JWMGameConfig gameConfig;
     private RoundInfo roundInfo;
+    private bool symbolsSubmitted;
+
+
 
     private void Start()
     {
@@ -37,8 +41,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
-        playerA_Board.ResponseValidated += CheckForRoundEnd;
-        playerB_Board.ResponseValidated += CheckForRoundEnd;
+        playerA_Board.ResponseSumbitted += OnPlayerSubmittedResponse;
+        playerB_Board.ResponseSumbitted += OnPlayerSubmittedResponse;
 
         playerA_Board.ResponseSymbolPicked += OnSymbolPicked;
         playerB_Board.ResponseSymbolPicked += OnSymbolPicked;
@@ -54,9 +58,10 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 		}
 	}
 
+
+
     private void OnSymbolPicked(ResponseColumn responseColumn)
 	{
-        Debug.Log($"symbol picked, locking columns if action dep is negative; it is currently {gameConfig.ActionDependency}, and gameMode is {gameConfig.gameMode}");
         switch(gameConfig.ActionDependency)
 		{
             case Dependency.Negative:
@@ -108,20 +113,21 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Initialize(correctIndexSequence);
 
-        if(isFirstRound)
+        symbolsSubmitted = false;
+
+        if (isFirstRound)
 		{
             roundStarted = false;
 
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
 
+        playerA_Board.OnStimulusDisplayStart();
+        playerB_Board.OnStimulusDisplayStart();
+
         SoundManager.Instance.PlaySound(SoundType.RoundStart);
 
-        yield return new WaitForSeconds(1f);
-
-        stimulusDisplay.DoDisplayAnimation(gameConfig.displayDurationPerSymbol);
-
-        yield return new WaitForSeconds(gameConfig.sequenceLength * gameConfig.displayDurationPerSymbol);
+        yield return stimulusDisplay.DisplayAnimation(gameConfig.displayDurationPerSymbol, 1f);
 
         playerA_Board.OnStimulusDisplayCompleted(roundInfo);
         playerB_Board.OnStimulusDisplayCompleted(roundInfo);
@@ -129,18 +135,34 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         // end of stimulus display
     }
 
-    private void CheckForRoundEnd()
+    private void OnPlayerSubmittedResponse()
     {
         bool bothPlayersHaveValidated = playerA_Board.ResponsePanel.IsValidated && playerB_Board.ResponsePanel.IsValidated;
 
         if (bothPlayersHaveValidated)
         {
-            StartCoroutine(EndRound());
+            if(!symbolsSubmitted)
+			{
+                symbolsSubmitted = true;
+     
+                playerA_Board.OnCoinBettingPhaseStart(roundInfo);
+                playerB_Board.OnCoinBettingPhaseStart(roundInfo);
+                // start coin betting
+            }
+            else
+			{
+                StartCoroutine(EndRound());
+            }    
         }
     }
 
     private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd
     {
+        playerA_Board.SetInteractable(false);
+        playerB_Board.SetInteractable(false);
+
+        yield return new WaitForSeconds(1f);
+
         yield return stimulusDisplay.RevealAnimation(1.5f);
 
         yield return new WaitForSeconds(0.3f);
