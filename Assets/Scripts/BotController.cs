@@ -106,7 +106,6 @@ public class BotController : MonoBehaviour
                 target.ResponsePanel.AddCoinsInColumn(1, i);
                 target.CoinCounter.RemoveCoin(1);
             }
-
         }
 
         yield return null;

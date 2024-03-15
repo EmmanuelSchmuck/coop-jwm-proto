@@ -87,6 +87,7 @@ GameObject:
   - component: {fileID: 1894715919085196766}
   - component: {fileID: 4628759591584903798}
   - component: {fileID: 3331870021829976307}
+  - component: {fileID: 6792887441025626328}
   m_Layer: 5
   m_Name: Coin
   m_TagString: Untagged
@@ -173,6 +174,52 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6792887441025626328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6348372582123319558}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 979053aa0022d7a4782771994a409176, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animDuration: 0.2
+  animSizeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0031433105
+      value: 0
+      inSlope: 6.6866903
+      outSlope: 6.6866903
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.050282605
+    - serializedVersion: 3
+      time: 0.41875142
+      value: 1.2301679
+      inSlope: 0.043587532
+      outSlope: 0.043587532
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.16869475
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8076262865828589124
 GameObject:
   m_ObjectHideFlags: 0

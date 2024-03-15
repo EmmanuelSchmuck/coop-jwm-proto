@@ -16,7 +16,7 @@ public class StimulusDisplay : MonoBehaviour
 		for (int i = 0; i < correctIndices.Length; i++)
 		{
 			StimulusCard card = Instantiate(stimulusCardPrefab, this.transform);
-			card.Initialize(correctIndices[i]);
+			card.Initialize(correctIndices[i], animate: false);
 			card.SetVisible(false);
 			cards.Add(card);
 		}
@@ -28,7 +28,7 @@ public class StimulusDisplay : MonoBehaviour
 		float durationPerCard = animationDuration / cards.Count;
 		foreach (var card in cards)
 		{
-			card.SetVisible(true);
+			card.SetVisible(true, animate: true);
 
 			SoundManager.Instance.PlaySound(SoundType.StimulusShow);
 
@@ -42,7 +42,7 @@ public class StimulusDisplay : MonoBehaviour
 
 		foreach(var card in cards)
 		{
-			card.SetVisible(true);
+			card.SetVisible(true, animate: true);
 
 			SoundManager.Instance.PlaySound(SoundType.StimulusShow);
 

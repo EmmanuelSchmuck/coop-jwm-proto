@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Toolbox;
 
 public class ResponseColumn : MonoBehaviour
 {
@@ -75,7 +76,8 @@ public class ResponseColumn : MonoBehaviour
 		CoinCount += amount;
 		for(int i = 0; i<amount;i++)
 		{
-			coins.Add(Instantiate(coinPrefab, coinContainer));
+			GameObject coin = Instantiate(coinPrefab, coinContainer);
+			coins.Add(coin);
 		}
 		SoundManager.Instance.PlaySound(SoundType.AddCoin);
 
@@ -100,6 +102,7 @@ public class ResponseColumn : MonoBehaviour
 	public void RemoveCoin()
 	{
 		if (coins.Count <= 0) throw new System.Exception("No coin to remove !");
+
 		GameObject coin = coins[0];
 		coins.RemoveAt(0);
 		Destroy(coin);
@@ -170,7 +173,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetSymbol(int symbolIndex)
 	{
-		card.Initialize(symbolIndex);
+		card.Initialize(symbolIndex, animate: true);
 
 		SoundManager.Instance.PlaySound(SoundType.SetSymbol);
 

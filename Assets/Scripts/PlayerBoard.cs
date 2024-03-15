@@ -86,7 +86,9 @@ public class PlayerBoard : MonoBehaviour
 	{
         SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
         responsePanel.SetSymbolsInteractable(true);
-        symbolKeyboard.Interactable = true;
+
+        if(DEBUG_isHumanPlayer) symbolKeyboard.Interactable = true;
+
 
         //responsePanel.set
 
@@ -178,7 +180,7 @@ public class PlayerBoard : MonoBehaviour
 
         column.RemoveCoin();
 
-        bool canValidate = GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
+        bool canValidate = GameConfig.ActionDependency == Dependency.Negative ? true : GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
         responsePanel.SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
