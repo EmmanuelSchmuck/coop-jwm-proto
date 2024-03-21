@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class PlayerBoard : MonoBehaviour
 {
     [SerializeField] private bool DEBUG_isHumanPlayer;
+    [SerializeField] private bool isMainPlayer;
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinCounter coinCounter;
     [SerializeField] private ScoreCounter scoreCounter;
     [SerializeField] private TMPro.TextMeshProUGUI instructionText;
+    [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
 
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
@@ -31,12 +33,21 @@ public class PlayerBoard : MonoBehaviour
     private const string STIMULUS_RESPONSE_INSTRUCTION = "Use the keyboard on left to assign symbols to each card.";
     private const string COIN_BETTING_INSTRUCTION = "Right-click below each symbol to bet coins.";
 
-    public void Initialize(int symbolPoolSize)
+    public void Initialize(int symbolPoolSize, string playerName)
 	{
+        SetPlayerName(playerName);
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
         SetInstructionText(EMPTY);
-	}
+        SetCoinCounterVisible(false);
+
+    }
+
+    private void SetCoinCounterVisible(bool visible)
+	{
+        coinCounter.gameObject.SetActive(visible);
+    }
+
     public void OnResponseValidated()
 	{
         ResponseSumbitted?.Invoke();
@@ -47,6 +58,11 @@ public class PlayerBoard : MonoBehaviour
         if (!DEBUG_isHumanPlayer) text = "";
         instructionText.text = text;
     }
+
+    private void SetPlayerName(string name)
+	{
+        playerNameText.text = name;
+	}
 
     public void OnRoundStart(int symbolPoolSize, RoundInfo roundInfo, bool isFirstRound)
 	{
@@ -75,6 +91,8 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
+        symbolKeyboard.Interactable = false;
+        SetCoinCounterVisible(isMainPlayer);
         SetInstructionText(COIN_BETTING_INSTRUCTION);
         CoinBettingStarted?.Invoke(roundInfo);
         // enable coin zones
@@ -97,6 +115,8 @@ public class PlayerBoard : MonoBehaviour
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
     {
+        SetCoinCounterVisible(false);
+
         SetInstructionText(EMPTY);
         //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
 

@@ -36,8 +36,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         gameModeText.text = gameConfig.gameMode.ToString();
 
-        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
-        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE);
+        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, gameConfig.playerName);
+        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, "Bot Player");
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 

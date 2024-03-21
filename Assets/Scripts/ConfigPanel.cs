@@ -6,6 +6,7 @@ using System.Linq;
 
 public class ConfigPanel : MonoBehaviour
 {
+    [SerializeField] private TMPro.TMP_InputField playerNameInputField;
     [SerializeField] private TMPro.TMP_InputField sequenceLenghtInputField;
     [SerializeField] private TMPro.TMP_InputField displayDurationInputField;
     [SerializeField] private TMPro.TMP_InputField maxCoinPerCardInputField;
@@ -15,6 +16,9 @@ public class ConfigPanel : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        playerNameInputField.text = config.playerName.ToString();
+        playerNameInputField.onValueChanged.AddListener(delegate { OnPlayerNameInputChanged(); });
+
         sequenceLenghtInputField.text = config.sequenceLength.ToString();
         sequenceLenghtInputField.onValueChanged.AddListener(delegate { OnSequenceLengthInputChanged(); });
 
@@ -37,6 +41,12 @@ public class ConfigPanel : MonoBehaviour
     private void OnAllowSymbolRepetitionValueChanged()
 	{
         config.allowSymbolRepetition = allowSymbolRepetitionToggle.isOn;
+    }
+
+    private void OnPlayerNameInputChanged()
+    {
+        string text = playerNameInputField.text;
+        config.playerName = text;
     }
 
     private void OnGamerModeInputChanged()

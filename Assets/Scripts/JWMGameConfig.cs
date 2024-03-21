@@ -5,6 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class JWMGameConfig
 {
+    public string playerName;
     public GameMode gameMode;
     public int sequenceLength = 6;
     public float displayDurationPerSymbol = 1f;
