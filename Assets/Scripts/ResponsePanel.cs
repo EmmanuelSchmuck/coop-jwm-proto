@@ -13,6 +13,7 @@ public class ResponsePanel : MonoBehaviour
 	public bool IsValidated { get; private set; }
 	public bool AllSymbolsPicked => columns.All(c => c.SymbolIndex != null);
 	public bool AllColumnsLocked => columns.All(c => c.IsLocked);
+	public bool AllColumnsPickedOrLocked => columns.All(c => c.IsLocked || c.SymbolIndex != null);
 	public int CoinsInColumns => columns.Sum(c => c.CoinCount);
 
 	private List<ResponseColumn> columns;

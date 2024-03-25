@@ -40,7 +40,6 @@ public class ButtonHighlighter : MonoBehaviour
 
 	private IEnumerator Animate()
 	{
-		Debug.Log("start animate highlight");
 		while(isEnabled)
 		{
 			yield return CoroutineTools.Tween01(loopDuration, t => image.color = baseColor.WithAlphaMultiplied(t), animCurve.Evaluate);

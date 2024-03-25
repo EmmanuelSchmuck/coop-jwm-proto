@@ -8,37 +8,24 @@ public class BotController : MonoBehaviour
 {
     [SerializeField] private bool fastMode;
     [SerializeField] private PlayerBoard target;
-    [SerializeField] private PlayerBoard otherPlayer;
-    private bool canPickSymbol;
+    private int[] playerB_indices;
+    private float[] playerB_coinAmountSequenceFloat;
+
     // Start is called before the first frame update
     void Start()
     {
-        target.StimulusDisplayed += OnStimulusDisplayed;
-        otherPlayer.ResponseSymbolPicked += OnOtherPlayerSymbolPicked;
+        target.ResponsePhaseStarted += OnResponsePhaseStarted;
         target.CoinBettingStarted += OnCoinBettingStarted;
+        target.ResponseTurnStarted += OnResponseTurnStarted;
+        target.StimulusDisplayed += OnStimulusDisplayed;
     }
 
     void OnStimulusDisplayed(RoundInfo roundInfo)
 	{
-        StartCoroutine(AfterStimulusDisplayRoutine(roundInfo));
-	}
-
-    void OnCoinBettingStarted(RoundInfo roundInfo)
-    {
-        StartCoroutine(CoinBettingRoutine(roundInfo));
-    }
-
-    void OnOtherPlayerSymbolPicked(ResponseColumn column)
-	{
-        canPickSymbol = true;
-    }
-
-    private IEnumerator AfterStimulusDisplayRoutine(RoundInfo roundInfo)
-	{
         JWMGameConfig gameConfig = roundInfo.gameConfig;
 
-        int[] playerB_indices = new int[gameConfig.sequenceLength];
-        float[] playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
+        playerB_indices = new int[gameConfig.sequenceLength];
+        playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
 
         for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
@@ -48,18 +35,51 @@ public class BotController : MonoBehaviour
 
             playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
+    }
 
+    void OnResponsePhaseStarted(RoundInfo roundInfo)
+    {
+        StartCoroutine(PickSymbolsRoutine(roundInfo));
+    }
+
+    void OnCoinBettingStarted(RoundInfo roundInfo)
+    {
+        StartCoroutine(CoinBettingRoutine(roundInfo));
+    }
+
+    void OnResponseTurnStarted(RoundInfo roundInfo)
+	{
+        // pick a single symbol
+        StartCoroutine(PickSingleSymbolRoutine(roundInfo));
+    }
+
+    private IEnumerator PickSingleSymbolRoutine(RoundInfo roundInfo)
+    {
+        if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+
+        int columnIndex = target.ResponsePanel.Columns.First(x => x.SymbolIndex == null && !x.IsLocked).ColumnIndex;
+
+        target.SymbolKeyboard.SetSelectedSymbolIndex(playerB_indices[columnIndex]);
+
+        target.OnResponseSymbolPickAttempted(target.ResponsePanel.Columns[columnIndex]); //.SetSymbolInColumn(playerB_indices[lastPickedSymbolIndex], lastPickedSymbolIndex);
+
+        if (!fastMode) yield return new WaitForSeconds(0.5f);
+        //      if (!fastMode) yield return new WaitForSeconds(0.25f);
+
+        //      yield return null;
+
+        //      if(target.ResponsePanel.AllColumnsPickedOrLocked)
+        //{
+        //          target.ResponsePanel.SetValidated(true);
+        //      }
+
+        // playerB_ResponsePanel.SetCoversVisible(true);
+
+    }
+
+    private IEnumerator PickSymbolsRoutine(RoundInfo roundInfo)
+	{
         if (!fastMode) yield return new WaitForSeconds(1f);
-
-
-		//      while(!target.ResponsePanel.AllSymbolsPickedOrLocked) // pick symbols, waiting between each symbol; either a small delay or until it's our turn
-		//{
-		//          if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
-
-		//          int columnIndex = target.ResponsePanel.Columns.First(c => c.SymbolIndex == null && !c.IsLocked).ColumnIndex;
-
-		//          target.ResponsePanel.SetSymbolInColumn(playerB_indices[columnIndex], columnIndex);
-		//      }
 
 		for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
 		{

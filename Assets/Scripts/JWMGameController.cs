@@ -24,15 +24,18 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private JWMGameConfig gameConfig;
     private RoundInfo roundInfo;
-    private bool symbolsSubmitted;
-
-
+    private bool symbolsSubmitted_REFACTOR_ME;
+    private PlayerBoard activePlayer;
+    private PlayerBoard inactivePlayer;
+    private PlayerBoard firstPlayer;
 
     private void Start()
     {
         gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
 
         gameConfig.recallCurve = debugConfig.recallCurve; // WIP
+
+        firstPlayer = playerA_Board; // WIP
 
         gameModeText.text = gameConfig.gameMode.ToString();
 
@@ -64,13 +67,39 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 	{
         switch(gameConfig.ActionDependency)
 		{
+            default:
+            case Dependency.None:
+                return;
+            case Dependency.Positive: // set other player's corresponding column symbol to same symbol
             case Dependency.Negative:
                 playerA_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
                 playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
-                break;
-            default:
-                return;
+                break;  
 		}
+
+        if(inactivePlayer.ResponsePanel.AllColumnsPickedOrLocked)
+		{
+            StartCoinBettingPhase();
+        }
+		else
+		{
+            NextPlayerResponseTurn();
+        }
+	}
+
+    private void NextPlayerResponseTurn()
+	{
+        SetActivePlayer(activePlayer == null ? firstPlayer : inactivePlayer);
+        activePlayer.OnResponseTurnStart(roundInfo);
+        inactivePlayer.OnResponseTurnEnd();
+    }
+
+    private void SetActivePlayer(PlayerBoard player)
+	{
+        activePlayer = player;
+        inactivePlayer = player == playerA_Board ? playerB_Board : playerA_Board;
+
+        //Debug.Log($"Set active player to {player}");
 	}
 
     private void ExitToMenu()
@@ -113,7 +142,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Initialize(correctIndexSequence);
 
-        symbolsSubmitted = false;
+        symbolsSubmitted_REFACTOR_ME = false;
 
         if (isFirstRound)
 		{
@@ -129,10 +158,26 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return stimulusDisplay.DisplayAnimation(gameConfig.displayDurationPerSymbol, 1f);
 
-        playerA_Board.OnStimulusDisplayCompleted(roundInfo);
-        playerB_Board.OnStimulusDisplayCompleted(roundInfo);
+        playerA_Board.OnStimulusDisplayEnd(roundInfo);
+        playerB_Board.OnStimulusDisplayEnd(roundInfo);
 
-        // end of stimulus display
+
+        if (gameConfig.ActionDependency == Dependency.None)
+		{
+            playerA_Board.OnResponsePhaseStart(roundInfo);
+            playerB_Board.OnResponsePhaseStart(roundInfo);
+        }
+        else
+		{
+            NextPlayerResponseTurn();
+		}
+    }
+
+    private void StartCoinBettingPhase()
+	{
+        symbolsSubmitted_REFACTOR_ME = true; // refactor this
+        playerA_Board.OnCoinBettingPhaseStart(roundInfo);
+        playerB_Board.OnCoinBettingPhaseStart(roundInfo);
     }
 
     private void OnPlayerSubmittedResponse()
@@ -141,12 +186,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         if (bothPlayersHaveValidated)
         {
-            if(!symbolsSubmitted)
+            if(!symbolsSubmitted_REFACTOR_ME)
 			{
-                symbolsSubmitted = true;
-     
-                playerA_Board.OnCoinBettingPhaseStart(roundInfo);
-                playerB_Board.OnCoinBettingPhaseStart(roundInfo);
+                StartCoinBettingPhase();
                 // start coin betting
             }
             else

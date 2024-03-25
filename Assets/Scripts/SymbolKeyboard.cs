@@ -37,6 +37,11 @@ public class SymbolKeyboard : MonoBehaviour
         SelectedSymbolIndex = null;
     }
 
+    public void SetSelectedSymbolIndex(int symbolIndex)
+	{
+        SelectedSymbolIndex = symbolIndex;
+    }
+
     private void OnKeyClicked(SymbolKey key)
 	{
         if (!Interactable) return;

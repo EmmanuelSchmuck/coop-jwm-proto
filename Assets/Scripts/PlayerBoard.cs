@@ -24,14 +24,20 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action ResponseSumbitted;
     public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
-    public event System.Action<RoundInfo> StimulusDisplayed; // rename: symbol pick phase started
+    public event System.Action<RoundInfo> StimulusDisplayed;
+    public event System.Action<RoundInfo> ResponsePhaseStarted; // rename: symbol pick phase started
     public event System.Action<RoundInfo> CoinBettingStarted;
+    public event System.Action<RoundInfo> ResponseTurnStarted;
     public event System.Action<ResponseColumn> ResponseSymbolPicked;
 
     private const string EMPTY = "";
     private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember each symbol.";
     private const string STIMULUS_RESPONSE_INSTRUCTION = "Use the keyboard on left to assign symbols to each card.";
     private const string COIN_BETTING_INSTRUCTION = "Right-click below each symbol to bet coins.";
+    private const string TURN_START_INSTRUCTION = "Use the keyboard on left to assign a symbol to a card.";
+    private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a symbol...";
+
+    private RoundInfo roundInfo;
 
     public void Initialize(int symbolPoolSize, string playerName)
 	{
@@ -67,6 +73,7 @@ public class PlayerBoard : MonoBehaviour
     public void OnRoundStart(int symbolPoolSize, RoundInfo roundInfo, bool isFirstRound)
 	{
         this.GameConfig = roundInfo.gameConfig;
+        this.roundInfo = roundInfo;
 
         symbolKeyboard.ResetSelection();
 
@@ -89,6 +96,11 @@ public class PlayerBoard : MonoBehaviour
         SetInstructionText(STIMULUS_DISPLAY_INSTRUCTION);
     }
 
+    public void OnStimulusDisplayEnd(RoundInfo roundInfo)
+    {
+        StimulusDisplayed?.Invoke(roundInfo);
+    }
+
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
         symbolKeyboard.Interactable = false;
@@ -100,7 +112,22 @@ public class PlayerBoard : MonoBehaviour
         responsePanel.SetValidated(false);
 	}
 
-    public void OnStimulusDisplayCompleted(RoundInfo roundInfo)
+    public void OnResponseTurnStart(RoundInfo roundInfo)
+	{
+        SetInstructionText(TURN_START_INSTRUCTION);
+        symbolKeyboard.Interactable = true;
+        responsePanel.SetSymbolsInteractable(true);
+        ResponseTurnStarted?.Invoke(roundInfo);
+    }
+
+    public void OnResponseTurnEnd()
+	{
+        SetInstructionText(TURN_END_INSTRUCTION);
+        symbolKeyboard.Interactable = false;
+        responsePanel.SetSymbolsInteractable(false);
+    }
+
+    public void OnResponsePhaseStart(RoundInfo roundInfo)
 	{
         SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
         responsePanel.SetSymbolsInteractable(true);
@@ -110,7 +137,7 @@ public class PlayerBoard : MonoBehaviour
 
         //responsePanel.set
 
-        StimulusDisplayed?.Invoke(roundInfo);
+        ResponsePhaseStarted?.Invoke(roundInfo);
     }
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
@@ -157,7 +184,7 @@ public class PlayerBoard : MonoBehaviour
 
         StartRoundButtonClicked?.Invoke();
     }
-
+    
     public void OnResponseSymbolPickAttempted(ResponseColumn column) // rename this !
 	{
         int? selectedSymbolIndex = SelectedSymbolIndex; // this needs to work for the bot as well; bot should use the keyboard
@@ -166,12 +193,18 @@ public class PlayerBoard : MonoBehaviour
 
         column.SetSymbol((int)selectedSymbolIndex);
 
-        
-        bool canValidate = responsePanel.AllSymbolsPicked;
-        responsePanel.SetCanValidate(canValidate);
-        SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
-        //responsePanel.CheckIfCanValidate(GameConfig.CoinPerRound);
+        bool canValidate = responsePanel.AllColumnsPickedOrLocked;
 
+        if(GameConfig.ActionDependency == Dependency.None)
+		{
+            responsePanel.SetCanValidate(canValidate);
+            SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
+        }
+        else if(canValidate) // action dependency positive or negative; we validate without using the button
+		{
+            responsePanel.SetValidated(true);
+		}
+        
         ResponseSymbolPicked?.Invoke(column);
     }
 
