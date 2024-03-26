@@ -55,7 +55,7 @@ public class BotController : MonoBehaviour
 
     private IEnumerator PickSingleSymbolRoutine(RoundInfo roundInfo)
     {
-        if(!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        if(!fastMode) yield return new WaitForSeconds(Random.Range(0.8f, 1.2f));
 
         int columnIndex = target.ResponsePanel.Columns.First(x => x.SymbolIndex == null && !x.IsLocked).ColumnIndex;
 

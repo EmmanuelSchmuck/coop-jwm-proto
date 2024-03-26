@@ -61,8 +61,13 @@ public class ResponseColumn : MonoBehaviour
 	public void SetLocked(bool isLocked = true)
 	{
 		this.IsLocked = isLocked;
+
 		DEBUG_lock.SetActive(isLocked);
-		//if (IsLocked) Interactable = false;
+
+		if(isLocked)
+		{
+			SoundManager.Instance.PlaySound(SoundType.Lock);
+		}
 	}
 
 	public void SetCoinButtonsVisible(bool visible)

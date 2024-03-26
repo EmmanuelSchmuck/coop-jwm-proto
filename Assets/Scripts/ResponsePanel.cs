@@ -117,7 +117,6 @@ public class ResponsePanel : MonoBehaviour
 
 	public void SetCanValidate(bool canValidate)
 	{
-		//IsValidated = validated;
 		validateButton.gameObject.SetActive(canValidate);
 	}
 
@@ -128,7 +127,6 @@ public class ResponsePanel : MonoBehaviour
 
 	public void SetColumnLocked(int columnIndex)
 	{
-		Debug.Log("locking column");
 		columns[columnIndex].SetLocked();
 	}
 

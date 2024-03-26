@@ -65,29 +65,42 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private void OnSymbolPicked(ResponseColumn responseColumn)
 	{
-        switch(gameConfig.ActionDependency)
-		{
+        //if (gameConfig.ActionDependency == Dependency.None) return;
+
+        StartCoroutine(OnSymbolPickedRoutine(responseColumn));    
+	}
+
+    private IEnumerator OnSymbolPickedRoutine(ResponseColumn responseColumn)
+	{
+        switch (gameConfig.ActionDependency)
+        {
             default:
-            case Dependency.None:
-                return;
+            case Dependency.None: // exit the routine without doing anything
+                yield break;
             case Dependency.Positive:
+                activePlayer.SetInteractable(false);
+                yield return new WaitForSeconds(0.25f);
                 inactivePlayer.ResponsePanel.SetSymbolInColumn((int)responseColumn.SymbolIndex, responseColumn.ColumnIndex);
                 break;
             case Dependency.Negative:
+                activePlayer.SetInteractable(false);
+                yield return new WaitForSeconds(0.25f);
                 inactivePlayer.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
                 //playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
-                break;  
-		}
+                break;
+        }
 
-        if(inactivePlayer.ResponsePanel.AllColumnsPickedOrLocked)
-		{
+        yield return new WaitForSeconds(0.75f);
+
+        if (inactivePlayer.ResponsePanel.AllColumnsPickedOrLocked)
+        {
             StartCoinBettingPhase();
         }
-		else
-		{
+        else
+        {
             NextPlayerResponseTurn();
         }
-	}
+    }
 
     private void NextPlayerResponseTurn()
 	{
