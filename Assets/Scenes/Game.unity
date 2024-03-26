@@ -4398,7 +4398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   debugConfig:
     playerName: Debug Name
-    gameMode: 4
+    gameMode: 7
     sequenceLength: 6
     displayDurationPerSymbol: 0.7
     allowSymbolRepetition: 1

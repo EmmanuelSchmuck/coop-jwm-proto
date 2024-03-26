@@ -24,7 +24,7 @@ public class JWMGameConfig
     // Positive ActionDependency is not defined for this game, we can only return Dependency.Negative or Dependency.None
     public Dependency ActionDependency => gameMode switch
     {
-        //GameMode.PositiveAction or GameMode.PositiveRewardAction => Dependency.Positive,
+        GameMode.PositiveAction or GameMode.PositiveRewardAction => Dependency.Positive,
         GameMode.NegativeAction or GameMode.NegativeRewardAction => Dependency.Negative,
         _ => Dependency.None
     };

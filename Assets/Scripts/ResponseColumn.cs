@@ -178,5 +178,7 @@ public class ResponseColumn : MonoBehaviour
 		SoundManager.Instance.PlaySound(SoundType.SetSymbol);
 
 		this.SymbolIndex = symbolIndex;
+
+		SymbolInteractable = false;
 	}
 }

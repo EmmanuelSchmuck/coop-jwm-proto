@@ -70,10 +70,12 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             default:
             case Dependency.None:
                 return;
-            case Dependency.Positive: // set other player's corresponding column symbol to same symbol
+            case Dependency.Positive:
+                inactivePlayer.ResponsePanel.SetSymbolInColumn((int)responseColumn.SymbolIndex, responseColumn.ColumnIndex);
+                break;
             case Dependency.Negative:
-                playerA_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
-                playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
+                inactivePlayer.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
+                //playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
                 break;  
 		}
 
