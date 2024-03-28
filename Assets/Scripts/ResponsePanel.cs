@@ -36,6 +36,9 @@ public class ResponsePanel : MonoBehaviour
 			columns.Add(column);
 			column.Initialize(this, i);
 		}
+
+		validateButton.transform.SetSiblingIndex(transform.childCount);
+		startRoundButton.transform.SetSiblingIndex(transform.childCount);
 	}
 
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)

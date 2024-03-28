@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class SymbolKeyboard : MonoBehaviour
 {
-    [SerializeField] private GameObject cover;
+    [SerializeField] private Transform keyContainer;
+    [SerializeField] private CanvasGroup keyCanvasGroup;
     public int? SelectedSymbolIndex { get; private set; }
     public bool Interactable
     {
@@ -13,8 +14,9 @@ public class SymbolKeyboard : MonoBehaviour
         set
         {
             interactable = value;
-            cover.SetActive(!interactable);
-            foreach (var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
+            keyCanvasGroup.alpha = interactable ? 1f : 0f;
+            keyCanvasGroup.interactable = interactable;
+            foreach (var symbolKey in keyContainer.GetComponentsInChildren<SymbolKey>())
             {
                 symbolKey.SetInteractable(interactable);
             }
@@ -25,7 +27,7 @@ public class SymbolKeyboard : MonoBehaviour
     public void Initialize(int symbolPoolSize)
 	{
         int i = 0;
-        foreach(var symbolKey in transform.GetComponentsInChildren<SymbolKey>())
+        foreach(var symbolKey in keyContainer.GetComponentsInChildren<SymbolKey>())
         {
             symbolKey.Initialize(symbolIndex: i);
 

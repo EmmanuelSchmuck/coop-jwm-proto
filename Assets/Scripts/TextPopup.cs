@@ -21,10 +21,11 @@ public class TextPopup : MonoBehaviour
 	{
         textElement.text = text;
         StopAllCoroutines();
+        Vector3 startPosition = rectTransform.anchoredPosition;
         StartCoroutine(CoroutineTools.Tween01(animationDuration, t =>
         {
             textElement.alpha = opacityCurve.Evaluate(t);
-            rectTransform.anchoredPosition = rectTransform.anchoredPosition.WithY(heightCurve.Evaluate(t));
+            rectTransform.anchoredPosition = startPosition + heightCurve.Evaluate(t) * Vector3.up;
         }));
     }
 }
