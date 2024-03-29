@@ -96,10 +96,12 @@ public class ResponsePanel : MonoBehaviour
 		startRoundButton.gameObject.SetActive(visible);
 	}
 
-	public void SetSymbolsInteractable(bool interactable) // only affect columns, not other buttons
+	public void SetSymbolsInteractable(bool interactable, bool onlyNonPickedSymbols = false)
 	{
 		foreach(var column in columns)
 		{
+			if (onlyNonPickedSymbols && column.SymbolIndex != null) continue;
+
 			column.SymbolInteractable = interactable;
 		}
 	}

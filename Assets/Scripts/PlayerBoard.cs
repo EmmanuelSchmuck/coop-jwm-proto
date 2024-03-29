@@ -121,16 +121,17 @@ public class PlayerBoard : MonoBehaviour
     public void OnResponseTurnStart(RoundInfo roundInfo)
 	{
         turnCount++;
-        SetInstructionText(TURN_START_INSTRUCTION);
-
+        
         if(turnCount == 1)
 		{
             symbolKeyboard.Highlighted = isMainPlayer;
             symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
         }
-        
+
+        SetInstructionText(TURN_START_INSTRUCTION);
+
         symbolKeyboard.Interactable = true;
-        responsePanel.SetSymbolsInteractable(true);
+        responsePanel.SetSymbolsInteractable(true, onlyNonPickedSymbols: true);
         ResponseTurnStarted?.Invoke(roundInfo);
     }
 
