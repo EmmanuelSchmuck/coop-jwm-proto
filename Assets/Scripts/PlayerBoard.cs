@@ -130,7 +130,7 @@ public class PlayerBoard : MonoBehaviour
 
         SetInstructionText(TURN_START_INSTRUCTION);
 
-        symbolKeyboard.Interactable = true;
+        symbolKeyboard.Interactable = isMainPlayer;
         responsePanel.SetSymbolsInteractable(true, onlyNonPickedSymbols: true);
         ResponseTurnStarted?.Invoke(roundInfo);
     }
