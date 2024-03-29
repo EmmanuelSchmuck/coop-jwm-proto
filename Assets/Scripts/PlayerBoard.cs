@@ -13,10 +13,13 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private ScoreCounter scoreCounter;
     [SerializeField] private TMPro.TextMeshProUGUI instructionText;
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
+    [SerializeField] private GameObject validateButton;
+    [SerializeField] private GameObject startRoundButton;
 
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
     public CoinCounter CoinCounter => coinCounter;
+    public bool IsValidated { get; private set; }
     private int score;
     public JWMGameConfig GameConfig { get; private set; }
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
@@ -43,6 +46,8 @@ public class PlayerBoard : MonoBehaviour
 
     public void Initialize(int symbolPoolSize, string playerName)
 	{
+        IsValidated = false;
+        SetCanValidate(false);
         SetPlayerName(playerName);
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
@@ -77,6 +82,9 @@ public class PlayerBoard : MonoBehaviour
         this.GameConfig = roundInfo.gameConfig;
         this.roundInfo = roundInfo;
 
+        IsValidated = false;
+        SetCanValidate(false);
+
         symbolKeyboard.ResetSelection();
 
         symbolPickedCount = 0;
@@ -88,13 +96,15 @@ public class PlayerBoard : MonoBehaviour
 
         if(isFirstRound && DEBUG_isHumanPlayer)
 		{
-            responsePanel.SetStartRoundButtonVisible(true);
+            SetStartRoundButtonVisible(true);
         }
 
         SetInteractable(false);
 
         RoundStarted?.Invoke(roundInfo);
     }
+
+    private void SetStartRoundButtonVisible(bool visible) => startRoundButton?.gameObject.SetActive(visible);
 
     public void OnStimulusDisplayStart()
     {
@@ -115,7 +125,7 @@ public class PlayerBoard : MonoBehaviour
         CoinBettingStarted?.Invoke(roundInfo);
         // enable coin zones
         responsePanel.SetCoinZoneInteractable(true);
-        responsePanel.SetValidated(false);
+        IsValidated = false;
 	}
 
     public void OnResponseTurnStart(RoundInfo roundInfo)
@@ -163,6 +173,13 @@ public class PlayerBoard : MonoBehaviour
         responsePanel.SymbolsHighlighted = isMainPlayer;
     }
 
+    public void OnValidateButtonClick()
+    {
+        SoundManager.Instance.PlaySound(SoundType.GenericClick);
+        SetValidated(true);
+    }
+
+
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
     {
         SetCoinCounterVisible(false);
@@ -186,7 +203,7 @@ public class PlayerBoard : MonoBehaviour
             responsePanel.Columns[i].Cleanup();
         }
 
-        if (DEBUG_isHumanPlayer) responsePanel.SetStartRoundButtonVisible(true);   
+        if (DEBUG_isHumanPlayer) SetStartRoundButtonVisible(true);   
     }
 
     public int ComputeRawRoundScore(RoundInfo roundInfo)
@@ -203,7 +220,9 @@ public class PlayerBoard : MonoBehaviour
 
     public void WIP_OnStartRoundButtonClick()
     {
-        responsePanel.SetStartRoundButtonVisible(false);
+        SetStartRoundButtonVisible(false);
+
+        SoundManager.Instance.PlaySound(SoundType.GenericClick);
 
         StartRoundButtonClicked?.Invoke();
     }
@@ -222,24 +241,29 @@ public class PlayerBoard : MonoBehaviour
             symbolKeyboard.SymbolSelected -= OnKeyboardFirstSelect;
         }
 
-        
-
         column.SetSymbol((int)selectedSymbolIndex);
 
         bool canValidate = responsePanel.AllColumnsPickedOrLocked;
 
-        if(GameConfig.ActionDependency == Dependency.None)
-		{
-            responsePanel.SetCanValidate(canValidate);
-            SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
-        }
-        else if(canValidate) // action dependency positive or negative; we validate without using the button
-		{
-            responsePanel.SetValidated(true);
-		}
-        
+  //      if(GameConfig.ActionDependency == Dependency.None)
+		//{
+  //          SetCanValidate(canValidate);
+  //          SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
+  //      }
+  //      else if(canValidate) // action dependency positive or negative; we validate without using the button
+		//{
+  //          SetValidated(true);
+		//}
+        if(canValidate) SetValidated(true);
+
+
         ResponseSymbolPicked?.Invoke(column);
     }
+
+    public void SetCanValidate(bool canValidate)
+	{
+        validateButton?.gameObject.SetActive(canValidate);
+	}
 
     public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
     {
@@ -254,11 +278,18 @@ public class PlayerBoard : MonoBehaviour
         column.AddCoin();
 
         bool canValidate = GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
-        responsePanel.SetCanValidate(canValidate);
+        SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
 
     }
+
+    public void SetValidated(bool validated)
+	{
+        IsValidated = validated;
+        validateButton?.gameObject.SetActive(false);
+        OnResponseValidated();
+	}
 
     public void WIP_OnResponseColumnRemoveCoinClicked(ResponseColumn column)
     {
@@ -269,7 +300,7 @@ public class PlayerBoard : MonoBehaviour
         column.RemoveCoin();
 
         bool canValidate = GameConfig.ActionDependency == Dependency.Negative ? true : GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
-        responsePanel.SetCanValidate(canValidate);
+        SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
     }

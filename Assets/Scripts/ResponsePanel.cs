@@ -7,8 +7,7 @@ using System.Linq;
 public class ResponsePanel : MonoBehaviour
 {
     [SerializeField] private ResponseColumn columnPrefab;
-	[SerializeField] private Button validateButton;
-	[SerializeField] private Button startRoundButton;
+
 
 	public bool SymbolsHighlighted
 	{
@@ -33,7 +32,6 @@ public class ResponsePanel : MonoBehaviour
 		}
 	}
 
-	public bool IsValidated { get; private set; }
 	public bool AllSymbolsPicked => columns.All(c => c.SymbolIndex != null);
 	public bool AllColumnsLocked => columns.All(c => c.IsLocked);
 	public bool AllColumnsPickedOrLocked => columns.All(c => c.IsPickedOrLocked);
@@ -59,9 +57,6 @@ public class ResponsePanel : MonoBehaviour
 			columns.Add(column);
 			column.Initialize(this, i);
 		}
-
-		validateButton.transform.SetSiblingIndex(transform.childCount);
-		startRoundButton.transform.SetSiblingIndex(transform.childCount);
 	}
 
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
@@ -91,11 +86,6 @@ public class ResponsePanel : MonoBehaviour
 		column.SetCoinButtonsVisible(false);
 	}
 
-	public void SetStartRoundButtonVisible(bool visible)
-	{
-		startRoundButton.gameObject.SetActive(visible);
-	}
-
 	public void SetSymbolsInteractable(bool interactable, bool onlyNonPickedSymbols = false)
 	{
 		foreach(var column in columns)
@@ -118,17 +108,6 @@ public class ResponsePanel : MonoBehaviour
 		board.WIP_OnStartRoundButtonClick();
 	}
 
-	public void OnValidateButtonClick()
-	{
-		SetValidated(true);
-	}
-
-	public void SetValidated(bool validated) // refactor this!
-	{
-		IsValidated = validated;
-		validateButton.gameObject.SetActive(false);
-		if(validated) board.OnResponseValidated();
-	}
 
 	//public void ShowCorrectFeedback(int[] correctIndices)
 	//{
@@ -143,10 +122,6 @@ public class ResponsePanel : MonoBehaviour
 		return columns.Where((c, i) => c.SymbolIndex == correctIndices[i]);
 	}
 
-	public void SetCanValidate(bool canValidate)
-	{
-		validateButton.gameObject.SetActive(canValidate);
-	}
 
 	public void AddCoinsInColumn(int amount, int columnIndex)
 	{
@@ -165,11 +140,7 @@ public class ResponsePanel : MonoBehaviour
 
 	private void Cleanup()
 	{
-		IsValidated = false;
-
 		hoveredColumn = null;
-
-		validateButton.gameObject.SetActive(false);
 
 		foreach (var column in transform.GetComponentsInChildren<ResponseColumn>())
 		{

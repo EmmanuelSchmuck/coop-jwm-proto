@@ -197,7 +197,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private void OnPlayerSubmittedResponse()
     {
-        bool bothPlayersHaveValidated = playerA_Board.ResponsePanel.IsValidated && playerB_Board.ResponsePanel.IsValidated;
+        bool bothPlayersHaveValidated = playerA_Board.IsValidated && playerB_Board.IsValidated;
 
         if (bothPlayersHaveValidated)
         {

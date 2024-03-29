@@ -93,7 +93,7 @@ public class BotController : MonoBehaviour
         yield return null;
 
         // playerB_ResponsePanel.SetCoversVisible(true);
-        target.ResponsePanel.SetValidated(true);
+        target.SetValidated(true);
     }
 
     private IEnumerator CoinBettingRoutine(RoundInfo roundInfo)
@@ -131,7 +131,7 @@ public class BotController : MonoBehaviour
         yield return null;
 
         // playerB_ResponsePanel.SetCoversVisible(true);
-        target.ResponsePanel.SetValidated(true);
+        target.SetValidated(true);
     }
 
     private int[] ComputeCoinSequence(float[] coinSequenceFloat, JWMGameConfig gameConfig) // to do: refactor + fix, also compute coinSequenceFloat here
