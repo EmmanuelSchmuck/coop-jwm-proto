@@ -15,12 +15,13 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
-	[SerializeField] private StimulusCard card;
+	[SerializeField] private SymbolCard symbolCard;
 	[SerializeField] private GameObject DEBUG_lock;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
 	public bool IsLocked { get; private set; }
+	public bool IsPickedOrLocked => IsLocked || SymbolIndex != null;
 	public int CoinCount { get; private set; }
 	public bool CoinZoneInteractable {
 		get => coinZoneInteractable;
@@ -29,6 +30,14 @@ public class ResponseColumn : MonoBehaviour
 			coinZoneInteractable = value;
 			coinZone.Interactable = value;
 		}
+	}
+	public bool CoinZoneHighlighted
+	{
+		set => coinZone.Highlighted = value;
+	}
+	public bool SymbolHighlighted
+	{
+		set => symbolCard.Highlighted = value;
 	}
 	private bool coinZoneInteractable;
 	public bool SymbolInteractable
@@ -46,7 +55,7 @@ public class ResponseColumn : MonoBehaviour
 		this.ColumnIndex = columnIndex;
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
-		card.Initialize(null);
+		symbolCard.Initialize(null);
 		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
@@ -135,7 +144,7 @@ public class ResponseColumn : MonoBehaviour
 		{
 			Destroy(coinContainer.GetChild(i).gameObject);
 		}
-		card.Initialize(null);
+		symbolCard.Initialize(null);
 		SetLocked(false);
 		check.Hide();
 
@@ -146,7 +155,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetCoverVisible(bool visible) // change this!
 	{
-		card.SetVisible(!visible);
+		symbolCard.SetVisible(!visible);
 	}
 
 	public void ShowCorrectFeedback(bool isCorrect)
@@ -178,7 +187,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetSymbol(int symbolIndex)
 	{
-		card.Initialize(symbolIndex, animate: true);
+		symbolCard.Initialize(symbolIndex, animate: true);
 
 		SoundManager.Instance.PlaySound(SoundType.SetSymbol);
 

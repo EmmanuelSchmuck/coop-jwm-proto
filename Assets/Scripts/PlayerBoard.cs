@@ -38,6 +38,8 @@ public class PlayerBoard : MonoBehaviour
     private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a symbol...";
 
     private RoundInfo roundInfo;
+    private int symbolPickedCount;
+    private int turnCount;
 
     public void Initialize(int symbolPoolSize, string playerName)
 	{
@@ -77,6 +79,9 @@ public class PlayerBoard : MonoBehaviour
 
         symbolKeyboard.ResetSelection();
 
+        symbolPickedCount = 0;
+        turnCount = 0;
+
         responsePanel.Initialize(GameConfig.sequenceLength, this);
 
         coinCounter.SetCoin(GameConfig.CoinPerRound);
@@ -104,6 +109,7 @@ public class PlayerBoard : MonoBehaviour
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
         symbolKeyboard.Interactable = false;
+        responsePanel.CoinZoneHighlighted = isMainPlayer;
         SetCoinCounterVisible(isMainPlayer);
         SetInstructionText(COIN_BETTING_INSTRUCTION);
         CoinBettingStarted?.Invoke(roundInfo);
@@ -114,7 +120,15 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnResponseTurnStart(RoundInfo roundInfo)
 	{
+        turnCount++;
         SetInstructionText(TURN_START_INSTRUCTION);
+
+        if(turnCount == 1)
+		{
+            symbolKeyboard.Highlighted = isMainPlayer;
+            symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
+        }
+        
         symbolKeyboard.Interactable = true;
         responsePanel.SetSymbolsInteractable(true);
         ResponseTurnStarted?.Invoke(roundInfo);
@@ -130,6 +144,8 @@ public class PlayerBoard : MonoBehaviour
     public void OnResponsePhaseStart(RoundInfo roundInfo)
 	{
         SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
+        symbolKeyboard.Highlighted = isMainPlayer;
+        symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
         responsePanel.SetSymbolsInteractable(true);
 
         if(DEBUG_isHumanPlayer) symbolKeyboard.Interactable = true;
@@ -138,6 +154,12 @@ public class PlayerBoard : MonoBehaviour
         //responsePanel.set
 
         ResponsePhaseStarted?.Invoke(roundInfo);
+    }
+
+    private void OnKeyboardFirstSelect()
+	{
+        symbolKeyboard.Highlighted = false;
+        responsePanel.SymbolsHighlighted = isMainPlayer;
     }
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
@@ -191,6 +213,16 @@ public class PlayerBoard : MonoBehaviour
 
         if (selectedSymbolIndex == null) return;
 
+        symbolPickedCount++;
+
+        if(symbolPickedCount == 1)
+		{
+            responsePanel.SymbolsHighlighted = false;
+            symbolKeyboard.SymbolSelected -= OnKeyboardFirstSelect;
+        }
+
+        
+
         column.SetSymbol((int)selectedSymbolIndex);
 
         bool canValidate = responsePanel.AllColumnsPickedOrLocked;
@@ -213,6 +245,8 @@ public class PlayerBoard : MonoBehaviour
         if (column.CoinCount >= GameConfig.maxCoinPerSymbol) return;
 
         if (coinCounter.CoinCount <= 0) return;
+
+        responsePanel.CoinZoneHighlighted = false;
 
         coinCounter.RemoveCoin();
 

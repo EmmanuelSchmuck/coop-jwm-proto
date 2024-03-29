@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class StimulusDisplay : MonoBehaviour
 {
-	[SerializeField] private StimulusCard stimulusCardPrefab;
-	private List<StimulusCard> cards;
+	[SerializeField] private SymbolCard stimulusCardPrefab;
+	private List<SymbolCard> cards;
 
 	public void Initialize(int[] correctIndices)
 	{
 		Cleanup();
 
-		cards = new List<StimulusCard>();
+		cards = new List<SymbolCard>();
 
 		for (int i = 0; i < correctIndices.Length; i++)
 		{
-			StimulusCard card = Instantiate(stimulusCardPrefab, this.transform);
+			SymbolCard card = Instantiate(stimulusCardPrefab, this.transform);
 			card.Initialize(correctIndices[i], animate: false);
 			card.SetVisible(false);
 			cards.Add(card);

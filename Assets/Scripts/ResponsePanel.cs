@@ -10,10 +10,33 @@ public class ResponsePanel : MonoBehaviour
 	[SerializeField] private Button validateButton;
 	[SerializeField] private Button startRoundButton;
 
+	public bool SymbolsHighlighted
+	{
+		set
+		{
+			foreach (var col in columns)
+			{
+				// if IsPickedOrLocked, do not highlight, but stil allow un-highlight
+				col.SymbolHighlighted = value && !col.IsPickedOrLocked; 
+			}
+		}
+	}
+
+	public bool CoinZoneHighlighted
+	{
+		set
+		{
+			foreach (var col in columns)
+			{
+				col.CoinZoneHighlighted = value;
+			}
+		}
+	}
+
 	public bool IsValidated { get; private set; }
 	public bool AllSymbolsPicked => columns.All(c => c.SymbolIndex != null);
 	public bool AllColumnsLocked => columns.All(c => c.IsLocked);
-	public bool AllColumnsPickedOrLocked => columns.All(c => c.IsLocked || c.SymbolIndex != null);
+	public bool AllColumnsPickedOrLocked => columns.All(c => c.IsPickedOrLocked);
 	public int CoinsInColumns => columns.Sum(c => c.CoinCount);
 
 	private List<ResponseColumn> columns;

@@ -17,7 +17,6 @@ public class ButtonHighlighter : MonoBehaviour
 	private void OnEnable()
 	{
 		if(activeWithGameobject) SetEnabled(true);
-
 	}
 
 	private void OnDisable()

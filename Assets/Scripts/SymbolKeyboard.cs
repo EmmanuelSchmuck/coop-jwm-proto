@@ -7,7 +7,20 @@ public class SymbolKeyboard : MonoBehaviour
 {
     [SerializeField] private Transform keyContainer;
     [SerializeField] private CanvasGroup keyCanvasGroup;
+    [SerializeField] private ButtonHighlighter highlight;
     public int? SelectedSymbolIndex { get; private set; }
+    public bool Highlighted
+    {
+        set
+        {
+            highlight.gameObject.SetActive(value);
+            //foreach (var symbolKey in keyContainer.GetComponentsInChildren<SymbolKey>())
+            //{
+            //    symbolKey.Highlighted = value;
+            //}
+        }
+    }
+    public event System.Action SymbolSelected;
     public bool Interactable
     {
         get => interactable;
@@ -41,14 +54,20 @@ public class SymbolKeyboard : MonoBehaviour
 
     public void SetSelectedSymbolIndex(int symbolIndex)
 	{
-        SelectedSymbolIndex = symbolIndex;
+        SelectSymbol(symbolIndex);
     }
+
+    private void SelectSymbol(int symbolIndex)
+	{
+        SelectedSymbolIndex = symbolIndex;
+        SymbolSelected?.Invoke();
+	}
 
     private void OnKeyClicked(SymbolKey key)
 	{
         if (!Interactable) return;
         SoundManager.Instance.PlaySound(SoundType.GenericClick);
-        SelectedSymbolIndex = key.SymbolIndex;
+        SelectSymbol(key.SymbolIndex);
     }
 
     public void ResetSelection()

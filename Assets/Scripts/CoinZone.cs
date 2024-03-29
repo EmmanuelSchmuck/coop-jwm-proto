@@ -5,36 +5,44 @@ using UnityEngine.EventSystems;
 
 public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    private ResponseColumn parent;
-
-    public bool Interactable { get; set; }
-
-
-    public void Initialize(ResponseColumn parent)
+	[SerializeField] private ButtonHighlighter highlight;
+	public bool Highlighted
 	{
-        this.parent = parent;
+		set
+		{
+			highlight.gameObject.SetActive(value);
+		}
 	}
-    
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (!Interactable) return;
+	private ResponseColumn parent;
 
-        if (eventData.button == PointerEventData.InputButton.Left)
-            parent.OnAddCoinButtonClick();
+	public bool Interactable { get; set; }
 
-        else if (eventData.button == PointerEventData.InputButton.Right)
-            parent.OnRemoveCoinButtonClick();
-    }
 
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (!Interactable) return;
+	public void Initialize(ResponseColumn parent)
+	{
+		this.parent = parent;
+	}
 
-        parent.OnCoinZoneHoverEnter();
-    }
+	public void OnPointerClick(PointerEventData eventData)
+	{
+		if (!Interactable) return;
 
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        parent.OnCoinZoneHoverLeave();
-    }
+		if (eventData.button == PointerEventData.InputButton.Left)
+			parent.OnAddCoinButtonClick();
+
+		else if (eventData.button == PointerEventData.InputButton.Right)
+			parent.OnRemoveCoinButtonClick();
+	}
+
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		if (!Interactable) return;
+
+		parent.OnCoinZoneHoverEnter();
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		parent.OnCoinZoneHoverLeave();
+	}
 }
