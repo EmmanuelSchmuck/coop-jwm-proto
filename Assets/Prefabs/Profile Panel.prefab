@@ -115,7 +115,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -16.229961, y: -122.6}
+  m_AnchoredPosition: {x: -16.229961, y: -136.2}
   m_SizeDelta: {x: 178.5, y: 66.92}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7949593322908951242
@@ -548,6 +548,7 @@ MonoBehaviour:
   incrementAnimationDuration: 1
   scoreText: {fileID: 4989469345533819857}
   textPopup: {fileID: 7949593322908951242}
+  particlesPrefab: {fileID: 3407895249509103252, guid: ea31b4406cd812941ab1aea6e7718dd2, type: 3}
 --- !u!222 &5730171492639995970
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -654,7 +655,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7544403331166924630}
-  - component: {fileID: 6981134917582803642}
   - component: {fileID: 4291082517354325032}
   - component: {fileID: 1372536514340300521}
   m_Layer: 5
@@ -683,21 +683,6 @@ RectTransform:
   m_AnchoredPosition: {x: 15.1, y: -22.6}
   m_SizeDelta: {x: 80.21, y: 50}
   m_Pivot: {x: 0, y: 0.5}
---- !u!114 &6981134917582803642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7868698438080443642}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bd94442a7573a454dbaecda3b59c9350, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  incrementAnimationDuration: 1
-  scoreText: {fileID: 1372536514340300521}
-  textPopup: {fileID: 7949593322908951242}
 --- !u!222 &4291082517354325032
 CanvasRenderer:
   m_ObjectHideFlags: 0

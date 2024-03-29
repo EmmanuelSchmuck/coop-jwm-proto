@@ -2005,8 +2005,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 56.7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2219,7 +2219,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0.00012207031, y: 0}
-  m_SizeDelta: {x: 314.5, y: 131.8}
+  m_SizeDelta: {x: 314.5, y: 124}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &569148997
 MonoBehaviour:
@@ -3015,7 +3015,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 24.2}
+  m_AnchoredPosition: {x: 0, y: 20}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &755344979
@@ -6719,7 +6719,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -24.51}
+  m_AnchoredPosition: {x: 0, y: -20}
   m_SizeDelta: {x: 315.1, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1932280121
@@ -6775,7 +6775,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 24
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -8347,6 +8347,14 @@ PrefabInstance:
       value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 336452575114911555, guid: 1411042e478e04d4ab664712df6f1a52, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 220
+      objectReference: {fileID: 0}
+    - target: {fileID: 336452575114911555, guid: 1411042e478e04d4ab664712df6f1a52, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 110
+      objectReference: {fileID: 0}
+    - target: {fileID: 336452575114911555, guid: 1411042e478e04d4ab664712df6f1a52, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -8397,10 +8405,6 @@ PrefabInstance:
     - target: {fileID: 1262602520154009182, guid: 1411042e478e04d4ab664712df6f1a52, type: 3}
       propertyPath: m_Name
       value: Profile Panel
-      objectReference: {fileID: 0}
-    - target: {fileID: 1701192243517075678, guid: 1411042e478e04d4ab664712df6f1a52, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -136.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
