@@ -49,6 +49,7 @@ public class ResponseColumn : MonoBehaviour
 		}
 	}
 	private bool symbolInteractable;
+	public bool AllowInteractionIfLocked;
 
 	public void Initialize(ResponsePanel responsePanel, int columnIndex)
 	{
@@ -67,15 +68,24 @@ public class ResponseColumn : MonoBehaviour
 		Cleanup();
 	}
 
-	public void SetLocked(bool isLocked = true)
+	public void SetCoinZoneVisible(bool visible, bool animate = false)
+	{
+		coinZone.gameObject.SetActive(visible);
+		if(animate)
+		{
+			coinZone.FadeToVisible(visible);
+		}
+	}
+
+	public void SetLocked(bool isLocked = true, bool playSound = false)
 	{
 		this.IsLocked = isLocked;
 
 		DEBUG_lock.SetActive(isLocked);
 
-		if(isLocked)
+		if(playSound)
 		{
-			SoundManager.Instance.PlaySound(SoundType.Lock);
+			SoundManager.Instance.PlaySound(isLocked? SoundType.Lock : SoundType.Unlock);
 		}
 	}
 
@@ -177,7 +187,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void OnSymbolButtonClick()
 	{
-		if (!symbolInteractable || IsLocked) return;
+		if (!symbolInteractable || IsLocked && !AllowInteractionIfLocked) return;
 
 		// if symbolkeyboard has non-null selectedSymbolIndex, set this column symbolIndex and update the symbol icon
 		// then reset symbolkeyboard (set selectedSymbolIndex to null)

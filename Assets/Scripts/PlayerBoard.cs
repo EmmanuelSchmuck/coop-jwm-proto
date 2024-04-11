@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class PlayerBoard : MonoBehaviour
 {
-    [SerializeField] private bool DEBUG_isHumanPlayer;
     [SerializeField] private bool isMainPlayer;
+    [SerializeField] private PlayerBoard oppositeBoard;
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinCounter coinCounter;
@@ -15,6 +15,9 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
     [SerializeField] private GameObject validateButton;
     [SerializeField] private GameObject startRoundButton;
+    [SerializeField] private GameObject activePlayerIndicator;
+
+    public PlayerBoard OppositeBoard => oppositeBoard;
 
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
@@ -24,14 +27,14 @@ public class PlayerBoard : MonoBehaviour
     public JWMGameConfig GameConfig { get; private set; }
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
 
-    public event System.Action ResponseSumbitted;
     public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
     public event System.Action<RoundInfo> StimulusDisplayed;
     public event System.Action<RoundInfo> ResponsePhaseStarted; // rename: symbol pick phase started
     public event System.Action<RoundInfo> CoinBettingStarted;
-    public event System.Action<RoundInfo> ResponseTurnStarted;
-    public event System.Action<ResponseColumn> ResponseSymbolPicked;
+    public event System.Action<RoundInfo> LockResponseTurnStarted;
+    public event System.Action<RoundInfo> SymbolResponseTurnStarted;
+    public event System.Action<ResponseColumn> ResponseSymbolClicked;
 
     private const string EMPTY = "";
     private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember each symbol.";
@@ -39,13 +42,19 @@ public class PlayerBoard : MonoBehaviour
     private const string COIN_BETTING_INSTRUCTION = "Right-click below each symbol to bet coins.";
     private const string TURN_START_INSTRUCTION = "Use the keyboard on left to assign a symbol to a card.";
     private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a symbol...";
+    private const string LOCK_SYMBOL_INSTRUCTION = "Click on an opposite card to lock it.";
+    private const string UNLOCK_SYMBOL_INSTRUCTION = "Click on an opposite card to unlock it.";
+    private const string ASSIGN_SYMBOL_INSTRUCTION = "Use the keyboard on left to assign a symbol to a card.";
 
     private RoundInfo roundInfo;
     private int symbolPickedCount;
     private int turnCount;
+    private bool oppositeBoardSymbolClicked;
+    private bool symbolClicked;
 
     public void Initialize(int symbolPoolSize, string playerName)
 	{
+        activePlayerIndicator.SetActive(false);
         IsValidated = false;
         SetCanValidate(false);
         SetPlayerName(playerName);
@@ -61,14 +70,9 @@ public class PlayerBoard : MonoBehaviour
         coinCounter.gameObject.SetActive(visible);
     }
 
-    public void OnResponseValidated()
-	{
-        ResponseSumbitted?.Invoke();
-    }
-
     private void SetInstructionText(string text)
     {
-        if (!DEBUG_isHumanPlayer) text = "";
+        if (!isMainPlayer) text = "";
         instructionText.text = text;
     }
 
@@ -94,7 +98,7 @@ public class PlayerBoard : MonoBehaviour
 
         coinCounter.SetCoin(GameConfig.CoinPerRound);
 
-        if(isFirstRound && DEBUG_isHumanPlayer)
+        if(isFirstRound && isMainPlayer)
 		{
             SetStartRoundButtonVisible(true);
         }
@@ -118,6 +122,8 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
+        responsePanel.SetCoinZonesVisible(true, animate: true);
+        activePlayerIndicator.SetActive(true);
         symbolKeyboard.Interactable = false;
         responsePanel.CoinZoneHighlighted = isMainPlayer;
         SetCoinCounterVisible(isMainPlayer);
@@ -128,41 +134,104 @@ public class PlayerBoard : MonoBehaviour
         IsValidated = false;
 	}
 
-    public void OnResponseTurnStart(RoundInfo roundInfo)
+    public IEnumerator LockResponseTurn()
 	{
-        turnCount++;
-        
-        if(turnCount == 1)
+        activePlayerIndicator.SetActive(true);
+
+        oppositeBoardSymbolClicked = false;
+
+        bool isPositiveDependency = roundInfo.gameConfig.ActionDependency == Dependency.Positive;
+
+        SetInstructionText(isPositiveDependency ? UNLOCK_SYMBOL_INSTRUCTION : LOCK_SYMBOL_INSTRUCTION);
+
+        oppositeBoard.ResponsePanel.SetSymbolsInteractable(true, allowInteractIfLocked: true,
+            onlyNonPickedOrLockedSymbols: !isPositiveDependency,
+            onlyLocked: isPositiveDependency);
+
+        oppositeBoard.SymbolKeyboard.ResetSelection();
+        oppositeBoard.ResponseSymbolClicked += OnOppositeBoardSymbolClicked;
+
+        LockResponseTurnStarted?.Invoke(roundInfo);
+
+        if(isPositiveDependency)
 		{
-            symbolKeyboard.Highlighted = isMainPlayer;
-            symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
+            oppositeBoard.ResponsePanel.LockedCardsHighlighted = isMainPlayer;
         }
+        else
+		{
+            oppositeBoard.ResponsePanel.EmptyCardsHighlighted = isMainPlayer;
+        }
+        
 
-        SetInstructionText(TURN_START_INSTRUCTION);
+        yield return new WaitUntil(() => oppositeBoardSymbolClicked);
 
-        symbolKeyboard.Interactable = isMainPlayer;
-        responsePanel.SetSymbolsInteractable(true, onlyNonPickedSymbols: true);
-        ResponseTurnStarted?.Invoke(roundInfo);
+        oppositeBoard.ResponseSymbolClicked -= OnOppositeBoardSymbolClicked;
+
+        oppositeBoard.ResponsePanel.SetSymbolsInteractable(false);
+
+        activePlayerIndicator.SetActive(false);
+
+        oppositeBoard.ResponsePanel.EmptyCardsHighlighted = false;
+
+        oppositeBoard.ResponsePanel.LockedCardsHighlighted = false;
+
+        SetInstructionText(TURN_END_INSTRUCTION);
+
     }
 
-    public void OnResponseTurnEnd()
-	{
+    public IEnumerator SymbolPickResponseTurn()
+    {
+
+        SetInstructionText(ASSIGN_SYMBOL_INSTRUCTION);
+
+        activePlayerIndicator.SetActive(true);
+        symbolPickedCount = 0; // WIP hack
+        turnCount++;
+        symbolKeyboard.Highlighted = isMainPlayer;
+        symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
+
+        symbolKeyboard.Interactable = isMainPlayer;
+
+        ResponsePanel.SetSymbolsInteractable(true, onlyNonPickedOrLockedSymbols: true);
+
+        SymbolResponseTurnStarted?.Invoke(roundInfo);
+
+        symbolClicked = false;
+
+        yield return new WaitUntil(() => symbolClicked);
+
+        activePlayerIndicator.SetActive(false);
         SetInstructionText(TURN_END_INSTRUCTION);
         symbolKeyboard.Interactable = false;
         responsePanel.SetSymbolsInteractable(false);
     }
 
+    private void OnOppositeBoardSymbolClicked(ResponseColumn column)
+	{
+        oppositeBoardSymbolClicked = true;
+        column.SetLocked(roundInfo.gameConfig.ActionDependency == Dependency.Negative, playSound: true);
+    }
+
+    public void OnCoinBettingEnd()
+    {
+        activePlayerIndicator.SetActive(false);
+        SetCoinCounterVisible(false);
+
+        SetInstructionText(EMPTY);
+        //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
+
+        SetInteractable(false);
+    }
+
     public void OnResponsePhaseStart(RoundInfo roundInfo)
 	{
+        activePlayerIndicator.SetActive(true);
         SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
         symbolKeyboard.Highlighted = isMainPlayer;
         symbolKeyboard.SymbolSelected += OnKeyboardFirstSelect;
         responsePanel.SetSymbolsInteractable(true);
 
-        if(DEBUG_isHumanPlayer) symbolKeyboard.Interactable = true;
-
-
-        //responsePanel.set
+        symbolKeyboard.Interactable = isMainPlayer;
 
         ResponsePhaseStarted?.Invoke(roundInfo);
     }
@@ -170,7 +239,7 @@ public class PlayerBoard : MonoBehaviour
     private void OnKeyboardFirstSelect()
 	{
         symbolKeyboard.Highlighted = false;
-        responsePanel.SymbolsHighlighted = isMainPlayer;
+        responsePanel.EmptyCardsHighlighted = isMainPlayer;
     }
 
     public void OnValidateButtonClick()
@@ -182,13 +251,6 @@ public class PlayerBoard : MonoBehaviour
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
     {
-        SetCoinCounterVisible(false);
-
-        SetInstructionText(EMPTY);
-        //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
-
-        SetInteractable(false);
-
         for (int i = 0; i < responsePanel.Columns.Count; i++)
         {
             yield return new WaitForSeconds(0.3f);
@@ -202,8 +264,8 @@ public class PlayerBoard : MonoBehaviour
         {
             responsePanel.Columns[i].Cleanup();
         }
-
-        if (DEBUG_isHumanPlayer) SetStartRoundButtonVisible(true);   
+        responsePanel.SetCoinZonesVisible(false);
+        if (isMainPlayer) SetStartRoundButtonVisible(true);   
     }
 
     public int ComputeRawRoundScore(RoundInfo roundInfo)
@@ -229,35 +291,32 @@ public class PlayerBoard : MonoBehaviour
     
     public void OnResponseSymbolPickAttempted(ResponseColumn column) // rename this !
 	{
+        ResponseSymbolClicked?.Invoke(column);
+
         int? selectedSymbolIndex = SelectedSymbolIndex; // this needs to work for the bot as well; bot should use the keyboard
 
-        if (selectedSymbolIndex == null) return;
-
-        symbolPickedCount++;
-
-        if(symbolPickedCount == 1)
+        if (selectedSymbolIndex != null)
 		{
-            responsePanel.SymbolsHighlighted = false;
-            symbolKeyboard.SymbolSelected -= OnKeyboardFirstSelect;
+            symbolPickedCount++;
+
+            if (symbolPickedCount == 1)
+            {
+                responsePanel.EmptyCardsHighlighted = false;
+                symbolKeyboard.SymbolSelected -= OnKeyboardFirstSelect;
+            }
+
+            column.SetSymbol((int)selectedSymbolIndex);
+
+            symbolClicked = true;
         }
 
-        column.SetSymbol((int)selectedSymbolIndex);
+        // else, we are locking or unlocking a column; TO DO: refactor this
 
-        bool canValidate = responsePanel.AllColumnsPickedOrLocked;
+        bool canValidate = roundInfo.gameConfig.ActionDependency == Dependency.Negative ? responsePanel.AllColumnsPickedOrLocked : responsePanel.AllSymbolsPicked;
+        
+        //Debug.Log($"can validate : {canValidate}");
 
-  //      if(GameConfig.ActionDependency == Dependency.None)
-		//{
-  //          SetCanValidate(canValidate);
-  //          SetInstructionText(canValidate ? EMPTY : STIMULUS_RESPONSE_INSTRUCTION);
-  //      }
-  //      else if(canValidate) // action dependency positive or negative; we validate without using the button
-		//{
-  //          SetValidated(true);
-		//}
-        if(canValidate) SetValidated(true);
-
-
-        ResponseSymbolPicked?.Invoke(column);
+        if(canValidate) SetValidated(true);  
     }
 
     public void SetCanValidate(bool canValidate)
@@ -288,7 +347,6 @@ public class PlayerBoard : MonoBehaviour
 	{
         IsValidated = validated;
         validateButton?.gameObject.SetActive(false);
-        OnResponseValidated();
 	}
 
     public void WIP_OnResponseColumnRemoveCoinClicked(ResponseColumn column)
@@ -307,7 +365,7 @@ public class PlayerBoard : MonoBehaviour
 
     public void SetInteractable(bool interactable)
     {
-        if (!DEBUG_isHumanPlayer) interactable = false; // dirty, refactor at some point!
+        if (!isMainPlayer) interactable = false; // dirty, refactor at some point!
 
         symbolKeyboard.Interactable = interactable;
 

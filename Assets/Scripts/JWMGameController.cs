@@ -24,10 +24,12 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private JWMGameConfig gameConfig;
     private RoundInfo roundInfo;
-    private bool symbolsSubmitted_REFACTOR_ME;
+
     private PlayerBoard activePlayer;
     private PlayerBoard inactivePlayer;
     private PlayerBoard firstPlayer;
+    private int turnCount;
+    private bool BothPlayersHaveValidated => playerA_Board.IsValidated && playerB_Board.IsValidated;
 
     private void Start()
     {
@@ -44,12 +46,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
-        playerA_Board.ResponseSumbitted += OnPlayerSubmittedResponse;
-        playerB_Board.ResponseSumbitted += OnPlayerSubmittedResponse;
-
-        playerA_Board.ResponseSymbolPicked += OnSymbolPicked;
-        playerB_Board.ResponseSymbolPicked += OnSymbolPicked;
-
         StartCoroutine(StartRound(isFirstRound: true));
     }
 
@@ -60,54 +56,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             ExitToMenu();
 		}
 	}
-
-
-
-    private void OnSymbolPicked(ResponseColumn responseColumn)
-	{
-        //if (gameConfig.ActionDependency == Dependency.None) return;
-
-        StartCoroutine(OnSymbolPickedRoutine(responseColumn));    
-	}
-
-    private IEnumerator OnSymbolPickedRoutine(ResponseColumn responseColumn)
-	{
-        switch (gameConfig.ActionDependency)
-        {
-            default:
-            case Dependency.None: // exit the routine without doing anything
-                yield break;
-            case Dependency.Positive:
-                activePlayer.SetInteractable(false);
-                yield return new WaitForSeconds(0.25f);
-                inactivePlayer.ResponsePanel.SetSymbolInColumn((int)responseColumn.SymbolIndex, responseColumn.ColumnIndex);
-                break;
-            case Dependency.Negative:
-                activePlayer.SetInteractable(false);
-                yield return new WaitForSeconds(0.25f);
-                inactivePlayer.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
-                //playerB_Board.ResponsePanel.SetColumnLocked(responseColumn.ColumnIndex);
-                break;
-        }
-
-        yield return new WaitForSeconds(0.75f);
-
-        if (inactivePlayer.ResponsePanel.AllColumnsPickedOrLocked)
-        {
-            StartCoinBettingPhase();
-        }
-        else
-        {
-            NextPlayerResponseTurn();
-        }
-    }
-
-    private void NextPlayerResponseTurn()
-	{
-        SetActivePlayer(activePlayer == null ? firstPlayer : inactivePlayer);
-        activePlayer.OnResponseTurnStart(roundInfo);
-        inactivePlayer.OnResponseTurnEnd();
-    }
 
     private void SetActivePlayer(PlayerBoard player)
 	{
@@ -148,6 +96,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private IEnumerator StartRound(bool isFirstRound = false)
     {
+        turnCount = 0;
         correctIndexSequence = GenerateCorrectIndicesSequence(JWMGameConfig.SYMBOL_POOL_SIZE);
 
         roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
@@ -156,8 +105,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerB_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
 
         stimulusDisplay.Initialize(correctIndexSequence);
-
-        symbolsSubmitted_REFACTOR_ME = false;
 
         if (isFirstRound)
 		{
@@ -181,36 +128,54 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 		{
             playerA_Board.OnResponsePhaseStart(roundInfo);
             playerB_Board.OnResponsePhaseStart(roundInfo);
-        }
-        else
-		{
-            NextPlayerResponseTurn();
-		}
-    }
 
-    private void StartCoinBettingPhase()
-	{
-        symbolsSubmitted_REFACTOR_ME = true; // refactor this
+            yield return new WaitUntil(() => BothPlayersHaveValidated);
+        }
+
+        else if (gameConfig.ActionDependency == Dependency.Positive)
+        {
+            playerA_Board.ResponsePanel.SetAllColumnsLocked();
+            playerB_Board.ResponsePanel.SetAllColumnsLocked();
+
+            do
+            {
+                if (turnCount > 0) yield return playerA_Board.SymbolPickResponseTurn();
+                
+                if (BothPlayersHaveValidated) break;
+
+                yield return playerA_Board.LockResponseTurn();
+
+                yield return playerB_Board.SymbolPickResponseTurn();
+                yield return playerB_Board.LockResponseTurn();
+
+                turnCount++;
+
+            } while (!BothPlayersHaveValidated);
+        }
+        else // negative
+        {
+            do
+            {
+                yield return playerA_Board.SymbolPickResponseTurn();
+                yield return playerA_Board.LockResponseTurn();
+
+                if (BothPlayersHaveValidated) break;
+
+                yield return playerB_Board.SymbolPickResponseTurn();
+                yield return playerB_Board.LockResponseTurn();
+
+            } while (!BothPlayersHaveValidated);
+        }
+
         playerA_Board.OnCoinBettingPhaseStart(roundInfo);
         playerB_Board.OnCoinBettingPhaseStart(roundInfo);
-    }
 
-    private void OnPlayerSubmittedResponse()
-    {
-        bool bothPlayersHaveValidated = playerA_Board.IsValidated && playerB_Board.IsValidated;
+        yield return new WaitUntil(() => BothPlayersHaveValidated);
 
-        if (bothPlayersHaveValidated)
-        {
-            if(!symbolsSubmitted_REFACTOR_ME)
-			{
-                StartCoinBettingPhase();
-                // start coin betting
-            }
-            else
-			{
-                StartCoroutine(EndRound());
-            }    
-        }
+        playerA_Board.OnCoinBettingEnd();
+        playerB_Board.OnCoinBettingEnd();
+
+        StartCoroutine(EndRound());
     }
 
     private IEnumerator EndRound() // to do: move more code from here to board.OnRoundEnd

@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Toolbox;
 
 public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
 	[SerializeField] private ButtonHighlighter highlight;
+	[SerializeField] private CanvasGroup canvasGroup;
+	[SerializeField] private AnimationCurve fadeCurve;
 	public bool Highlighted
 	{
 		set
@@ -21,6 +24,13 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 	public void Initialize(ResponseColumn parent)
 	{
 		this.parent = parent;
+	}
+
+	public void FadeToVisible(bool visible)
+	{
+		float startAlpha = visible ? 0f : 1f;
+		float targetAlpha = visible ? 1f : 0f;
+		StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 1f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
 	}
 
 	public void OnPointerClick(PointerEventData eventData)

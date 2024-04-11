@@ -59,7 +59,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0.122641504, g: 0.122641504, b: 0.122641504, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1039,6 +1039,7 @@ MonoBehaviour:
   coinButtons: {fileID: 3784929335024018278}
   symbolCard: {fileID: 5058285786343430870}
   DEBUG_lock: {fileID: 1039724613338510637}
+  AllowInteractionIfLocked: 0
 --- !u!114 &4298993516502658711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1236,6 +1237,7 @@ GameObject:
   - component: {fileID: 1565634834140851080}
   - component: {fileID: 2193446406489377091}
   - component: {fileID: 6953668252344528145}
+  - component: {fileID: 8700650426640931684}
   m_Layer: 5
   m_Name: Coin Zone
   m_TagString: Untagged
@@ -1336,6 +1338,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlight: {fileID: 3037708095632343075}
+  canvasGroup: {fileID: 8700650426640931684}
+  fadeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!225 &8700650426640931684
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8989843841753897951}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &2483848241782140795
 PrefabInstance:
   m_ObjectHideFlags: 0

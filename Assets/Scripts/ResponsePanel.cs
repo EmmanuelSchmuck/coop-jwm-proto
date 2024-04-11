@@ -9,7 +9,7 @@ public class ResponsePanel : MonoBehaviour
     [SerializeField] private ResponseColumn columnPrefab;
 
 
-	public bool SymbolsHighlighted
+	public bool EmptyCardsHighlighted
 	{
 		set
 		{
@@ -17,6 +17,18 @@ public class ResponsePanel : MonoBehaviour
 			{
 				// if IsPickedOrLocked, do not highlight, but stil allow un-highlight
 				col.SymbolHighlighted = value && !col.IsPickedOrLocked; 
+			}
+		}
+	}
+
+	public bool LockedCardsHighlighted
+	{
+		set
+		{
+			foreach (var col in columns)
+			{
+				// if IsPickedOrLocked, do not highlight, but stil allow un-highlight
+				col.SymbolHighlighted = value && col.IsLocked;
 			}
 		}
 	}
@@ -29,6 +41,14 @@ public class ResponsePanel : MonoBehaviour
 			{
 				col.CoinZoneHighlighted = value;
 			}
+		}
+	}
+
+	public void SetCoinZonesVisible(bool visible, bool animate = false)
+	{
+		foreach (var col in columns)
+		{
+			col.SetCoinZoneVisible(visible, animate);
 		}
 	}
 
@@ -57,11 +77,21 @@ public class ResponsePanel : MonoBehaviour
 			columns.Add(column);
 			column.Initialize(this, i);
 		}
+
+		SetCoinZonesVisible(false);
 	}
 
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)
 	{
 		board.OnResponseSymbolPickAttempted(column);
+	}
+
+	public void SetAllColumnsLocked()
+	{
+		foreach(var col in columns)
+		{
+			col.SetLocked();
+		}
 	}
 
 	public void OnResponseColumnAddCoin(ResponseColumn column)
@@ -86,13 +116,21 @@ public class ResponsePanel : MonoBehaviour
 		column.SetCoinButtonsVisible(false);
 	}
 
-	public void SetSymbolsInteractable(bool interactable, bool onlyNonPickedSymbols = false)
+	public enum SymbolSelectionMode
+	{
+		LockedSymbols,
+		NonPickedOrLocked
+	}
+
+	public void SetSymbolsInteractable(bool interactable, bool allowInteractIfLocked = false, bool onlyNonPickedOrLockedSymbols = false, bool onlyLocked = false)
 	{
 		foreach(var column in columns)
 		{
-			if (onlyNonPickedSymbols && column.SymbolIndex != null) continue;
+			if (onlyNonPickedOrLockedSymbols && column.IsPickedOrLocked) continue;
+			if (onlyLocked && !column.IsLocked) continue;
 
 			column.SymbolInteractable = interactable;
+			column.AllowInteractionIfLocked = allowInteractIfLocked;
 		}
 	}
 	public void SetCoinZoneInteractable(bool interactable) // only affect columns, not other buttons

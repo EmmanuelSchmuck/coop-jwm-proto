@@ -13,6 +13,7 @@ public enum SoundType
 	RemoveCoin,
 	SetSymbol,
 	Lock,
+	Unlock,
 	GainPoints,
 	RoundStart
 }

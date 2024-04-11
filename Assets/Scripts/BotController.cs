@@ -16,7 +16,8 @@ public class BotController : MonoBehaviour
     {
         target.ResponsePhaseStarted += OnResponsePhaseStarted;
         target.CoinBettingStarted += OnCoinBettingStarted;
-        target.ResponseTurnStarted += OnResponseTurnStarted;
+        target.LockResponseTurnStarted += OnLockResponseTurnStarted;
+        target.SymbolResponseTurnStarted += OnSymbolResponseTurnStarted;
         target.StimulusDisplayed += OnStimulusDisplayed;
     }
 
@@ -47,7 +48,7 @@ public class BotController : MonoBehaviour
         StartCoroutine(CoinBettingRoutine(roundInfo));
     }
 
-    void OnResponseTurnStarted(RoundInfo roundInfo)
+    void OnSymbolResponseTurnStarted(RoundInfo roundInfo)
 	{
         // pick a single symbol
         StartCoroutine(PickSingleSymbolRoutine(roundInfo));
@@ -63,7 +64,7 @@ public class BotController : MonoBehaviour
 
         target.OnResponseSymbolPickAttempted(target.ResponsePanel.Columns[columnIndex]); //.SetSymbolInColumn(playerB_indices[lastPickedSymbolIndex], lastPickedSymbolIndex);
 
-        if (!fastMode) yield return new WaitForSeconds(0.5f);
+        //if (!fastMode) yield return new WaitForSeconds(0.5f);
         //      if (!fastMode) yield return new WaitForSeconds(0.25f);
 
         //      yield return null;
@@ -75,6 +76,28 @@ public class BotController : MonoBehaviour
 
         // playerB_ResponsePanel.SetCoversVisible(true);
 
+    }
+
+    void OnLockResponseTurnStarted(RoundInfo roundInfo)
+    {
+        // pick a single symbol
+        StartCoroutine(LockOrUnlockOppositeSymbol(roundInfo));
+    }
+
+    private IEnumerator LockOrUnlockOppositeSymbol(RoundInfo roundInfo)
+    {
+        bool shouldLock = roundInfo.gameConfig.ActionDependency == Dependency.Negative; // else, should unlock
+
+        if (!fastMode) yield return new WaitForSeconds(Random.Range(0.8f, 1.2f));
+
+        // pick first column that is "empy" (not picked or locked) if we should lock; else pick first locked column if we should unlock
+        int columnIndex = target.OppositeBoard.ResponsePanel.Columns.First(x => shouldLock ? !x.IsPickedOrLocked : x.IsLocked).ColumnIndex;
+        ResponseColumn column = target.OppositeBoard.ResponsePanel.Columns[columnIndex];
+        //column.SetLocked(shouldLock);
+        //target.OppositeBoard.SymbolKeyboard.ResetSelection();
+        target.OppositeBoard.OnResponseSymbolPickAttempted(column);
+        
+        //if (!fastMode) yield return new WaitForSeconds(0.5f);
     }
 
     private IEnumerator PickSymbolsRoutine(RoundInfo roundInfo)
