@@ -79,6 +79,15 @@ public class ResponsePanel : MonoBehaviour
 		}
 
 		SetCoinZonesVisible(false);
+		SetColumnsVisible(false);
+	}
+
+	public void SetColumnsVisible(bool visible, bool animate = false)
+	{
+		foreach(var col in columns)
+		{
+			col.SetVisible(visible, animate);
+		}
 	}
 
 	public void WIP_OnResponseColumnSymbolClicked(ResponseColumn column)

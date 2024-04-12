@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Toolbox;
 
 public class SymbolKeyboard : MonoBehaviour
 {
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private AnimationCurve fadeCurve;
     [SerializeField] private Transform keyContainer;
     [SerializeField] private CanvasGroup keyCanvasGroup;
     [SerializeField] private ButtonHighlighter highlight;
@@ -55,6 +58,26 @@ public class SymbolKeyboard : MonoBehaviour
     public void SetSelectedSymbolIndex(int symbolIndex)
 	{
         SelectSymbol(symbolIndex);
+    }
+
+    public void SetVisible(bool visible, bool animate = false)
+    {
+        //this.gameObject.SetActive(visible);
+        if (animate)
+        {
+            this.gameObject.SetActive(true);
+            this.FadeToVisible(visible);
+        }
+        else
+		{
+            this.gameObject.SetActive(visible);
+        }
+    }
+    private void FadeToVisible(bool visible)
+    {
+        float startAlpha = visible ? 0f : 1f;
+        float targetAlpha = visible ? 1f : 0f;
+        StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
     }
 
     private void SelectSymbol(int symbolIndex)

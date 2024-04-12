@@ -17,6 +17,9 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private Transform coinButtons;
 	[SerializeField] private SymbolCard symbolCard;
 	[SerializeField] private GameObject DEBUG_lock;
+	[SerializeField] private Button symbolButton;
+	[SerializeField] private CanvasGroup canvasGroup;
+	[SerializeField] private AnimationCurve fadeCurve;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
@@ -45,6 +48,7 @@ public class ResponseColumn : MonoBehaviour
 		get => symbolInteractable;
 		set
 		{
+			symbolButton.gameObject.SetActive(value);
 			symbolInteractable = value;
 		}
 	}
@@ -63,6 +67,8 @@ public class ResponseColumn : MonoBehaviour
 		coinZone = GetComponentInChildren<CoinZone>();
 		coinZone.Initialize(this);
 
+		symbolCard.SetEmpty();
+
 		coins = new List<GameObject>();
 
 		Cleanup();
@@ -70,10 +76,36 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetCoinZoneVisible(bool visible, bool animate = false)
 	{
-		coinZone.gameObject.SetActive(visible);
+		//coinZone.gameObject.SetActive(visible);
 		if(animate)
 		{
+			coinZone.gameObject.SetActive(true);
 			coinZone.FadeToVisible(visible);
+		}
+		else
+		{
+			coinZone.gameObject.SetActive(visible);
+		}
+	}
+
+	private void FadeToVisible(bool visible)
+	{
+		float startAlpha = visible ? 0f : 1f;
+		float targetAlpha = visible ? 1f : 0f;
+		StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
+	}
+
+	public void SetVisible(bool visible, bool animate = false)
+	{
+		//this.gameObject.SetActive(visible);
+		if (animate)
+		{
+			this.gameObject.SetActive(true);
+			this.FadeToVisible(visible);
+		}
+		else
+		{
+			this.gameObject.SetActive(visible);
 		}
 	}
 
@@ -81,7 +113,7 @@ public class ResponseColumn : MonoBehaviour
 	{
 		this.IsLocked = isLocked;
 
-		DEBUG_lock.SetActive(isLocked);
+		symbolCard.SetLocked(isLocked);
 
 		if(playSound)
 		{
@@ -195,14 +227,16 @@ public class ResponseColumn : MonoBehaviour
 		responsePanel.WIP_OnResponseColumnSymbolClicked(this);
 	}
 
-	public void SetSymbol(int symbolIndex)
+	public void SetSymbol(int symbolIndex, bool canStillInteract = false)
 	{
 		symbolCard.Initialize(symbolIndex, animate: true);
+
+		symbolCard.SetBaseColor();
 
 		SoundManager.Instance.PlaySound(SoundType.SetSymbol);
 
 		this.SymbolIndex = symbolIndex;
 
-		SymbolInteractable = false;
+		SymbolInteractable = canStillInteract;
 	}
 }

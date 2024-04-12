@@ -30,10 +30,17 @@ public class ButtonHighlighter : MonoBehaviour
 
 		this.isEnabled = enabled;
 
+		Debug.Log("highlight 1");
+
 		if (enabled && wasEnabled) return;
 
-		if (enabled && !wasEnabled) StartCoroutine(Animate());
+		Debug.Log("highlight 2");
 
+		if (enabled && !wasEnabled)
+		{
+			StartCoroutine(Animate());
+			Debug.Log("highlight 3");
+		}
 		else if (!enabled && cancelAnim) StopAllCoroutines();	
 	}
 
@@ -41,6 +48,7 @@ public class ButtonHighlighter : MonoBehaviour
 	{
 		while(isEnabled)
 		{
+			Debug.Log("highlight 4");
 			yield return CoroutineTools.Tween01(loopDuration, t => image.color = baseColor.WithAlphaMultiplied(t), animCurve.Evaluate);
 		}
 	}

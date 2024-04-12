@@ -14,7 +14,7 @@ public class JWMGameConfig
     //public const int SCORE_MULTIPLIER = 1;
     public AnimationCurve recallCurve;
     public const int SYMBOL_POOL_SIZE = 9;
-    public int CoinPerRound => sequenceLength * 2;
+    public int CoinPerRound => ActionDependency == Dependency.Negative ? sequenceLength : sequenceLength * 2;
     public Dependency RewardDependency => gameMode switch
     {
         GameMode.PositiveReward or GameMode.PositiveRewardAction => Dependency.Positive,

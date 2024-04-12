@@ -8,6 +8,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
+    [SerializeField] private float interTurnDelay = 0.3f;
     //[SerializeField] private Sprite[] cardShapePool;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
@@ -55,7 +56,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 		{
             ExitToMenu();
 		}
-	}
+    }
 
     private void SetActivePlayer(PlayerBoard player)
 	{
@@ -145,8 +146,12 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
                 yield return playerA_Board.LockResponseTurn();
 
+                yield return new WaitForSeconds(interTurnDelay);
+
                 yield return playerB_Board.SymbolPickResponseTurn();
                 yield return playerB_Board.LockResponseTurn();
+
+                yield return new WaitForSeconds(interTurnDelay);
 
                 turnCount++;
 
@@ -159,10 +164,14 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
                 yield return playerA_Board.SymbolPickResponseTurn();
                 yield return playerA_Board.LockResponseTurn();
 
+                yield return new WaitForSeconds(interTurnDelay);
+
                 if (BothPlayersHaveValidated) break;
 
                 yield return playerB_Board.SymbolPickResponseTurn();
                 yield return playerB_Board.LockResponseTurn();
+
+                yield return new WaitForSeconds(interTurnDelay);
 
             } while (!BothPlayersHaveValidated);
         }
@@ -207,8 +216,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Hide();
 
-        playerA_Board.OnRoundEnd(roundInfo);
-        playerB_Board.OnRoundEnd(roundInfo);
+        yield return playerB_Board.OnRoundEnd(roundInfo);
+        yield return playerA_Board.OnRoundEnd(roundInfo);
+        
 
         // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
         // should have: feedback then score then end round, all in here

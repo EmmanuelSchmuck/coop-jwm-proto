@@ -1,10 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerBoard : MonoBehaviour
 {
+    [SerializeField] private SymbolCard selectedCard;
     [SerializeField] private bool isMainPlayer;
     [SerializeField] private PlayerBoard oppositeBoard;
     [SerializeField] private ResponsePanel responsePanel;
@@ -37,14 +36,14 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action<ResponseColumn> ResponseSymbolClicked;
 
     private const string EMPTY = "";
-    private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember each symbol.";
-    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use the keyboard on left to assign symbols to each card.";
-    private const string COIN_BETTING_INSTRUCTION = "Right-click below each symbol to bet coins.";
-    private const string TURN_START_INSTRUCTION = "Use the keyboard on left to assign a symbol to a card.";
-    private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a symbol...";
-    private const string LOCK_SYMBOL_INSTRUCTION = "Click on an opposite card to lock it.";
-    private const string UNLOCK_SYMBOL_INSTRUCTION = "Click on an opposite card to unlock it.";
-    private const string ASSIGN_SYMBOL_INSTRUCTION = "Use the keyboard on left to assign a symbol to a card.";
+    private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember the sequence of symbol.";
+    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
+    private const string COIN_BETTING_INSTRUCTION = "Right-click below each card to bet coins.";
+    private const string TURN_START_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
+    private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a card...";
+    private const string LOCK_SYMBOL_INSTRUCTION = "Click on an opposite card slot to lock it.";
+    private const string UNLOCK_SYMBOL_INSTRUCTION = "Click on an opposite card slot to unlock it.";
+    private const string ASSIGN_SYMBOL_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
 
     private RoundInfo roundInfo;
     private int symbolPickedCount;
@@ -62,7 +61,27 @@ public class PlayerBoard : MonoBehaviour
         SetScore(0, animate: false);
         SetInstructionText(EMPTY);
         SetCoinCounterVisible(false);
+        symbolKeyboard.SetVisible(false);
 
+        if (isMainPlayer)  selectedCard.gameObject.SetActive(false);
+
+        if (isMainPlayer) symbolKeyboard.SymbolSelected += OnKeyboardSymbolSelected;
+
+    }
+
+    private void Update()
+    {
+        if (!isMainPlayer) return;
+        
+        Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+        
+		selectedCard.transform.position = cursorPosition;    
+    }
+
+    private void OnKeyboardSymbolSelected()
+	{
+        selectedCard.gameObject.SetActive(true);
+        selectedCard.Initialize(symbolKeyboard.SelectedSymbolIndex);
     }
 
     private void SetCoinCounterVisible(bool visible)
@@ -118,10 +137,15 @@ public class PlayerBoard : MonoBehaviour
     public void OnStimulusDisplayEnd(RoundInfo roundInfo)
     {
         StimulusDisplayed?.Invoke(roundInfo);
+
+        symbolKeyboard.SetVisible(true, animate: true);
+        responsePanel.SetColumnsVisible(true, animate: true);
     }
 
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
+        if (isMainPlayer) selectedCard.gameObject.SetActive(false);
+        symbolKeyboard.SetVisible(false, true);
         responsePanel.SetCoinZonesVisible(true, animate: true);
         activePlayerIndicator.SetActive(true);
         symbolKeyboard.Interactable = false;
@@ -204,6 +228,7 @@ public class PlayerBoard : MonoBehaviour
         SetInstructionText(TURN_END_INSTRUCTION);
         symbolKeyboard.Interactable = false;
         responsePanel.SetSymbolsInteractable(false);
+        if (isMainPlayer) selectedCard.gameObject.SetActive(false);
     }
 
     private void OnOppositeBoardSymbolClicked(ResponseColumn column)
@@ -258,14 +283,19 @@ public class PlayerBoard : MonoBehaviour
         }
     }
 
-    public void OnRoundEnd(RoundInfo roundInfo)
+    public IEnumerator OnRoundEnd(RoundInfo roundInfo)
 	{
+        responsePanel.SetCoinZonesVisible(false, true);
+        //symbolKeyboard.SetVisible(false, true);
+        responsePanel.SetColumnsVisible(false, true);
+        yield return new WaitForSeconds(1.0f);
         for (int i = 0; i < responsePanel.Columns.Count; i++)
         {
             responsePanel.Columns[i].Cleanup();
         }
-        responsePanel.SetCoinZonesVisible(false);
-        if (isMainPlayer) SetStartRoundButtonVisible(true);   
+        
+        if (isMainPlayer) SetStartRoundButtonVisible(true);
+        
     }
 
     public int ComputeRawRoundScore(RoundInfo roundInfo)
@@ -305,7 +335,9 @@ public class PlayerBoard : MonoBehaviour
                 symbolKeyboard.SymbolSelected -= OnKeyboardFirstSelect;
             }
 
-            column.SetSymbol((int)selectedSymbolIndex);
+            column.SetSymbol((int)selectedSymbolIndex, canStillInteract: roundInfo.gameConfig.ActionDependency == Dependency.None);
+
+            if(isMainPlayer) selectedCard.gameObject.SetActive(false);
 
             symbolClicked = true;
         }
@@ -313,14 +345,15 @@ public class PlayerBoard : MonoBehaviour
         // else, we are locking or unlocking a column; TO DO: refactor this
 
         bool canValidate = roundInfo.gameConfig.ActionDependency == Dependency.Negative ? responsePanel.AllColumnsPickedOrLocked : responsePanel.AllSymbolsPicked;
-        
-        //Debug.Log($"can validate : {canValidate}");
 
-        if(canValidate) SetValidated(true);  
+        //Debug.Log($"can validate : {canValidate}");
+        if(roundInfo.gameConfig.ActionDependency == Dependency.None) SetCanValidate(canValidate);
+        else if (canValidate) SetValidated(true);  
     }
 
     public void SetCanValidate(bool canValidate)
 	{
+        if (canValidate) SetInstructionText(EMPTY);
         validateButton?.gameObject.SetActive(canValidate);
 	}
 

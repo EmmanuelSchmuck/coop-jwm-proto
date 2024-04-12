@@ -30,7 +30,7 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 	{
 		float startAlpha = visible ? 0f : 1f;
 		float targetAlpha = visible ? 1f : 0f;
-		StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 1f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
+		StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
 	}
 
 	public void OnPointerClick(PointerEventData eventData)
