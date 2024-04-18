@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerBoard : MonoBehaviour
 {
+    [SerializeField] private GameObject disabledCover;
     [SerializeField] private SymbolCard selectedCard;
     [SerializeField] private bool isMainPlayer;
     [SerializeField] private PlayerBoard oppositeBoard;
@@ -37,7 +38,7 @@ public class PlayerBoard : MonoBehaviour
 
     private const string EMPTY = "";
     private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember the sequence of symbol.";
-    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
+    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use cards on the left to replicate the original sequence.";
     private const string COIN_BETTING_INSTRUCTION = "Right-click below each card to bet coins.";
     private const string TURN_START_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
     private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a card...";
@@ -50,6 +51,7 @@ public class PlayerBoard : MonoBehaviour
     private int turnCount;
     private bool oppositeBoardSymbolClicked;
     private bool symbolClicked;
+    public bool IsDisabled { get; private set; }
 
     public void Initialize(int symbolPoolSize, string playerName)
 	{
@@ -105,6 +107,12 @@ public class PlayerBoard : MonoBehaviour
         this.GameConfig = roundInfo.gameConfig;
         this.roundInfo = roundInfo;
 
+        if(!isMainPlayer)
+		{
+            IsDisabled = GameConfig.gameMode == GameMode.SinglePlayer;
+            disabledCover.SetActive(IsDisabled);
+        }
+
         IsValidated = false;
         SetCanValidate(false);
 
@@ -131,11 +139,15 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnStimulusDisplayStart()
     {
+        if (IsDisabled) return;
+
         SetInstructionText(STIMULUS_DISPLAY_INSTRUCTION);
     }
 
     public void OnStimulusDisplayEnd(RoundInfo roundInfo)
     {
+        if (IsDisabled) return;
+
         StimulusDisplayed?.Invoke(roundInfo);
 
         symbolKeyboard.SetVisible(true, animate: true);
@@ -144,6 +156,7 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
+        if (IsDisabled) return;
         if (isMainPlayer) selectedCard.gameObject.SetActive(false);
         symbolKeyboard.SetVisible(false, true);
         responsePanel.SetCoinZonesVisible(true, animate: true);
@@ -239,6 +252,7 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnCoinBettingEnd()
     {
+        if (IsDisabled) return;
         activePlayerIndicator.SetActive(false);
         SetCoinCounterVisible(false);
 
@@ -250,6 +264,7 @@ public class PlayerBoard : MonoBehaviour
 
     public void OnResponsePhaseStart(RoundInfo roundInfo)
 	{
+        if (IsDisabled) return;
         activePlayerIndicator.SetActive(true);
         SetInstructionText(STIMULUS_RESPONSE_INSTRUCTION);
         symbolKeyboard.Highlighted = isMainPlayer;
@@ -276,6 +291,7 @@ public class PlayerBoard : MonoBehaviour
 
     public IEnumerator ShowFeedback(RoundInfo roundInfo)
     {
+        if (IsDisabled) yield break;
         for (int i = 0; i < responsePanel.Columns.Count; i++)
         {
             yield return new WaitForSeconds(0.3f);
@@ -285,6 +301,7 @@ public class PlayerBoard : MonoBehaviour
 
     public IEnumerator OnRoundEnd(RoundInfo roundInfo)
 	{
+        if (IsDisabled) yield break;
         responsePanel.SetCoinZonesVisible(false, true);
         //symbolKeyboard.SetVisible(false, true);
         responsePanel.SetColumnsVisible(false, true);
@@ -408,6 +425,8 @@ public class PlayerBoard : MonoBehaviour
 
     public void IncrementScore(int value)
     {
+        if (IsDisabled) return;
+
         SetScore(score + value);
         SoundManager.Instance.PlaySound(SoundType.GainPoints);
     }

@@ -30,7 +30,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     private PlayerBoard inactivePlayer;
     private PlayerBoard firstPlayer;
     private int turnCount;
-    private bool BothPlayersHaveValidated => playerA_Board.IsValidated && playerB_Board.IsValidated;
+    private bool BothPlayersHaveValidated => playerA_Board.IsValidated && (playerB_Board.IsValidated || playerB_Board.IsDisabled);
 
     private void Start()
     {
@@ -124,7 +124,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_Board.OnStimulusDisplayEnd(roundInfo);
         playerB_Board.OnStimulusDisplayEnd(roundInfo);
 
-
         if (gameConfig.ActionDependency == Dependency.None)
 		{
             playerA_Board.OnResponsePhaseStart(roundInfo);
@@ -132,7 +131,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             yield return new WaitUntil(() => BothPlayersHaveValidated);
         }
-
         else if (gameConfig.ActionDependency == Dependency.Positive)
         {
             playerA_Board.ResponsePanel.SetAllColumnsLocked();

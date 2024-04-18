@@ -11,9 +11,7 @@ public class ButtonHighlighter : MonoBehaviour
 	[SerializeField] private AnimationCurve animCurve;
 	[SerializeField] private Image image;
 	[SerializeField] private Color baseColor;
-
 	private bool isEnabled;
-
 	private void OnEnable()
 	{
 		if(activeWithGameobject) SetEnabled(true);
@@ -30,16 +28,11 @@ public class ButtonHighlighter : MonoBehaviour
 
 		this.isEnabled = enabled;
 
-		Debug.Log("highlight 1");
-
 		if (enabled && wasEnabled) return;
-
-		Debug.Log("highlight 2");
 
 		if (enabled && !wasEnabled)
 		{
 			StartCoroutine(Animate());
-			Debug.Log("highlight 3");
 		}
 		else if (!enabled && cancelAnim) StopAllCoroutines();	
 	}
@@ -48,7 +41,6 @@ public class ButtonHighlighter : MonoBehaviour
 	{
 		while(isEnabled)
 		{
-			Debug.Log("highlight 4");
 			yield return CoroutineTools.Tween01(loopDuration, t => image.color = baseColor.WithAlphaMultiplied(t), animCurve.Evaluate);
 		}
 	}
