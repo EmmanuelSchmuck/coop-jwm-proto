@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerBoard : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private ScoreCounter scoreCounter;
     [SerializeField] private TMPro.TextMeshProUGUI instructionText;
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
+    [SerializeField] private Image avatarImage;
     [SerializeField] private GameObject validateButton;
     [SerializeField] private GameObject startRoundButton;
     [SerializeField] private GameObject activePlayerIndicator;
@@ -53,12 +55,13 @@ public class PlayerBoard : MonoBehaviour
     private bool symbolClicked;
     public bool IsDisabled { get; private set; }
 
-    public void Initialize(int symbolPoolSize, string playerName)
+    public void Initialize(int symbolPoolSize, string playerName, Sprite avatar)
 	{
         activePlayerIndicator.SetActive(false);
         IsValidated = false;
         SetCanValidate(false);
         SetPlayerName(playerName);
+        avatarImage.sprite = avatar;
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
         SetInstructionText(EMPTY);

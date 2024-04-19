@@ -6,6 +6,7 @@ using UnityEngine;
 public class JWMGameConfig
 {
     public string playerName;
+    public Sprite playerAvatar;
     public GameMode gameMode;
     public int sequenceLength = 6;
     public float displayDurationPerSymbol = 1f;

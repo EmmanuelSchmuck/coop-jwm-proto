@@ -12,12 +12,16 @@ public class ConfigPanel : MonoBehaviour
     [SerializeField] private TMPro.TMP_InputField maxCoinPerCardInputField;
     [SerializeField] private Toggle allowSymbolRepetitionToggle;
     [SerializeField] private TMPro.TMP_Dropdown rewardDependancyDropdown;
+    [SerializeField] private TMPro.TMP_Dropdown avatarDropdown;
     public JWMGameConfig config;
     // Start is called before the first frame update
     void Start()
     {
         playerNameInputField.text = config.playerName.ToString();
         playerNameInputField.onValueChanged.AddListener(delegate { OnPlayerNameInputChanged(); });
+
+        avatarDropdown.value = avatarDropdown.options.IndexOf(avatarDropdown.options.First(o => o.image == config.playerAvatar));
+        avatarDropdown.onValueChanged.AddListener(delegate { OnAvatarInputChanged(); });
 
         sequenceLenghtInputField.text = config.sequenceLength.ToString();
         sequenceLenghtInputField.onValueChanged.AddListener(delegate { OnSequenceLengthInputChanged(); });
@@ -54,6 +58,13 @@ public class ConfigPanel : MonoBehaviour
         int value = rewardDependancyDropdown.value;
         config.gameMode = (GameMode)value;
         
+    }
+
+    private void OnAvatarInputChanged()
+	{
+        int value = rewardDependancyDropdown.value;
+        Sprite avatar = rewardDependancyDropdown.options[value].image;
+
     }
 
     private void OnSequenceLengthInputChanged()
