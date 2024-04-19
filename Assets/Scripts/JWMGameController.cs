@@ -237,6 +237,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         Tie
     }
 
+    // returns scores for player A and player B
     private (int, int) UpdatePlayerScores()
 	{
         int playerA_Score = playerA_Board.ComputeRawRoundScore(roundInfo);
@@ -246,7 +247,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             : playerA_Score > playerB_Score ? EndResult.BestPlayerIsA
             : EndResult.BestPlayerIsB;
 
-        //int bestScore = Mathf.Max(playerA_Score, playerB_Score);
         int sumScore = playerA_Score + playerB_Score;
 
         return gameConfig.RewardDependency switch
@@ -256,8 +256,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             Dependency.Negative => result switch
             {
                 EndResult.Tie => (playerA_Score, playerB_Score),
-                EndResult.BestPlayerIsA => (playerA_Score, 0),
-                EndResult.BestPlayerIsB => (0, playerB_Score),
+                EndResult.BestPlayerIsA => (sumScore, 0),
+                EndResult.BestPlayerIsB => (0, sumScore),
                 _ => throw new System.NotImplementedException()
             },
             _ => throw new System.NotImplementedException()

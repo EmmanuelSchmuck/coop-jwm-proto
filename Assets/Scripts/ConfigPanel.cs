@@ -62,8 +62,9 @@ public class ConfigPanel : MonoBehaviour
 
     private void OnAvatarInputChanged()
 	{
-        int value = rewardDependancyDropdown.value;
-        Sprite avatar = rewardDependancyDropdown.options[value].image;
+        int value = avatarDropdown.value;
+        Sprite avatar = avatarDropdown.options[value].image;
+        config.playerAvatar = avatar;
 
     }
 

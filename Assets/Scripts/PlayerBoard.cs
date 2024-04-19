@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using Toolbox;
 
 public class PlayerBoard : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class PlayerBoard : MonoBehaviour
     private const string EMPTY = "";
     private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember the sequence of symbol.";
     private const string STIMULUS_RESPONSE_INSTRUCTION = "Use cards on the left to replicate the original sequence.";
-    private const string COIN_BETTING_INSTRUCTION = "Right-click below each card to bet coins.";
+    private const string COIN_BETTING_INSTRUCTION = "Click below each card to place coins. Right-click to remove coins.";
     private const string TURN_START_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
     private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a card...";
     private const string LOCK_SYMBOL_INSTRUCTION = "Click on an opposite card slot to lock it.";
@@ -138,7 +139,31 @@ public class PlayerBoard : MonoBehaviour
         RoundStarted?.Invoke(roundInfo);
     }
 
-    private void SetStartRoundButtonVisible(bool visible) => startRoundButton?.gameObject.SetActive(visible);
+    private void SetStartRoundButtonVisible(bool visible)
+    {
+        if (startRoundButton == null) return;
+
+        
+
+        if (visible)
+		{
+            startRoundButton.gameObject.SetActive(true);
+            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
+            {
+                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(t, .3f);
+                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(t, .3f);
+            }));
+		}
+        else
+		{
+            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
+            {
+                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(1 - t, .3f);
+                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(1 - t, .3f);
+            }, onFinish: () => startRoundButton.gameObject.SetActive(false)));
+        }
+        
+    }
 
     public void OnStimulusDisplayStart()
     {
@@ -324,7 +349,8 @@ public class PlayerBoard : MonoBehaviour
 
         foreach (var column in responsePanel.GetCorrectColumns(roundInfo.correctIndexSequence))
         {
-            round_score += (1 + column.CoinCount);
+            //round_score += (1 + column.CoinCount);
+            round_score += (0 + column.CoinCount);
         }
 
         return round_score;

@@ -166,6 +166,15 @@ public class ResponseColumn : MonoBehaviour
 		SoundManager.Instance.PlaySound(SoundType.RemoveCoin);
 	}
 
+	public void FadeCoins()
+	{
+		foreach (var coin in coins)
+		{
+			coin.GetComponent<CanvasGroup>().alpha = 0.2f;
+		}
+	}
+
+
 	public void OnAddCoinButtonClick()
 	{
 		if (!coinZoneInteractable) return;
@@ -204,6 +213,10 @@ public class ResponseColumn : MonoBehaviour
 	{
 		check.Show(isCorrect);
 		SoundManager.Instance.PlaySound(isCorrect ? SoundType.FeedbackCorrect : SoundType.FeedbackError);
+		if(!isCorrect)
+		{
+			FadeCoins();
+		}
 	}
 
 	public void OnCoinZoneHoverEnter()

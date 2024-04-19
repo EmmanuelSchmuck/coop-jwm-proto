@@ -88,6 +88,7 @@ GameObject:
   - component: {fileID: 4628759591584903798}
   - component: {fileID: 3331870021829976307}
   - component: {fileID: 6792887441025626328}
+  - component: {fileID: 701906560462200973}
   m_Layer: 5
   m_Name: Coin
   m_TagString: Untagged
@@ -220,6 +221,18 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!225 &701906560462200973
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6348372582123319558}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &8076262865828589124
 GameObject:
   m_ObjectHideFlags: 0
