@@ -17,7 +17,6 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
 
-
     private bool roundStarted;
     
     private int[] correctIndexSequence;
@@ -31,6 +30,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     private PlayerBoard inactivePlayer;
     private PlayerBoard firstPlayer;
     private int turnCount;
+    private bool playerA_lastTurnIsSuccess;
     private bool BothPlayersHaveValidated => playerA_Board.IsValidated && (playerB_Board.IsValidated || playerB_Board.IsDisabled);
 
     private void Start()
@@ -217,7 +217,30 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return playerB_Board.OnRoundEnd(roundInfo);
         yield return playerA_Board.OnRoundEnd(roundInfo);
-        
+
+        // adaptive procedure start =====
+
+        if(gameConfig.enable2Up1DDownStaircase)
+		{
+            bool playerASuccess = playerA_Board.AllSymbolsAreCorrect(roundInfo);
+
+            if (!playerASuccess) // round failed: difficulty down
+            {
+                gameConfig.sequenceLength--;
+            }
+            else if (playerASuccess && playerA_lastTurnIsSuccess) // two consecutive successes: difficulty up
+            {
+                gameConfig.sequenceLength++;
+
+            }
+
+            gameConfig.ClampSequenceLength(gameConfig.sequenceLength);
+
+            playerA_lastTurnIsSuccess = playerASuccess;
+        }   
+
+        // adaptive procedure end =====
+
 
         // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
         // should have: feedback then score then end round, all in here

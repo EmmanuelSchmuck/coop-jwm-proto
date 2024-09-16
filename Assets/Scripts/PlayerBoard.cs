@@ -2,6 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Toolbox;
+using System.Linq;
 
 public class PlayerBoard : MonoBehaviour
 {
@@ -342,6 +343,12 @@ public class PlayerBoard : MonoBehaviour
         if (isMainPlayer) SetStartRoundButtonVisible(true);
         
     }
+
+    public bool AllSymbolsAreCorrect(RoundInfo roundInfo)
+	{
+        return responsePanel.GetCorrectColumns(roundInfo.correctIndexSequence).Count() == roundInfo.gameConfig.sequenceLength;
+    }
+
 
     public int ComputeRawRoundScore(RoundInfo roundInfo)
     {

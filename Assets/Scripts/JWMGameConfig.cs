@@ -11,10 +11,13 @@ public class JWMGameConfig
     public int sequenceLength = 6;
     public float displayDurationPerSymbol = 1f;
     public bool allowSymbolRepetition = false;
+    public bool enable2Up1DDownStaircase;
     public int maxCoinPerSymbol = 3;
     //public const int SCORE_MULTIPLIER = 1;
     public AnimationCurve recallCurve;
     public const int SYMBOL_POOL_SIZE = 9;
+    public const int MAX_SEQUENCE_LENGTH = 9;
+    public const int MIN_SEQUENCE_LENGTH = 3;
     public int CoinPerRound => ActionDependency == Dependency.Negative ? sequenceLength : sequenceLength * 2;
     public Dependency RewardDependency => gameMode switch
     {

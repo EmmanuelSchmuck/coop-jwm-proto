@@ -1105,7 +1105,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 197291975}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -5587,10 +5587,11 @@ MonoBehaviour:
   debugConfig:
     playerName: Debug Name
     playerAvatar: {fileID: 21300000, guid: 4666c832fbbee3e46892a3ac14811e3d, type: 3}
-    gameMode: 2
+    gameMode: 0
     sequenceLength: 5
-    displayDurationPerSymbol: 0.5
+    displayDurationPerSymbol: 1
     allowSymbolRepetition: 1
+    enable2Up1DDownStaircase: 1
     maxCoinPerSymbol: 3
     recallCurve:
       serializedVersion: 2
@@ -6426,11 +6427,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5850321203024978499, guid: 2be03738d2c64f24fadc0a3f937336e9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 990
+      value: 1070
       objectReference: {fileID: 0}
     - target: {fileID: 5850321203024978499, guid: 2be03738d2c64f24fadc0a3f937336e9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -80
+      value: -62
       objectReference: {fileID: 0}
     - target: {fileID: 5850321203024978499, guid: 2be03738d2c64f24fadc0a3f937336e9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -8962,7 +8963,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1645100063072396386, guid: eb25b63c047d8954b93fb8cdd8852a45, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -219
+      value: -227.63
       objectReference: {fileID: 0}
     - target: {fileID: 1645100063072396386, guid: eb25b63c047d8954b93fb8cdd8852a45, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
