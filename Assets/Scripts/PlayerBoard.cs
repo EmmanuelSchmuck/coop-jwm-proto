@@ -80,9 +80,9 @@ public class PlayerBoard : MonoBehaviour
     {
         if (!isMainPlayer) return;
         
-        Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+        Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 89f));
         
-		selectedCard.transform.position = cursorPosition;    
+		selectedCard.transform.position = cursorPosition.WithZ(89f);    
     }
 
     private void OnKeyboardSymbolSelected()

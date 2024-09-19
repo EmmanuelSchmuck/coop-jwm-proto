@@ -5587,7 +5587,7 @@ MonoBehaviour:
   debugConfig:
     playerName: Debug Name
     playerAvatar: {fileID: 21300000, guid: 4666c832fbbee3e46892a3ac14811e3d, type: 3}
-    gameMode: 0
+    gameMode: 2
     sequenceLength: 5
     displayDurationPerSymbol: 1
     allowSymbolRepetition: 1
@@ -7922,7 +7922,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 895950132107469358, guid: 04ff1cfa122d5c14d9a8dd335efd08df, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 85
+      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 895950132107469358, guid: 04ff1cfa122d5c14d9a8dd335efd08df, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9136,7 +9136,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 895950132107469358, guid: 04ff1cfa122d5c14d9a8dd335efd08df, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -85
+      value: -75
       objectReference: {fileID: 0}
     - target: {fileID: 895950132107469358, guid: 04ff1cfa122d5c14d9a8dd335efd08df, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
