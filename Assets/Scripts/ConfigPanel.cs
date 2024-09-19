@@ -11,6 +11,7 @@ public class ConfigPanel : MonoBehaviour
     [SerializeField] private TMPro.TMP_InputField displayDurationInputField;
     [SerializeField] private TMPro.TMP_InputField maxCoinPerCardInputField;
     [SerializeField] private Toggle allowSymbolRepetitionToggle;
+    [SerializeField] private Toggle enableStaircaseToggle;
     [SerializeField] private TMPro.TMP_Dropdown rewardDependancyDropdown;
     [SerializeField] private TMPro.TMP_Dropdown avatarDropdown;
     public JWMGameConfig config;
@@ -32,6 +33,9 @@ public class ConfigPanel : MonoBehaviour
         maxCoinPerCardInputField.text = config.maxCoinPerSymbol.ToString();
         maxCoinPerCardInputField.onValueChanged.AddListener(delegate { OnMaxCoinPerCardInputChanged(); });
 
+        allowSymbolRepetitionToggle.isOn = config.enable2Up1DDownStaircase;
+        allowSymbolRepetitionToggle.onValueChanged.AddListener(delegate { OnEnableStaircaseValueChanged(); });
+
         allowSymbolRepetitionToggle.isOn = config.allowSymbolRepetition;
         allowSymbolRepetitionToggle.onValueChanged.AddListener(delegate { OnAllowSymbolRepetitionValueChanged(); });
 
@@ -45,6 +49,11 @@ public class ConfigPanel : MonoBehaviour
     private void OnAllowSymbolRepetitionValueChanged()
 	{
         config.allowSymbolRepetition = allowSymbolRepetitionToggle.isOn;
+    }
+
+    private void OnEnableStaircaseValueChanged()
+    {
+        config.enable2Up1DDownStaircase = enableStaircaseToggle.isOn;
     }
 
     private void OnPlayerNameInputChanged()
