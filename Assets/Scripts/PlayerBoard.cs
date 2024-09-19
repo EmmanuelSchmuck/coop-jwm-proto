@@ -393,6 +393,8 @@ public class PlayerBoard : MonoBehaviour
             if(isMainPlayer) selectedCard.gameObject.SetActive(false);
 
             symbolClicked = true;
+
+            symbolKeyboard.ResetSelection();
         }
 
         // else, we are locking or unlocking a column; TO DO: refactor this
