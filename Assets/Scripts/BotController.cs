@@ -30,10 +30,13 @@ public class BotController : MonoBehaviour
 
         for (int i = 0; i < gameConfig.sequenceLength; i++)
         {
+            // get the proba of being correct from sampling the recall curve
             float correctProbability = Mathf.Clamp01(gameConfig.recallCurve.Evaluate((float)i / Mathf.Max(1, gameConfig.sequenceLength - 1)));
 
+            // pick random value to see if symbol index is correct or not; if not correct, pick a random index
             playerB_indices[i] = Random.value < correctProbability ? roundInfo.correctIndexSequence[i] : Random.Range(0, 9);
 
+            // assign coin amount value based on correctProbability 
             playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
     }
