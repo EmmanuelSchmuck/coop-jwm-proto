@@ -46,7 +46,6 @@ public class SymbolKeyboard : MonoBehaviour
         foreach(var symbolKey in keyContainer.GetComponentsInChildren<SymbolKey>())
         {
             symbolKey.Initialize(symbolIndex: i);
-
             symbolKey.Clicked += OnKeyClicked;
 
             i++;
@@ -72,12 +71,16 @@ public class SymbolKeyboard : MonoBehaviour
 		{
             this.gameObject.SetActive(visible);
         }
+
+        canvasGroup.interactable = visible;
+        canvasGroup.blocksRaycasts = visible;
     }
     private void FadeToVisible(bool visible)
     {
         float startAlpha = visible ? 0f : 1f;
         float targetAlpha = visible ? 1f : 0f;
-        StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
+        float duration = visible ? 0.7f : 0.3f;
+        StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, duration, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
     }
 
     private void SelectSymbol(int symbolIndex)

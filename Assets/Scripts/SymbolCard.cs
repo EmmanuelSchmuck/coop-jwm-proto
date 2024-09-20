@@ -14,6 +14,7 @@ public class SymbolCard : MonoBehaviour
 	[SerializeField] private Image coverImage;
 	[SerializeField] private GameObject questionMark;
 	[SerializeField] private ButtonHighlighter highlight;
+	private int? symbolIndex;
 	private bool highlighted;
 	public bool Highlighted
 	{
@@ -26,11 +27,13 @@ public class SymbolCard : MonoBehaviour
 		}
 	}
 	private readonly char[] fontSymbolChars = new char[] {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' };
-    public void Initialize(int? symbolIndex, bool animate = false)
+    public void Initialize(int? symbolIndex, bool animate = false) // if animate = false, no symbol is displayed !
 	{
+		this.symbolIndex = symbolIndex;
+		questionMark.SetActive(false);
+		symbolText.text = "";
 		SetLocked(false);
-		questionMark.SetActive(symbolIndex == null);
-		symbolText.text = symbolIndex == null ? "" : fontSymbolChars[(int)symbolIndex].ToString();
+		
 		if (animate) DoAppearAnimation();
 
 	}
@@ -51,14 +54,19 @@ public class SymbolCard : MonoBehaviour
 		lockImage.enabled = locked;
 	}
 
-	private void DoAppearAnimation()
+	private void DoAppearAnimation() // (to do: refactor)
 	{
+		questionMark.SetActive(symbolIndex == null);
+		symbolText.text = symbolIndex == null ? "" : fontSymbolChars[(int)symbolIndex].ToString();
 		symbolText.transform.localScale = Vector3.zero;
 		StartCoroutine(CoroutineTools.Tween01(animDuration, t => symbolText.transform.localScale = Vector3.one * animSizeCurve.Evaluate(t)));
 	}
 
+	// to do: refactor this;
 	public void SetVisible(bool visible, bool animate = false)
 	{
+		questionMark.SetActive(symbolIndex == null);
+		symbolText.text = symbolIndex == null || !visible ? "" : fontSymbolChars[(int)symbolIndex].ToString();
 		coverImage.gameObject.SetActive(!visible);
 		if (animate) DoAppearAnimation();
 	}

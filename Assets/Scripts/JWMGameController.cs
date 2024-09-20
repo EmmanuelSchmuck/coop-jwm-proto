@@ -48,6 +48,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
+        stimulusDisplay.SetVisible(false);
+
         StartCoroutine(StartRound(isFirstRound: true));
     }
 
@@ -114,6 +116,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
+
+        yield return stimulusDisplay.AnimateVisible(true);
 
         playerA_Board.OnStimulusDisplayStart();
         playerB_Board.OnStimulusDisplayStart();
@@ -213,14 +217,16 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         yield return new WaitForSeconds(1f);
 
-        stimulusDisplay.Hide();
+        stimulusDisplay.HideCards();
 
         yield return playerB_Board.OnRoundEnd(roundInfo);
         yield return playerA_Board.OnRoundEnd(roundInfo);
 
+        yield return stimulusDisplay.AnimateVisible(false);
+
         // adaptive procedure start =====
 
-        if(gameConfig.enable2Up1DDownStaircase)
+        if (gameConfig.enable2Up1DDownStaircase)
 		{
             bool playerASuccess = playerA_Board.AllSymbolsAreCorrect(roundInfo);
 

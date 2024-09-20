@@ -89,6 +89,7 @@ public class PlayerBoard : MonoBehaviour
 	{
         selectedCard.gameObject.SetActive(true);
         selectedCard.Initialize(symbolKeyboard.SelectedSymbolIndex);
+        selectedCard.SetVisible(true);
     }
 
     private void SetCoinCounterVisible(bool visible)

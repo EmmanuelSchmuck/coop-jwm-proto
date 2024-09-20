@@ -20,6 +20,7 @@ public class SymbolKey : MonoBehaviour
 	{
 		//iconImage.sprite = symbolIcon;
 		card.Initialize(symbolIndex);
+		card.SetVisible(true);
 		this.SymbolIndex = symbolIndex;
 	}
 
