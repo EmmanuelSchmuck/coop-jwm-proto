@@ -191,10 +191,14 @@ public class ResponseColumn : MonoBehaviour
 
 	public void Cleanup()
 	{
-		for (int i = 0; i < coinContainer.childCount; i++)
+		foreach(var coin in coinContainer.GetComponentsInChildren<Coin>())
 		{
-			Destroy(coinContainer.GetChild(i).gameObject);
+			Destroy(coin.gameObject);
 		}
+		//for (int i = 0; i < coinContainer.childCount; i++)
+		//{
+		//	Destroy(coinContainer.GetChild(i).gameObject);
+		//}
 		symbolCard.Initialize(null);
 		SetLocked(false);
 		check.Hide();

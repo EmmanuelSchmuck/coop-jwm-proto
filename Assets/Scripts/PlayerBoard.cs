@@ -41,8 +41,8 @@ public class PlayerBoard : MonoBehaviour
     public event System.Action<ResponseColumn> ResponseSymbolClicked;
 
     private const string EMPTY = "";
-    private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember the sequence of symbol.";
-    private const string STIMULUS_RESPONSE_INSTRUCTION = "Use cards on the left to replicate the original sequence.";
+    private const string STIMULUS_DISPLAY_INSTRUCTION = "Remember the sequence of symbols.";
+    private const string STIMULUS_RESPONSE_INSTRUCTION = "Drag & drop symbols from the bottom to replicate the original sequence.";
     private const string COIN_BETTING_INSTRUCTION = "Click below each card to place coins. Right-click to remove coins.";
     private const string TURN_START_INSTRUCTION = "Use cards on the left to replicate the hidden sequence.";
     private const string TURN_END_INSTRUCTION = "Waiting for the other player to pick a card...";
@@ -80,9 +80,9 @@ public class PlayerBoard : MonoBehaviour
     {
         if (!isMainPlayer) return;
         
-        Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 89f));
-        
-		selectedCard.transform.position = cursorPosition.WithZ(89f);    
+        Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
+
+        selectedCard.transform.position = cursorPosition;   
     }
 
     private void OnKeyboardSymbolSelected()

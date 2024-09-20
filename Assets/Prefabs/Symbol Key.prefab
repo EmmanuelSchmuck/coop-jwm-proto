@@ -115,7 +115,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.8588236, g: 0.8352942, b: 0.7254902, a: 1}
+    m_NormalColor: {r: 0.28627452, g: 0.40000004, b: 0.5568628, a: 1}
     m_HighlightedColor: {r: 0.74105555, g: 0.8584906, b: 0.8562369, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.4575472, g: 1, b: 0.8239458, a: 1}
@@ -151,6 +151,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
+  - eventID: 13
+    callback:
+      m_PersistentCalls:
+        m_Calls: []
   - eventID: 2
     callback:
       m_PersistentCalls:
