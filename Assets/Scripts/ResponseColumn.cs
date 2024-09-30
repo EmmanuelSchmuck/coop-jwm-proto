@@ -19,6 +19,7 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private GameObject DEBUG_lock;
 	[SerializeField] private Button symbolButton;
 	[SerializeField] private CanvasGroup canvasGroup;
+	[SerializeField] private CoinRepository coinRepo;
 	[SerializeField] private AnimationCurve fadeCurve;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
@@ -30,13 +31,14 @@ public class ResponseColumn : MonoBehaviour
 		get => coinZoneInteractable;
 		set
 		{
+			return;
 			coinZoneInteractable = value;
 			coinZone.Interactable = value;
 		}
 	}
 	public bool CoinZoneHighlighted
 	{
-		set => coinZone.Highlighted = value;
+		set => value = value; // coinZone.Highlighted = value;
 	}
 	public bool SymbolHighlighted
 	{
@@ -61,11 +63,12 @@ public class ResponseColumn : MonoBehaviour
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
 		symbolCard.Initialize(null);
+		coinRepo.Initialize();
 		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
-		coinZone = GetComponentInChildren<CoinZone>();
-		coinZone.Initialize(this);
+		//coinZone = GetComponentInChildren<CoinZone>();
+		//coinZone.Initialize(this);
 
 		symbolCard.SetEmpty();
 
@@ -76,6 +79,8 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetCoinZoneVisible(bool visible, bool animate = false)
 	{
+		return;
+
 		//coinZone.gameObject.SetActive(visible);
 		if(animate)
 		{

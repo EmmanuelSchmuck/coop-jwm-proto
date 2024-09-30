@@ -7,9 +7,14 @@ public class Coin : MonoBehaviour
 {
     [SerializeField] private float animDuration;
     [SerializeField] private AnimationCurve animSizeCurve;
-    // Start is called before the first frame update
-    void Start()
-    {
+    [SerializeField] private int value;
+    public int Value => value;
+
+    [SerializeField] private CoinType coinType;
+    public CoinType CoinType => coinType;
+    public void PlaySizeAnimation()
+	{
+        StopAllCoroutines();
         StartCoroutine(CoroutineTools.Tween01(animDuration, t => transform.localScale = Vector3.one * animSizeCurve.Evaluate(t)));
     }
 }

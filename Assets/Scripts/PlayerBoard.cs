@@ -12,6 +12,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private PlayerBoard oppositeBoard;
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
+    [SerializeField] private CoinRepository[] coinRepositories;
     [SerializeField] private CoinCounter coinCounter;
     [SerializeField] private ScoreCounter scoreCounter;
     [SerializeField] private TMPro.TextMeshProUGUI instructionText;
@@ -20,6 +21,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private GameObject validateButton;
     [SerializeField] private GameObject startRoundButton;
     [SerializeField] private GameObject activePlayerIndicator;
+    [SerializeField] private Coin bronzeCoinPrefab, silverCoinPrefab, goldCoinPrefab;
 
     public PlayerBoard OppositeBoard => oppositeBoard;
 
@@ -56,7 +58,8 @@ public class PlayerBoard : MonoBehaviour
     private bool oppositeBoardSymbolClicked;
     private bool symbolClicked;
     public bool IsDisabled { get; private set; }
-
+    private Coin grabbedCoin;
+    private CoinRepository lastClickedRepo;
     public void Initialize(int symbolPoolSize, string playerName, Sprite avatar)
 	{
         activePlayerIndicator.SetActive(false);
@@ -82,7 +85,12 @@ public class PlayerBoard : MonoBehaviour
         
         Vector3 cursorPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
 
-        selectedCard.transform.position = cursorPosition;   
+        selectedCard.transform.position = cursorPosition;
+        
+        if(grabbedCoin != null)
+		{
+            grabbedCoin.transform.position = cursorPosition;
+		}
     }
 
     private void OnKeyboardSymbolSelected()
@@ -129,6 +137,12 @@ public class PlayerBoard : MonoBehaviour
 
         responsePanel.Initialize(GameConfig.sequenceLength, this);
 
+        InitializeCoinRepos(3,3,3);
+        foreach (var coinRepo in GetComponentsInChildren<CoinRepository>(true))
+        {
+            coinRepo.Clicked += OnCoinRepoClicked;
+        }
+
         coinCounter.SetCoin(GameConfig.CoinPerRound);
 
         if(isFirstRound && isMainPlayer)
@@ -141,11 +155,34 @@ public class PlayerBoard : MonoBehaviour
         RoundStarted?.Invoke(roundInfo);
     }
 
+    private void InitializeCoinRepos(int bronzeCount, int silverCount, int goldCount)
+	{
+        Coin[] bronzeCoins = new Coin[bronzeCount];
+        for(int i = 0; i<bronzeCount;i++)
+		{
+            bronzeCoins[i] = Instantiate(bronzeCoinPrefab, this.transform);
+        }
+        Coin[] silverCoins = new Coin[silverCount];
+        for (int i = 0; i < silverCount; i++)
+        {
+            silverCoins[i] = Instantiate(silverCoinPrefab, this.transform);
+        }
+        Coin[] goldCoins = new Coin[goldCount];
+        for (int i = 0; i < goldCount; i++)
+        {
+            goldCoins[i] = Instantiate(goldCoinPrefab, this.transform);
+        }
+        coinRepositories[0].Initialize(bronzeCoins);
+        coinRepositories[1].Initialize(silverCoins);
+        coinRepositories[2].Initialize(goldCoins);
+
+        coinRepositories[3].Initialize(new Coin[1] { Instantiate(goldCoinPrefab, this.transform) });
+
+    }
+
     private void SetStartRoundButtonVisible(bool visible)
     {
         if (startRoundButton == null) return;
-
-        
 
         if (visible)
 		{
@@ -184,6 +221,33 @@ public class PlayerBoard : MonoBehaviour
         responsePanel.SetColumnsVisible(true, animate: true);
     }
 
+    private void OnCoinRepoClicked(CoinRepository repo, bool isDrag)
+	{
+        if (repo == lastClickedRepo && isDrag) return;
+
+        lastClickedRepo = repo;
+
+        Debug.Log("CoinRepoClicked");
+        if(grabbedCoin != null) // try to deposit coin in repo
+		{
+            if (repo.CanAcceptCoin(grabbedCoin))
+			{
+                repo.AddCoin(grabbedCoin);
+                grabbedCoin = null;
+                Debug.Log($"Deposited coin {Time.frameCount}");
+            }
+		}
+        else
+		{
+            if(repo.CoinCount > 0)
+			{
+                grabbedCoin = repo.TakeLastCoin();
+                grabbedCoin.transform.SetParent(this.transform);
+                Debug.Log($"Taken coin {Time.frameCount}");
+            }
+		}
+	}
+
     public void OnCoinBettingPhaseStart(RoundInfo roundInfo)
 	{
         if (IsDisabled) return;
@@ -193,11 +257,16 @@ public class PlayerBoard : MonoBehaviour
         activePlayerIndicator.SetActive(true);
         symbolKeyboard.Interactable = false;
         responsePanel.CoinZoneHighlighted = isMainPlayer;
+
         SetCoinCounterVisible(isMainPlayer);
+
         SetInstructionText(COIN_BETTING_INSTRUCTION);
         CoinBettingStarted?.Invoke(roundInfo);
         // enable coin zones
         responsePanel.SetCoinZoneInteractable(true);
+
+        
+
         IsValidated = false;
 	}
 
