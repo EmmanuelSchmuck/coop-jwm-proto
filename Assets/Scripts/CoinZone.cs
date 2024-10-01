@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Toolbox;
 
-public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class CoinZone : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
 	[SerializeField] private ButtonHighlighter highlight;
 	[SerializeField] private CanvasGroup canvasGroup;
 	[SerializeField] private AnimationCurve fadeCurve;
+	[SerializeField] private CoinRepository coinRepo;
 	public bool Highlighted
 	{
 		set
@@ -20,10 +21,15 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 
 	public bool Interactable { get; set; }
 
+	public int CoinCount => coinRepo.CoinCount;
+
 
 	public void Initialize(ResponseColumn parent)
 	{
 		this.parent = parent;
+		coinRepo.Initialize();
+		coinRepo.CoinAdded += OnCoinAdded;
+		coinRepo.CoinRemoved += OnCoinRemoved;
 	}
 
 	public void FadeToVisible(bool visible)
@@ -33,15 +39,31 @@ public class CoinZone : MonoBehaviour, IPointerClickHandler, IPointerEnterHandle
 		StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
 	}
 
-	public void OnPointerClick(PointerEventData eventData)
+	private void OnCoinAdded()
 	{
-		if (!Interactable) return;
+		parent.OnAddCoinButtonClick();
+	}
 
-		if (eventData.button == PointerEventData.InputButton.Left)
-			parent.OnAddCoinButtonClick();
+	private void OnCoinRemoved()
+	{
+		parent.OnRemoveCoinButtonClick();
+	}
 
-		else if (eventData.button == PointerEventData.InputButton.Right)
-			parent.OnRemoveCoinButtonClick();
+	//public void OnPointerClick(PointerEventData eventData)
+	//{
+	//	if (!Interactable) return;
+
+	//	if (eventData.button == PointerEventData.InputButton.Left)
+	//		parent.OnAddCoinButtonClick();
+
+	//	else if (eventData.button == PointerEventData.InputButton.Right)
+	//		parent.OnRemoveCoinButtonClick();
+	//}
+
+	public void AddCoin(Coin coin)
+	{
+		coinRepo.AddCoin(coin);
+		parent.OnAddCoinButtonClick();
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)

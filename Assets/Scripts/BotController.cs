@@ -141,16 +141,19 @@ public class BotController : MonoBehaviour
         int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
 
 
-        for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
+        for (int i = 0; i < roundInfo.gameConfig.sequenceLength && i < roundInfo.gameConfig.CoinPerRound; i++)
         {
             if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+
+            //if (!fastMode) yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
+            Coin coin = target.CoinRepositories.Where(r => r.CoinCount > 0).Random().TakeLastCoin();
+            target.ResponsePanel.AddCoinsInColumn(coin, i);
+            
 
             int coinAmount = playerB_coinAmountSequence[i];
             for (int c = 0; c < coinAmount; c++)
             {
-                if (!fastMode) yield return new WaitForSeconds(Random.Range(0.1f, 0.2f));
-                target.ResponsePanel.AddCoinsInColumn(1, i);
-                target.CoinCounter.RemoveCoin(1);
+                
             }
         }
 

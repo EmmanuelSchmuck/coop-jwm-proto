@@ -18,7 +18,8 @@ public class JWMGameConfig
     public const int SYMBOL_POOL_SIZE = 9;
     public const int MAX_SEQUENCE_LENGTH = 9;
     public const int MIN_SEQUENCE_LENGTH = 3;
-    public int CoinPerRound => ActionDependency == Dependency.Negative ? sequenceLength : sequenceLength * 2;
+    //public int CoinPerRound => ActionDependency == Dependency.Negative ? sequenceLength : sequenceLength * 2;
+    public int CoinPerRound => 9;
     public Dependency RewardDependency => gameMode switch
     {
         GameMode.PositiveReward or GameMode.PositiveRewardAction => Dependency.Positive,

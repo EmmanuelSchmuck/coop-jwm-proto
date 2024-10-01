@@ -24,6 +24,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private Coin bronzeCoinPrefab, silverCoinPrefab, goldCoinPrefab;
 
     public PlayerBoard OppositeBoard => oppositeBoard;
+    public CoinRepository[] CoinRepositories => coinRepositories;
 
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
@@ -140,7 +141,7 @@ public class PlayerBoard : MonoBehaviour
         InitializeCoinRepos(3,3,3);
         foreach (var coinRepo in GetComponentsInChildren<CoinRepository>(true))
         {
-            coinRepo.Clicked += OnCoinRepoClicked;
+            coinRepo.Interacted += OnCoinRepoClicked;
         }
 
         coinCounter.SetCoin(GameConfig.CoinPerRound);
@@ -176,7 +177,7 @@ public class PlayerBoard : MonoBehaviour
         coinRepositories[1].Initialize(silverCoins);
         coinRepositories[2].Initialize(goldCoins);
 
-        coinRepositories[3].Initialize(new Coin[1] { Instantiate(goldCoinPrefab, this.transform) });
+        //oinRepositories[3].Initialize(new Coin[1] { Instantiate(goldCoinPrefab, this.transform) });
 
     }
 
@@ -227,24 +228,29 @@ public class PlayerBoard : MonoBehaviour
 
         lastClickedRepo = repo;
 
-        Debug.Log("CoinRepoClicked");
-        if(grabbedCoin != null) // try to deposit coin in repo
+        //Debug.Log("CoinRepoClicked");
+        if(grabbedCoin != null && repo.CanAcceptCoinOfType(grabbedCoin.CoinType)) // deposit or swap
 		{
-            if (repo.CanAcceptCoin(grabbedCoin))
+            if(repo.CoinCount == repo.MaxCointCount) // repo is full, must swap
+			{
+                Coin swapCoin = repo.TakeLastCoin();
+                swapCoin.transform.SetParent(this.transform);
+                repo.AddCoin(grabbedCoin);
+                grabbedCoin = swapCoin;
+            }
+            else // simple deposit
 			{
                 repo.AddCoin(grabbedCoin);
                 grabbedCoin = null;
-                Debug.Log($"Deposited coin {Time.frameCount}");
             }
 		}
-        else
-		{
-            if(repo.CoinCount > 0)
-			{
-                grabbedCoin = repo.TakeLastCoin();
-                grabbedCoin.transform.SetParent(this.transform);
-                Debug.Log($"Taken coin {Time.frameCount}");
-            }
+        //else if(//test for swap)
+        
+        else if (grabbedCoin == null) // test for simple deposit
+        {
+            grabbedCoin = repo.TakeLastCoin();
+            grabbedCoin.transform.SetParent(this.transform);
+                //Debug.Log($"Taken coin {Time.frameCount}");      
 		}
 	}
 
@@ -484,17 +490,19 @@ public class PlayerBoard : MonoBehaviour
 
     public void WIP_OnResponseColumnAddCoinClicked(ResponseColumn column)
     {
-        if (column.CoinCount >= GameConfig.maxCoinPerSymbol) return;
+        //if (column.CoinCount >= GameConfig.maxCoinPerSymbol) return;
 
-        if (coinCounter.CoinCount <= 0) return;
+        //if (coinCounter.CoinCount <= 0) return;
 
         responsePanel.CoinZoneHighlighted = false;
 
-        coinCounter.RemoveCoin();
+        //coinCounter.RemoveCoin();
 
-        column.AddCoin();
+        //column.AddCoin();
 
-        bool canValidate = GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
+        bool canValidate = GameConfig.sequenceLength == responsePanel.CoinsInColumns;
+
+        Debug.Log($"coin count = {responsePanel.CoinsInColumns}");
         SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);
@@ -509,13 +517,13 @@ public class PlayerBoard : MonoBehaviour
 
     public void WIP_OnResponseColumnRemoveCoinClicked(ResponseColumn column)
     {
-        if (column.CoinCount <= 0) return;
+        //if (column.CoinCount <= 0) return;
 
-        coinCounter.AddCoin();
+        //coinCounter.AddCoin();
 
-        column.RemoveCoin();
+        //column.RemoveCoin();
 
-        bool canValidate = GameConfig.ActionDependency == Dependency.Negative ? true : GameConfig.CoinPerRound == responsePanel.CoinsInColumns;
+        bool canValidate = GameConfig.ActionDependency == Dependency.Negative ? true : GameConfig.sequenceLength == responsePanel.CoinsInColumns;
         SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);

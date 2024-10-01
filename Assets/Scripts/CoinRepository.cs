@@ -10,12 +10,15 @@ public class CoinRepository : MonoBehaviour
     [SerializeField] private CoinType coinType;
     public bool AcceptsAllCoinTypes => acceptsAllCoinTypes;
     public CoinType CoinType => coinType;
-    public event System.Action<CoinRepository, bool> Clicked;
+    public event System.Action<CoinRepository, bool> Interacted;
     //public event System.Action CoinDeposited;
     private readonly List<Coin> coins = new();
     public int CoinCount => coins.Count;
+    public int MaxCointCount => maxCoinCount;
     public int TotalCoinValue => coins.Sum(c => c.Value);
     private int lastFrameClick;
+    public event System.Action CoinAdded;
+    public event System.Action CoinRemoved;
 
     public void AddCoin(Coin coin, bool fromInit = false)
 	{
@@ -24,10 +27,11 @@ public class CoinRepository : MonoBehaviour
         if(!fromInit)
 		{
             SoundManager.Instance.PlaySound(SoundType.AddCoin);
-        }
+            CoinAdded?.Invoke();
+        }      
     }
 
-    public bool CanAcceptCoin(Coin coin) => CoinCount < maxCoinCount && (acceptsAllCoinTypes || coinType == coin.CoinType);
+    public bool CanAcceptCoinOfType(CoinType coinType) => (acceptsAllCoinTypes || this.coinType == coinType);
 
 	private void Cleanup()
 	{
@@ -63,31 +67,32 @@ public class CoinRepository : MonoBehaviour
         Coin coin = coins.Last();
         coins.RemoveAt(coins.Count-1);
         SoundManager.Instance.PlaySound(SoundType.RemoveCoin);
+        CoinRemoved?.Invoke();
         return coin;
 	}
 
-    private void OnClick(bool isDrag)
+    private void OnInteract(bool isDrag)
 	{
         if(lastFrameClick == Time.frameCount)
 		{
-            Debug.Log($"same frame {Time.frameCount}");
+            //Debug.Log($"same frame {Time.frameCount}");
             return;
 		}
         lastFrameClick = Time.frameCount;
-        Debug.Log($"Clicked {Time.frameCount} {gameObject.name}");
+        //Debug.Log($"Clicked {Time.frameCount} {gameObject.name}");
         
-        Clicked?.Invoke(this, isDrag);
+        Interacted?.Invoke(this, isDrag);
     }
 
     public void OnPointerDown()
 	{
-        Debug.Log($"PointerDown {Time.frameCount} {gameObject.name}");
-        OnClick(false);
+        //Debug.Log($"PointerDown {Time.frameCount} {gameObject.name}");
+        OnInteract(false);
     }
 
     public void OnEndDrag()
 	{
-        Debug.Log($"Drop {Time.frameCount} {gameObject.name}");
-        OnClick(true);
+        //Debug.Log($"Drop {Time.frameCount} {gameObject.name}");
+        OnInteract(true);
     }
 }

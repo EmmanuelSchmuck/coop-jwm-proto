@@ -170,9 +170,9 @@ public class ResponsePanel : MonoBehaviour
 	}
 
 
-	public void AddCoinsInColumn(int amount, int columnIndex)
+	public void AddCoinsInColumn(Coin coin, int columnIndex)
 	{
-		columns[columnIndex].AddCoin(amount);
+		columns[columnIndex].AddCoin(coin);
 	}
 
 	public void SetColumnLocked(int columnIndex)

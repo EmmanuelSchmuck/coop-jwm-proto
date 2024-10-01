@@ -19,26 +19,25 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private GameObject DEBUG_lock;
 	[SerializeField] private Button symbolButton;
 	[SerializeField] private CanvasGroup canvasGroup;
-	[SerializeField] private CoinRepository coinRepo;
+	//[SerializeField] private CoinRepository coinRepo;
 	[SerializeField] private AnimationCurve fadeCurve;
 	private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
 	public bool IsLocked { get; private set; }
 	public bool IsPickedOrLocked => IsLocked || SymbolIndex != null;
-	public int CoinCount { get; private set; }
+	public int CoinCount => coinZone.CoinCount;
 	public bool CoinZoneInteractable {
 		get => coinZoneInteractable;
 		set
 		{
-			return;
 			coinZoneInteractable = value;
 			coinZone.Interactable = value;
 		}
 	}
 	public bool CoinZoneHighlighted
 	{
-		set => value = value; // coinZone.Highlighted = value;
+		set => coinZone.Highlighted = value; // coinZone.Highlighted = value;
 	}
 	public bool SymbolHighlighted
 	{
@@ -63,12 +62,12 @@ public class ResponseColumn : MonoBehaviour
 		this.responsePanel = responsePanel;
 		SymbolIndex = null;
 		symbolCard.Initialize(null);
-		coinRepo.Initialize();
+		
 		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
-		//coinZone = GetComponentInChildren<CoinZone>();
-		//coinZone.Initialize(this);
+		coinZone = GetComponentInChildren<CoinZone>();
+		coinZone.Initialize(this);
 
 		symbolCard.SetEmpty();
 
@@ -79,9 +78,9 @@ public class ResponseColumn : MonoBehaviour
 
 	public void SetCoinZoneVisible(bool visible, bool animate = false)
 	{
-		return;
+		//return;
 
-		//coinZone.gameObject.SetActive(visible);
+		coinZone.gameObject.SetActive(visible);
 		if(animate)
 		{
 			coinZone.gameObject.SetActive(true);
@@ -132,16 +131,9 @@ public class ResponseColumn : MonoBehaviour
 		coinButtons.gameObject.SetActive(false);
 	}
 
-	public void AddCoin(int amount = 1)
+	public void AddCoin(Coin coin)
 	{
-		CoinCount += amount;
-		for(int i = 0; i<amount;i++)
-		{
-			GameObject coin = Instantiate(coinPrefab, coinContainer);
-			coins.Add(coin);
-		}
-		SoundManager.Instance.PlaySound(SoundType.AddCoin);
-
+		coinZone.AddCoin(coin);
 	}
 
 	public void SetCoins(int amount) // to do: refactor this + add & remove coin
@@ -153,23 +145,23 @@ public class ResponseColumn : MonoBehaviour
 
 		coins.Clear();
 
-		CoinCount = amount;
+		//CoinCount = amount;
 		for (int i = 0; i < amount; i++)
 		{
 			coins.Add(Instantiate(coinPrefab, coinContainer));
 		}
 	}
 
-	public void RemoveCoin()
-	{
-		if (coins.Count <= 0) throw new System.Exception("No coin to remove !");
+	//public void RemoveCoin()
+	//{
+	//	if (coins.Count <= 0) throw new System.Exception("No coin to remove !");
 
-		GameObject coin = coins[0];
-		coins.RemoveAt(0);
-		Destroy(coin);
-		CoinCount--;
-		SoundManager.Instance.PlaySound(SoundType.RemoveCoin);
-	}
+	//	GameObject coin = coins[0];
+	//	coins.RemoveAt(0);
+	//	Destroy(coin);
+	//	//CoinCount--;
+	//	SoundManager.Instance.PlaySound(SoundType.RemoveCoin);
+	//}
 
 	public void FadeCoins()
 	{
