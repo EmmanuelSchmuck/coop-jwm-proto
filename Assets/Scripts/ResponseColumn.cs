@@ -19,32 +19,32 @@ public class ResponseColumn : MonoBehaviour
 	[SerializeField] private GameObject DEBUG_lock;
 	[SerializeField] private Button symbolButton;
 	[SerializeField] private CanvasGroup canvasGroup;
-	//[SerializeField] private CoinRepository coinRepo;
+	[SerializeField] private CoinRepository coinRepo;
 	[SerializeField] private AnimationCurve fadeCurve;
-	private CoinZone coinZone;
+	//private CoinZone coinZone;
 	private List<GameObject> coins;
 	private ResponsePanel responsePanel;
 	public bool IsLocked { get; private set; }
 	public bool IsPickedOrLocked => IsLocked || SymbolIndex != null;
-	public int CoinCount => coinZone.CoinCount;
-	public int CoinValueSum => coinZone.CoinValueSum;
-	public bool CoinZoneInteractable {
-		get => coinZoneInteractable;
+	public int CoinCount => coinRepo.CoinCount;
+	public int CoinValueSum => coinRepo.CoinValueSum;
+	public bool CoinRepoInteractable {
+		get => coinRepoInteractable;
 		set
 		{
-			coinZoneInteractable = value;
-			coinZone.Interactable = value;
+			coinRepoInteractable = value;
+			coinRepo.Interactable = value;
 		}
 	}
-	public bool CoinZoneHighlighted
+	public bool CoinRepoHighlighted
 	{
-		set => coinZone.Highlighted = value; // coinZone.Highlighted = value;
+		set => coinRepo.Highlighted = value; // coinZone.Highlighted = value;
 	}
 	public bool SymbolHighlighted
 	{
 		set => symbolCard.Highlighted = value;
 	}
-	private bool coinZoneInteractable;
+	private bool coinRepoInteractable;
 	public bool SymbolInteractable
 	{
 		get => symbolInteractable;
@@ -67,8 +67,11 @@ public class ResponseColumn : MonoBehaviour
 		check.Hide();
 		SetCoverVisible(false);
 		SetCoinButtonsVisible(false);
-		coinZone = GetComponentInChildren<CoinZone>();
-		coinZone.Initialize(this);
+		coinRepo = GetComponentInChildren<CoinRepository>();
+		//coinZone = GetComponentInChildren<CoinZone>();
+		coinRepo.Initialize();
+		coinRepo.CoinAdded += OnAddCoinButtonClick;
+		coinRepo.CoinRemoved += OnRemoveCoinButtonClick;
 
 		symbolCard.SetEmpty();
 
@@ -77,19 +80,19 @@ public class ResponseColumn : MonoBehaviour
 		Cleanup();
 	}
 
-	public void SetCoinZoneVisible(bool visible, bool animate = false)
+	public void SetCoinRepoVisible(bool visible, bool animate = false)
 	{
 		//return;
 
-		coinZone.gameObject.SetActive(visible);
+		coinRepo.gameObject.SetActive(visible);
 		if(animate)
 		{
-			coinZone.gameObject.SetActive(true);
-			coinZone.FadeToVisible(visible);
+			coinRepo.gameObject.SetActive(true);
+			coinRepo.FadeToVisible(visible);
 		}
 		else
 		{
-			coinZone.gameObject.SetActive(visible);
+			coinRepo.gameObject.SetActive(visible);
 		}
 	}
 
@@ -134,7 +137,7 @@ public class ResponseColumn : MonoBehaviour
 
 	public void AddCoin(Coin coin)
 	{
-		coinZone.AddCoin(coin);
+		coinRepo.AddCoin(coin);
 	}
 
 	public void SetCoins(int amount) // to do: refactor this + add & remove coin
@@ -175,14 +178,14 @@ public class ResponseColumn : MonoBehaviour
 
 	public void OnAddCoinButtonClick()
 	{
-		if (!coinZoneInteractable) return;
+		if (!coinRepoInteractable) return;
 
 		responsePanel.OnResponseColumnAddCoin(this);
 	}
 
 	public void OnRemoveCoinButtonClick()
 	{
-		if (!coinZoneInteractable) return;
+		if (!coinRepoInteractable) return;
 
 		responsePanel.OnResponseColumnRemoveCoin(this);
 	}

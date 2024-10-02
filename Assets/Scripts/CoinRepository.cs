@@ -2,12 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Toolbox;
 
 public class CoinRepository : MonoBehaviour
 {
     [SerializeField] private int maxCoinCount;
     [SerializeField] private bool acceptsAllCoinTypes;
     [SerializeField] private CoinType coinType;
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private AnimationCurve fadeCurve;
+    [SerializeField] private ButtonHighlighter highlight;
     public bool AcceptsAllCoinTypes => acceptsAllCoinTypes;
     public CoinType CoinType => coinType;
     public event System.Action<CoinRepository, bool> Interacted;
@@ -20,6 +24,23 @@ public class CoinRepository : MonoBehaviour
     private int lastFrameClick;
     public event System.Action CoinAdded;
     public event System.Action CoinRemoved;
+
+    public bool Highlighted
+    {
+        set
+        {
+            highlight.gameObject.SetActive(value);
+        }
+    }
+
+    public bool Interactable { get; set; }
+
+    public void FadeToVisible(bool visible)
+    {
+        float startAlpha = visible ? 0f : 1f;
+        float targetAlpha = visible ? 1f : 0f;
+        StartCoroutine(CoroutineTools.Tween(startAlpha, targetAlpha, 0.7f, t => canvasGroup.alpha = fadeCurve.Evaluate(t)));
+    }
 
     public void AddCoin(Coin coin, bool fromInit = false)
 	{

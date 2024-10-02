@@ -39,7 +39,7 @@ public class ResponsePanel : MonoBehaviour
 		{
 			foreach (var col in columns)
 			{
-				col.CoinZoneHighlighted = value;
+				col.CoinRepoHighlighted = value;
 			}
 		}
 	}
@@ -48,7 +48,7 @@ public class ResponsePanel : MonoBehaviour
 	{
 		foreach (var col in columns)
 		{
-			col.SetCoinZoneVisible(visible, animate);
+			col.SetCoinRepoVisible(visible, animate);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class ResponsePanel : MonoBehaviour
 	{
 		foreach (var column in columns)
 		{
-			column.CoinZoneInteractable = interactable;
+			column.CoinRepoInteractable = interactable;
 		}
 	}
 
