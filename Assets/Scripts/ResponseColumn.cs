@@ -27,6 +27,7 @@ public class ResponseColumn : MonoBehaviour
 	public bool IsLocked { get; private set; }
 	public bool IsPickedOrLocked => IsLocked || SymbolIndex != null;
 	public int CoinCount => coinZone.CoinCount;
+	public int CoinValueSum => coinZone.CoinValueSum;
 	public bool CoinZoneInteractable {
 		get => coinZoneInteractable;
 		set

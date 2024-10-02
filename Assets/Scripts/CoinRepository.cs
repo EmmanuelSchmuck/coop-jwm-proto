@@ -14,6 +14,7 @@ public class CoinRepository : MonoBehaviour
     //public event System.Action CoinDeposited;
     private readonly List<Coin> coins = new();
     public int CoinCount => coins.Count;
+    public int CoinValueSum => coins.Sum(c => c.Value);
     public int MaxCointCount => maxCoinCount;
     public int TotalCoinValue => coins.Sum(c => c.Value);
     private int lastFrameClick;
@@ -42,7 +43,7 @@ public class CoinRepository : MonoBehaviour
 
         coins.Clear();
 
-        foreach(var coin in GetComponentsInChildren<Coin>())
+        foreach(var coin in GetComponentsInChildren<Coin>(includeInactive: true))
 		{
             Destroy(coin.gameObject);
         }

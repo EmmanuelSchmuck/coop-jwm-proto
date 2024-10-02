@@ -125,6 +125,10 @@ PrefabInstance:
       value: Coin Gold
       objectReference: {fileID: 0}
     - target: {fileID: 6792887441025626328, guid: 75fa8ed29a6c47c4eb67cb1670f4837f, type: 3}
+      propertyPath: value
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6792887441025626328, guid: 75fa8ed29a6c47c4eb67cb1670f4837f, type: 3}
       propertyPath: coinType
       value: 2
       objectReference: {fileID: 0}

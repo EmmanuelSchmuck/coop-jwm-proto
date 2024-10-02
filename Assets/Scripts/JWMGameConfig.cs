@@ -19,7 +19,24 @@ public class JWMGameConfig
     public const int MAX_SEQUENCE_LENGTH = 9;
     public const int MIN_SEQUENCE_LENGTH = 3;
     //public int CoinPerRound => ActionDependency == Dependency.Negative ? sequenceLength : sequenceLength * 2;
-    public int CoinPerRound => 9;
+    public (int, int, int) CoinsPerRound => ComputeCoinsPerRound();
+
+    private (int, int, int) ComputeCoinsPerRound()
+	{
+        int bronzeCoins = 0, silverCoins = 0, goldCoins = 0;
+
+        int coinsToShare = sequenceLength;
+
+        for(int i = 0; i < coinsToShare; i++)
+		{
+            if (i % 3 == 0) bronzeCoins++;
+            else if (i % 3 == 1) silverCoins++;
+            else if (i % 3 == 2) goldCoins++;
+        }
+
+        return (bronzeCoins, silverCoins, goldCoins);
+	}
+
     public Dependency RewardDependency => gameMode switch
     {
         GameMode.PositiveReward or GameMode.PositiveRewardAction => Dependency.Positive,

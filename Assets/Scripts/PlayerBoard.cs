@@ -13,7 +13,6 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private ResponsePanel responsePanel;
     [SerializeField] private SymbolKeyboard symbolKeyboard;
     [SerializeField] private CoinRepository[] coinRepositories;
-    [SerializeField] private CoinCounter coinCounter;
     [SerializeField] private ScoreCounter scoreCounter;
     [SerializeField] private TMPro.TextMeshProUGUI instructionText;
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
@@ -28,7 +27,6 @@ public class PlayerBoard : MonoBehaviour
 
     public ResponsePanel ResponsePanel => responsePanel;
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
-    public CoinCounter CoinCounter => coinCounter;
     public bool IsValidated { get; private set; }
     private int score;
     public JWMGameConfig GameConfig { get; private set; }
@@ -71,7 +69,8 @@ public class PlayerBoard : MonoBehaviour
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
         SetInstructionText(EMPTY);
-        SetCoinCounterVisible(false);
+        
+        SetCoinReposVisible(false);
         symbolKeyboard.SetVisible(false);
 
         if (isMainPlayer)  selectedCard.gameObject.SetActive(false);
@@ -101,9 +100,12 @@ public class PlayerBoard : MonoBehaviour
         selectedCard.SetVisible(true);
     }
 
-    private void SetCoinCounterVisible(bool visible)
+    private void SetCoinReposVisible(bool visible)
 	{
-        coinCounter.gameObject.SetActive(visible);
+        foreach(var rep in coinRepositories)
+		{
+            rep.gameObject.SetActive(visible);
+		}
     }
 
     private void SetInstructionText(string text)
@@ -137,16 +139,15 @@ public class PlayerBoard : MonoBehaviour
         turnCount = 0;
 
         responsePanel.Initialize(GameConfig.sequenceLength, this);
-
-        InitializeCoinRepos(3,3,3);
+        var coinsPerRound = GameConfig.CoinsPerRound;
+        InitializeCoinRepos(coinsPerRound.Item1, coinsPerRound.Item2, coinsPerRound.Item3);
         foreach (var coinRepo in GetComponentsInChildren<CoinRepository>(true))
         {
             coinRepo.Interacted += OnCoinRepoClicked;
         }
 
-        coinCounter.SetCoin(GameConfig.CoinPerRound);
 
-        if(isFirstRound && isMainPlayer)
+        if (isMainPlayer)
 		{
             SetStartRoundButtonVisible(true);
         }
@@ -246,7 +247,7 @@ public class PlayerBoard : MonoBehaviour
 		}
         //else if(//test for swap)
         
-        else if (grabbedCoin == null) // test for simple deposit
+        else if (grabbedCoin == null && repo.CoinCount > 0) // take coin if possible
         {
             grabbedCoin = repo.TakeLastCoin();
             grabbedCoin.transform.SetParent(this.transform);
@@ -264,7 +265,7 @@ public class PlayerBoard : MonoBehaviour
         symbolKeyboard.Interactable = false;
         responsePanel.CoinZoneHighlighted = isMainPlayer;
 
-        SetCoinCounterVisible(isMainPlayer);
+        SetCoinReposVisible(isMainPlayer);
 
         SetInstructionText(COIN_BETTING_INSTRUCTION);
         CoinBettingStarted?.Invoke(roundInfo);
@@ -359,7 +360,11 @@ public class PlayerBoard : MonoBehaviour
     {
         if (IsDisabled) return;
         activePlayerIndicator.SetActive(false);
-        SetCoinCounterVisible(false);
+        SetCoinReposVisible(false);
+        foreach (var coinRepo in GetComponentsInChildren<CoinRepository>(true))
+        {
+            coinRepo.Interacted -= OnCoinRepoClicked;
+        }
 
         SetInstructionText(EMPTY);
         //responsePanel.ShowCorrectFeedback(roundInfo.correctIndexSequence);
@@ -416,7 +421,7 @@ public class PlayerBoard : MonoBehaviour
             responsePanel.Columns[i].Cleanup();
         }
         
-        if (isMainPlayer) SetStartRoundButtonVisible(true);
+        //if (isMainPlayer) SetStartRoundButtonVisible(true);
         
     }
 
@@ -433,7 +438,7 @@ public class PlayerBoard : MonoBehaviour
         foreach (var column in responsePanel.GetCorrectColumns(roundInfo.correctIndexSequence))
         {
             //round_score += (1 + column.CoinCount);
-            round_score += (0 + column.CoinCount);
+            round_score += (1 + column.CoinValueSum);
         }
 
         return round_score;

@@ -124,6 +124,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Coin Bronze
       objectReference: {fileID: 0}
+    - target: {fileID: 6792887441025626328, guid: 75fa8ed29a6c47c4eb67cb1670f4837f, type: 3}
+      propertyPath: value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

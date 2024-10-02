@@ -22,6 +22,7 @@ public class CoinZone : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 	public bool Interactable { get; set; }
 
 	public int CoinCount => coinRepo.CoinCount;
+	public int CoinValueSum => coinRepo.CoinValueSum;
 
 
 	public void Initialize(ResponseColumn parent)

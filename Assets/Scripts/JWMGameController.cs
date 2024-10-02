@@ -110,7 +110,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Initialize(correctIndexSequence);
 
-        if (isFirstRound)
+        if (true)
 		{
             roundStarted = false;
 
@@ -251,10 +251,10 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         // to do: add & clarify "phases" such as feedback & score display, round end (show "next round" button) etc..;
         // should have: feedback then score then end round, all in here
 
-        roundStarted = false;
+        //roundStarted = false;
 
         // to do: move this into StartRound ?
-        yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
+        //yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
 
         StartCoroutine(StartRound());
     }

@@ -37,7 +37,7 @@ public class BotController : MonoBehaviour
             playerB_indices[i] = Random.value < correctProbability ? roundInfo.correctIndexSequence[i] : Random.Range(0, 9);
 
             // assign coin amount value based on correctProbability 
-            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
+            //playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
     }
 
@@ -135,13 +135,13 @@ public class BotController : MonoBehaviour
 
             playerB_indices[i] = Random.value < correctProbability ? roundInfo.correctIndexSequence[i] : Random.Range(0, 9);
 
-            playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
+            //playerB_coinAmountSequenceFloat[i] = correctProbability * gameConfig.CoinPerRound / gameConfig.sequenceLength;
         }
 
-        int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
+        //int[] playerB_coinAmountSequence = ComputeCoinSequence(playerB_coinAmountSequenceFloat, gameConfig);
 
 
-        for (int i = 0; i < roundInfo.gameConfig.sequenceLength && i < roundInfo.gameConfig.CoinPerRound; i++)
+        for (int i = 0; i < roundInfo.gameConfig.sequenceLength; i++)
         {
             if (!fastMode) yield return new WaitForSeconds(Random.Range(0.5f, 1f));
 
@@ -150,11 +150,11 @@ public class BotController : MonoBehaviour
             target.ResponsePanel.AddCoinsInColumn(coin, i);
             
 
-            int coinAmount = playerB_coinAmountSequence[i];
-            for (int c = 0; c < coinAmount; c++)
-            {
+            //int coinAmount = playerB_coinAmountSequence[i];
+            //for (int c = 0; c < coinAmount; c++)
+            //{
                 
-            }
+            //}
         }
 
         yield return null;
@@ -163,93 +163,93 @@ public class BotController : MonoBehaviour
         target.SetValidated(true);
     }
 
-    private int[] ComputeCoinSequence(float[] coinSequenceFloat, JWMGameConfig gameConfig) // to do: refactor + fix, also compute coinSequenceFloat here
-    {
+  //  private int[] ComputeCoinSequence(float[] coinSequenceFloat, JWMGameConfig gameConfig) // to do: refactor + fix, also compute coinSequenceFloat here
+  //  {
 
-        float normalizationFactor = gameConfig.CoinPerRound / coinSequenceFloat.Sum();
+  //      float normalizationFactor = gameConfig.CoinPerRound / coinSequenceFloat.Sum();
 
-        coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(gameConfig.maxCoinPerSymbol, x * normalizationFactor)).ToArray();
+  //      coinSequenceFloat = coinSequenceFloat.Select(x => Mathf.Min(gameConfig.maxCoinPerSymbol, x * normalizationFactor)).ToArray();
 
-        string s = "";
-        foreach (var f in coinSequenceFloat)
-        {
-            s += f + " - ";
-        }
-        Debug.Log($"float sequence = {s}, sum = {coinSequenceFloat.Sum()}");
+  //      string s = "";
+  //      foreach (var f in coinSequenceFloat)
+  //      {
+  //          s += f + " - ";
+  //      }
+  //      Debug.Log($"float sequence = {s}, sum = {coinSequenceFloat.Sum()}");
 
-        int[] coinSequenceInt = new int[gameConfig.sequenceLength];
-        int remainingCoins = gameConfig.CoinPerRound;
+  //      int[] coinSequenceInt = new int[gameConfig.sequenceLength];
+  //      int remainingCoins = gameConfig.CoinPerRound;
 
-        float avgFloat = coinSequenceFloat.Average();
+  //      float avgFloat = coinSequenceFloat.Average();
 
-        //var sorted = coinSequenceFloat.Select(x, i =>)
+  //      //var sorted = coinSequenceFloat.Select(x, i =>)
 
-        // var sortedFloats = coinSequenceFloat.OrderByDescending(x => x).ToList();
+  //      // var sortedFloats = coinSequenceFloat.OrderByDescending(x => x).ToList();
 
-        // indices of elements in coinSequenceFloat, sorted by descending value
-        // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
+  //      // indices of elements in coinSequenceFloat, sorted by descending value
+  //      // int[] sortedFloatIndices = coinSequenceFloat.Select(x => sortedFloats.IndexOf(x)).ToArray();
 
 
-        int[] sortedFloatIndices = coinSequenceFloat.OldIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
+  //      int[] sortedFloatIndices = coinSequenceFloat.OldIndicesIfSortedDescending().ToArray(); // DOES NOT WORK :'(
 
-		s = "";
-		foreach (var f in sortedFloatIndices)
-		{
-			s += f + " - ";
-		}
-		Debug.Log("sorted float indices = " + s);
+		//s = "";
+		//foreach (var f in sortedFloatIndices)
+		//{
+		//	s += f + " - ";
+		//}
+		//Debug.Log("sorted float indices = " + s);
 
-        int loops = 0;
-		do
-		{
-            // iterate over coinSequenceFloat, in descending value order; assign coins to highest value in priority
-            // if we still have coins, repeat process
+  //      int loops = 0;
+		//do
+		//{
+  //          // iterate over coinSequenceFloat, in descending value order; assign coins to highest value in priority
+  //          // if we still have coins, repeat process
 
-            for (int i = 0; i < gameConfig.sequenceLength; i++)
-            {
-                int floatIndex = sortedFloatIndices[i];
-                float floatValue = coinSequenceFloat[floatIndex];
+  //          for (int i = 0; i < gameConfig.sequenceLength; i++)
+  //          {
+  //              int floatIndex = sortedFloatIndices[i];
+  //              float floatValue = coinSequenceFloat[floatIndex];
 
-                int amount = Mathf.Min(remainingCoins, Mathf.RoundToInt(floatValue));
-                amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[floatIndex], amount);
-                amount = Mathf.Max(0, amount);
-                coinSequenceInt[floatIndex] += amount;
-                remainingCoins -= amount;
+  //              int amount = Mathf.Min(remainingCoins, Mathf.RoundToInt(floatValue));
+  //              amount = Mathf.Min(gameConfig.maxCoinPerSymbol - coinSequenceInt[floatIndex], amount);
+  //              amount = Mathf.Max(0, amount);
+  //              coinSequenceInt[floatIndex] += amount;
+  //              remainingCoins -= amount;
 
-                Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}, amount = {amount}");
+  //              Debug.Log($"floatIndex = {floatIndex}, floatValue = {floatValue}, amount = {amount}");
 
-                if (remainingCoins == 0) break;
+  //              if (remainingCoins == 0) break;
 
-            }
+  //          }
 
-            Debug.Log($"remaining coins = {remainingCoins}");
+  //          Debug.Log($"remaining coins = {remainingCoins}");
 
-            loops++;
+  //          loops++;
 
-        } while (remainingCoins > 0 && loops < 100);
+  //      } while (remainingCoins > 0 && loops < 100);
 
-        for (int i = 0; i < remainingCoins; i++)
-        {
-            bool success = false;
-            int attempts = 0;
-            int maxAttempts = 100;
+  //      for (int i = 0; i < remainingCoins; i++)
+  //      {
+  //          bool success = false;
+  //          int attempts = 0;
+  //          int maxAttempts = 100;
 
-            while (!success && attempts < maxAttempts)
-            {
-                attempts++;
-                int index = Random.Range(0, coinSequenceInt.Length);
-                if (coinSequenceInt[index] < gameConfig.maxCoinPerSymbol)
-                {
-                    success = true;
-                    coinSequenceInt[index]++;
+  //          while (!success && attempts < maxAttempts)
+  //          {
+  //              attempts++;
+  //              int index = Random.Range(0, coinSequenceInt.Length);
+  //              if (coinSequenceInt[index] < gameConfig.maxCoinPerSymbol)
+  //              {
+  //                  success = true;
+  //                  coinSequenceInt[index]++;
 
-                }
-            }
+  //              }
+  //          }
 
-            if (attempts == maxAttempts) Debug.LogError("Cannot place coins!");
+  //          if (attempts == maxAttempts) Debug.LogError("Cannot place coins!");
 
-        }
+  //      }
 
-        return coinSequenceInt;
-    }
+  //      return coinSequenceInt;
+  //  }
 }
