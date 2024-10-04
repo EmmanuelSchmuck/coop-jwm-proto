@@ -115,14 +115,14 @@ public class ResponsePanel : MonoBehaviour
 
 	public void OnColumnHoverEnter(ResponseColumn column)
 	{
-		hoveredColumn?.SetCoinButtonsVisible(false);
+		//hoveredColumn?.SetCoinButtonsVisible(false);
 		hoveredColumn = column;
-		hoveredColumn.SetCoinButtonsVisible(true);
+		//hoveredColumn.SetCoinButtonsVisible(true);
 	}
 
 	public void OnColumnHoverLeave(ResponseColumn column)
 	{
-		column.SetCoinButtonsVisible(false);
+		//column.SetCoinButtonsVisible(false);
 	}
 
 	public enum SymbolSelectionMode

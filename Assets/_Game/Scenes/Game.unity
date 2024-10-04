@@ -6123,7 +6123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25d349606a7190d46990afb1839981c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fastMode: 1
+  fastMode: 0
   target: {fileID: 867496798}
 --- !u!1 &894508032
 GameObject:
@@ -8454,7 +8454,7 @@ MonoBehaviour:
     playerName: Debug Name
     playerAvatar: {fileID: 21300000, guid: 4666c832fbbee3e46892a3ac14811e3d, type: 3}
     gameMode: 2
-    sequenceLength: 3
+    sequenceLength: 6
     displayDurationPerSymbol: 0.8
     allowSymbolRepetition: 1
     enable2Up1DDownStaircase: 1

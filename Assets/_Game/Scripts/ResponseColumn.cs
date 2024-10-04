@@ -11,8 +11,6 @@ public class ResponseColumn : MonoBehaviour
 	public int ColumnIndex { get; private set; }
 
 	[SerializeField] private Check check;
-
-	[SerializeField] private Transform coinContainer;
 	[SerializeField] private GameObject coinPrefab;
 	[SerializeField] private Transform coinButtons;
 	[SerializeField] private SymbolCard symbolCard;
@@ -66,7 +64,6 @@ public class ResponseColumn : MonoBehaviour
 		
 		check.Hide();
 		SetCoverVisible(false);
-		SetCoinButtonsVisible(false);
 		coinRepo = GetComponentInChildren<CoinRepository>();
 		//coinZone = GetComponentInChildren<CoinZone>();
 		coinRepo.Initialize();
@@ -129,32 +126,11 @@ public class ResponseColumn : MonoBehaviour
 		}
 	}
 
-	public void SetCoinButtonsVisible(bool visible)
-	{
-		// for now, keep buttons hidden, we dont use them
-		coinButtons.gameObject.SetActive(false);
-	}
-
 	public void AddCoin(Coin coin)
 	{
 		coinRepo.AddCoin(coin);
 	}
 
-	public void SetCoins(int amount) // to do: refactor this + add & remove coin
-	{
-		foreach(var coin in coins)
-		{
-			Destroy(coin);
-		}
-
-		coins.Clear();
-
-		//CoinCount = amount;
-		for (int i = 0; i < amount; i++)
-		{
-			coins.Add(Instantiate(coinPrefab, coinContainer));
-		}
-	}
 
 	//public void RemoveCoin()
 	//{
@@ -192,10 +168,6 @@ public class ResponseColumn : MonoBehaviour
 
 	public void Cleanup()
 	{
-		foreach(var coin in coinContainer.GetComponentsInChildren<Coin>())
-		{
-			Destroy(coin.gameObject);
-		}
 		//for (int i = 0; i < coinContainer.childCount; i++)
 		//{
 		//	Destroy(coinContainer.GetChild(i).gameObject);
@@ -205,8 +177,6 @@ public class ResponseColumn : MonoBehaviour
 		check.Hide();
 
 		//SetCoverVisible(true);
-
-		SetCoins(0);	
 	}
 
 	public void SetCoverVisible(bool visible) // change this!
