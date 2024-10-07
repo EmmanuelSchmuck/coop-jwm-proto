@@ -8511,10 +8511,9 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   interTurnDelay: 0.4
-  botAvatars:
-  - {fileID: 21300000, guid: b3634cbca5e72574a9997bad0667d035, type: 3}
-  - {fileID: 21300000, guid: 86b158b20b5534949b784e19d057455e, type: 3}
-  - {fileID: 21300000, guid: 448fd9c13123efe429daa4aa289c65ed, type: 3}
+  botPlayerInfo:
+    playerName: Bot Player
+    playerAvatar: {fileID: 11400000, guid: 0f106a7da5e32b34f9749c696cc27150, type: 2}
   playerA_Board: {fileID: 1517413776}
   playerB_Board: {fileID: 867496798}
   stimulusDisplay: {fileID: 1564768919}

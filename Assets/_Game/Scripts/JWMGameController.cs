@@ -9,7 +9,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [Header("Config")]
     [SerializeField] private JWMGameConfig debugConfig;
     [SerializeField] private float interTurnDelay = 0.3f;
-    [SerializeField] private Sprite[] botAvatars;
+    [SerializeField] private PlayerInfo botPlayerInfo;
     //[SerializeField] private Sprite[] cardShapePool;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
@@ -44,7 +44,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         gameModeText.text = gameConfig.gameMode.ToString();
 
         playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, gameConfig.playerName, gameConfig.playerAvatar);
-        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, "Bot Player", botAvatars.Random());
+        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, botPlayerInfo.playerName, botPlayerInfo.playerAvatar.avatarPortrait);
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
