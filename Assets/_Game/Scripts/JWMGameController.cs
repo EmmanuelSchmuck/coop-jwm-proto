@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Toolbox;
 using System.Linq;
+using PlayerProfileSystem;
 
 public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
@@ -16,6 +17,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private PlayerBoard playerB_Board;
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
+    [SerializeField] private PlayerInfo debugHumanPlayerInfo;
 
     private bool roundStarted;
     
@@ -43,7 +45,9 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         gameModeText.text = gameConfig.gameMode.ToString();
 
-        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, gameConfig.playerName, gameConfig.playerAvatar);
+        PlayerInfo humanPlayerInfo = AppState.HumanPlayerInfo ?? debugHumanPlayerInfo;
+
+        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, humanPlayerInfo.playerName, humanPlayerInfo.playerAvatar.avatarPortrait);
         playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, botPlayerInfo.playerName, botPlayerInfo.playerAvatar.avatarPortrait);
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;

@@ -8518,6 +8518,9 @@ MonoBehaviour:
   playerB_Board: {fileID: 867496798}
   stimulusDisplay: {fileID: 1564768919}
   gameModeText: {fileID: 1932280121}
+  debugHumanPlayerInfo:
+    playerName: Debug Name
+    playerAvatar: {fileID: 11400000, guid: a43c9bef8d92d124cb36d5c01859212a, type: 2}
 --- !u!4 &1336874612
 Transform:
   m_ObjectHideFlags: 0

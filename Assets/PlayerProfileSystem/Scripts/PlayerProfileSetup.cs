@@ -19,6 +19,7 @@ namespace PlayerProfileSystem
 		[SerializeField] private Button validateButton;
 		public string PlayerName { get; private set; }
 		public PlayerAvatarInfo SelectedAvatarInfo { get; private set; }
+		public PlayerInfo PlayerInfo { get; private set; }
 		public event System.Action ValidateButtonClicked;
 
 		void Start()
@@ -45,6 +46,7 @@ namespace PlayerProfileSystem
 
 		private void OnValidateButtonClick()
 		{
+			PlayerInfo = new PlayerInfo() {playerAvatar = SelectedAvatarInfo, playerName = PlayerName };
 			ValidateButtonClicked?.Invoke();
 		}
 
