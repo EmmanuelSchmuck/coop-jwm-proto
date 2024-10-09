@@ -336,8 +336,47 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         Tie
     }
 
-    // returns scores for player A and player B
     private (int, int) UpdatePlayerScores()
+    {
+        int playerA_Score = 0;
+        int playerB_Score = 0;
+        bool playerACorrect;
+        bool playerBCorrect;
+        int playerAValue;
+        int playerBValue;
+
+        for(int i = 0; i<gameConfig.sequenceLength;i++)
+		{
+            playerACorrect = playerA_Board.ResponsePanel.Columns[i].SymbolIndex == correctIndexSequence[i];
+            playerBCorrect = playerB_Board.ResponsePanel.Columns[i].SymbolIndex == correctIndexSequence[i];
+            playerAValue = playerACorrect ? 1 + playerA_Board.ResponsePanel.Columns[i].CoinValueSum : 0;
+            playerBValue = playerBCorrect ? 1 + playerB_Board.ResponsePanel.Columns[i].CoinValueSum : 0;
+            int maxScore = Mathf.Max(playerAValue, playerBValue);
+            
+            switch (gameConfig.RewardDependency)
+			{
+                case Dependency.None:
+                    playerA_Score = playerAValue;
+                    playerB_Score = playerBValue;
+                    break;
+
+                case Dependency.Positive:
+                    playerA_Score = maxScore;
+                    playerB_Score = maxScore;
+                    break;
+
+                case Dependency.Negative:
+                    playerA_Score = playerAValue > playerBValue ? playerAValue : 0;
+                    playerB_Score = playerBValue > playerAValue ? playerBValue : 0;
+                    break;
+            }
+        }
+
+        return (playerA_Score, playerB_Score);
+    }
+
+    // returns scores for player A and player B
+    private (int, int) UpdatePlayerScores_OLD()
 	{
         int playerA_Score = playerA_Board.ComputeRawRoundScore(roundInfo);
         int playerB_Score = playerB_Board.ComputeRawRoundScore(roundInfo);

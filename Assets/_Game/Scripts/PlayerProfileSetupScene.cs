@@ -12,11 +12,12 @@ public class PlayerProfileSetupScene : MonoBehaviour
     {
         AppState.EnsureAppState();
         profileSetup.ValidateButtonClicked += OnValideButtonClicked;
+        profileSetup.GetComponentInChildren<TMPro.TMP_InputField>().Select();
     }
 
     private void OnValideButtonClicked()
 	{
         AppState.HumanPlayerInfo = profileSetup.PlayerInfo;
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("Lobby");
 	}
 }

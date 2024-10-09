@@ -22,7 +22,6 @@ namespace PlayerProfileSystem
             else
 			{
                 emptyImage.enabled = true;
-
             }
         }
 
