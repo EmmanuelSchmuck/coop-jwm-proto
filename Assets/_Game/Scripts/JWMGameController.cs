@@ -8,53 +8,109 @@ using PlayerProfileSystem;
 public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 {
     [Header("Config")]
-    [SerializeField] private JWMGameConfig debugConfig;
+    [SerializeField] private TimelineConfig debugTimeline;
+    [SerializeField] private GameConfig gameConfig;
     [SerializeField] private float interTurnDelay = 0.3f;
     [SerializeField] private PlayerInfo botPlayerInfo;
+    [SerializeField] private PlayerInfo debugHumanPlayerInfo;
     //[SerializeField] private Sprite[] cardShapePool;
     [Header("References")]
     [SerializeField] private PlayerBoard playerA_Board;
     [SerializeField] private PlayerBoard playerB_Board;
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
-    [SerializeField] private PlayerInfo debugHumanPlayerInfo;
 
     private bool roundStarted;
+    private TimelineConfig timeline;
     
     private int[] correctIndexSequence;
 
     private const string parentSceneName = "Config";
 
-    private JWMGameConfig gameConfig;
+    //private GameConfig gameConfig;
     private RoundInfo roundInfo;
 
     private PlayerBoard activePlayer;
     private PlayerBoard inactivePlayer;
     private PlayerBoard firstPlayer;
-    private int turnCount;
+    private int turnIndex;
+    private int trialIndex;
+    private int blockIndex;
+    private int blockTrialCount;
+    private int? lastSequenceLengthStaircaseValue;
     private bool playerA_lastTurnIsSuccess;
     private bool BothPlayersHaveValidated => playerA_Board.IsValidated && (playerB_Board.IsValidated || playerB_Board.IsDisabled);
 
     private void Start()
     {
-        gameConfig = AppState.GameConfig ?? debugConfig; // WIP;
+        //gameConfig = gameConfig; // WIP;
 
-        gameConfig.recallCurve = debugConfig.recallCurve; // WIP
+        //gameConfig.recallCurve = staticConfig.recallCurve; // WIP
 
         firstPlayer = playerA_Board; // WIP
+
+        timeline = AppState.Timeline ?? debugTimeline;
+
+        lastSequenceLengthStaircaseValue = null;
 
         gameModeText.text = gameConfig.gameMode.ToString();
 
         PlayerInfo humanPlayerInfo = AppState.HumanPlayerInfo ?? debugHumanPlayerInfo;
 
-        playerA_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, humanPlayerInfo.playerName, humanPlayerInfo.playerAvatar.avatarPortrait);
-        playerB_Board.Initialize(JWMGameConfig.SYMBOL_POOL_SIZE, botPlayerInfo.playerName, botPlayerInfo.playerAvatar.avatarPortrait);
+        playerA_Board.Initialize(GameConfig.SYMBOL_POOL_SIZE, humanPlayerInfo.playerName, humanPlayerInfo.playerAvatar.avatarPortrait);
+        playerB_Board.Initialize(GameConfig.SYMBOL_POOL_SIZE, botPlayerInfo.playerName, botPlayerInfo.playerAvatar.avatarPortrait);
 
         playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
 
         stimulusDisplay.SetVisible(false);
 
-        StartCoroutine(StartRound(isFirstRound: true));
+        OnBlockStart(timeline.blockConfigs[0]);
+
+        
+    }
+
+    private void OnBlockStart(BlockConfig blockConfig)
+	{
+        Debug.Log($"BlockStart {blockIndex}");
+        gameConfig.sequenceLength = blockConfig.sequenceLength;
+
+        if(blockConfig.useLastStaircaseValue)
+		{
+            if(lastSequenceLengthStaircaseValue == null)
+			{
+                throw new System.Exception("Trying to use last staircase value which is null!");
+			}
+            gameConfig.sequenceLength = (int)lastSequenceLengthStaircaseValue;
+        }
+
+        gameConfig.enable2Up1DDownStaircase = blockConfig.enableStaircase;
+        gameConfig.isTutorial = blockConfig.isTutorial;
+        gameConfig.gameMode = (GameMode)blockConfig.gameMode;
+
+        blockTrialCount = blockConfig.trialCount;
+
+        trialIndex = 0;
+
+        StartCoroutine(StartRound());
+    }
+    private void OnBlockEnd()
+	{
+        if (gameConfig.enable2Up1DDownStaircase)
+		{
+            lastSequenceLengthStaircaseValue = gameConfig.sequenceLength;
+		}
+
+        blockIndex++;
+
+        if(blockIndex < timeline.blockConfigs.Length)
+		{
+            OnBlockStart(timeline.blockConfigs[blockIndex]);
+		}
+        else
+		{
+            // timeline completed
+            Debug.Log("Timeline completed");
+		}
     }
 
 	private void Update()
@@ -102,15 +158,17 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         return correctIndexSequence;
     }
 
-    private IEnumerator StartRound(bool isFirstRound = false)
+    private IEnumerator StartRound()
     {
-        turnCount = 0;
-        correctIndexSequence = GenerateCorrectIndicesSequence(JWMGameConfig.SYMBOL_POOL_SIZE);
+        bool isFirstRound = trialIndex == 0;
+
+        turnIndex = 0;
+        correctIndexSequence = GenerateCorrectIndicesSequence(GameConfig.SYMBOL_POOL_SIZE);
 
         roundInfo = new RoundInfo() { gameConfig = this.gameConfig, correctIndexSequence = this.correctIndexSequence };
         
-        playerA_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
-        playerB_Board.OnRoundStart(JWMGameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
+        playerA_Board.OnRoundStart(GameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
+        playerB_Board.OnRoundStart(GameConfig.SYMBOL_POOL_SIZE, roundInfo, isFirstRound);
 
         stimulusDisplay.Initialize(correctIndexSequence);
 
@@ -147,7 +205,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
             do
             {
-                if (turnCount > 0) yield return playerA_Board.SymbolPickResponseTurn();
+                if (turnIndex > 0) yield return playerA_Board.SymbolPickResponseTurn();
                 
                 if (BothPlayersHaveValidated) break;
 
@@ -160,7 +218,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
                 yield return new WaitForSeconds(interTurnDelay);
 
-                turnCount++;
+                turnIndex++;
 
             } while (!BothPlayersHaveValidated);
         }
@@ -247,7 +305,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             gameConfig.ClampSequenceLength(gameConfig.sequenceLength);
 
             playerA_lastTurnIsSuccess = playerASuccess;
-        }   
+        }
 
         // adaptive procedure end =====
 
@@ -259,8 +317,16 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         // to do: move this into StartRound ?
         //yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button 
+        trialIndex++;
 
-        StartCoroutine(StartRound());
+        if(trialIndex >= blockTrialCount)
+		{
+            OnBlockEnd();
+		}
+        else
+		{
+            StartCoroutine(StartRound());
+        }
     }
 
     enum EndResult

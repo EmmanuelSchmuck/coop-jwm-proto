@@ -8450,62 +8450,95 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a62c2b67a0d45534abfbde329b5ad553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugConfig:
-    playerName: Debug Name
-    playerAvatar: {fileID: 21300000, guid: 4666c832fbbee3e46892a3ac14811e3d, type: 3}
-    gameMode: 2
+  debugTimeline:
+    blockConfigs:
+    - trialCount: 3
+      enableStaircase: 1
+      useLastStaircaseValue: 0
+      isTutorial: 1
+      sequenceLength: 4
+      gameMode: 0
+    - trialCount: 5
+      enableStaircase: 1
+      useLastStaircaseValue: 1
+      isTutorial: 0
+      sequenceLength: 5
+      gameMode: 1
+    - trialCount: 5
+      enableStaircase: 1
+      useLastStaircaseValue: 0
+      isTutorial: 0
+      sequenceLength: 5
+      gameMode: 1
+    - trialCount: 5
+      enableStaircase: 1
+      useLastStaircaseValue: 1
+      isTutorial: 0
+      sequenceLength: 5
+      gameMode: 1
+  gameConfig:
+    gameMode: 0
     sequenceLength: 6
     displayDurationPerSymbol: 0.8
     allowSymbolRepetition: 1
-    enable2Up1DDownStaircase: 1
-    maxCoinPerSymbol: 3
+    enable2Up1DDownStaircase: 0
+    isTutorial: 0
     recallCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: -0.0067481995
-        value: 1.0023499
-        inSlope: -0.04156646
-        outSlope: -0.04156646
-        tangentMode: 34
+        time: -0.0067466954
+        value: 1.0047302
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
         weightedMode: 0
         inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.1561753
+        value: 1.0053233
+        inSlope: 0.013964238
+        outSlope: 0.013964238
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.22845311
+      - serializedVersion: 3
+        time: 0.4125289
+        value: 0.24715245
+        inSlope: 0.045348022
+        outSlope: 0.045348022
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.5193465
+      - serializedVersion: 3
+        time: 0.55359566
+        value: 0.25043547
+        inSlope: -0.019632256
+        outSlope: -0.019632256
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 0.077703446
-        value: 0.9988395
-        inSlope: -0.017665785
-        outSlope: -0.017665785
+        time: 0.84658545
+        value: 0.99687487
+        inSlope: 0.063761435
+        outSlope: 0.063761435
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.45466048
-      - serializedVersion: 3
-        time: 0.49754405
-        value: 0.19364798
-        inSlope: -0.00012480358
-        outSlope: -0.00012480358
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.117964864
-      - serializedVersion: 3
-        time: 0.9182675
-        value: 1.003439
-        inSlope: 0.020309707
-        outSlope: 0.020309707
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.14137118
+        outWeight: 0.43321824
       - serializedVersion: 3
         time: 1
         value: 1
-        inSlope: -0.042075664
-        outSlope: -0.042075664
-        tangentMode: 34
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
         weightedMode: 0
-        inWeight: 0.33333334
+        inWeight: 0
         outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
@@ -8514,13 +8547,13 @@ MonoBehaviour:
   botPlayerInfo:
     playerName: Bot Player
     playerAvatar: {fileID: 11400000, guid: 0f106a7da5e32b34f9749c696cc27150, type: 2}
+  debugHumanPlayerInfo:
+    playerName: Debug Name
+    playerAvatar: {fileID: 11400000, guid: a43c9bef8d92d124cb36d5c01859212a, type: 2}
   playerA_Board: {fileID: 1517413776}
   playerB_Board: {fileID: 867496798}
   stimulusDisplay: {fileID: 1564768919}
   gameModeText: {fileID: 1932280121}
-  debugHumanPlayerInfo:
-    playerName: Debug Name
-    playerAvatar: {fileID: 11400000, guid: a43c9bef8d92d124cb36d5c01859212a, type: 2}
 --- !u!4 &1336874612
 Transform:
   m_ObjectHideFlags: 0

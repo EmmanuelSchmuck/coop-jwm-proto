@@ -6,8 +6,9 @@ using PlayerProfileSystem;
 public static class AppState
 {
 	public static PlayerInfo HumanPlayerInfo { get; set; }
-	public static JWMGameConfig GameConfig { get; set; }
-    public static void EnsureAppState()
+	public static GameConfig GameConfig { get; set; }
+	public static TimelineConfig Timeline { get; set; }
+	public static void EnsureAppState()
 	{
 
 	}

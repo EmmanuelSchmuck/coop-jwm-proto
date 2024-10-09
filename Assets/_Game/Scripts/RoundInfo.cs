@@ -4,6 +4,6 @@ using UnityEngine;
 
 public class RoundInfo
 {
-    public JWMGameConfig gameConfig;
+    public GameConfig gameConfig;
     public int[] correctIndexSequence;
 }

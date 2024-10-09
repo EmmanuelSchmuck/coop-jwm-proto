@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class JWMGameConfig
+public class GameConfig
 {
-    public string playerName;
-    public Sprite playerAvatar;
     public GameMode gameMode;
     public int sequenceLength = 6;
     public float displayDurationPerSymbol = 1f;
     public bool allowSymbolRepetition = false;
     public bool enable2Up1DDownStaircase;
-    public int maxCoinPerSymbol = 3;
-    //public const int SCORE_MULTIPLIER = 1;
+    public bool isTutorial;
     public AnimationCurve recallCurve;
     public const int SYMBOL_POOL_SIZE = 9;
     public const int MAX_SEQUENCE_LENGTH = 9;
@@ -51,9 +48,9 @@ public class JWMGameConfig
         _ => Dependency.None
     };
 
-    public int ClampSequenceLength(int value) => Mathf.Clamp(value, 4, 10);
-    public float ClampDisplayDurationPerSymbol(float value) => Mathf.Clamp(value, 0.5f, 3f);
+    public int ClampSequenceLength(int value) => Mathf.Clamp(value, MIN_SEQUENCE_LENGTH, MAX_SEQUENCE_LENGTH);
+    //public float ClampDisplayDurationPerSymbol(float value) => Mathf.Clamp(value, 0.5f, 3f);
 
-    public int ClampCoinPerRound(int value) => Mathf.Clamp(value, 3, 15);
-    public int ClampMaxCoinPerSymbol(int value) => Mathf.Clamp(value, 2, 4);
+    //public int ClampCoinPerRound(int value) => Mathf.Clamp(value, 3, 15);
+    //public int ClampMaxCoinPerSymbol(int value) => Mathf.Clamp(value, 2, 4);
 }

@@ -29,7 +29,7 @@ public class PlayerBoard : MonoBehaviour
     public SymbolKeyboard SymbolKeyboard => symbolKeyboard;
     public bool IsValidated { get; private set; }
     private int score;
-    public JWMGameConfig GameConfig { get; private set; }
+    public GameConfig GameConfig { get; private set; }
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
 
     public event System.Action StartRoundButtonClicked;
@@ -507,7 +507,7 @@ public class PlayerBoard : MonoBehaviour
 
         bool canValidate = GameConfig.sequenceLength == responsePanel.CoinsInColumns;
 
-        Debug.Log($"coin count = {responsePanel.CoinsInColumns}");
+        //Debug.Log($"coin count = {responsePanel.CoinsInColumns}");
         SetCanValidate(canValidate);
 
         SetInstructionText(canValidate ? EMPTY : COIN_BETTING_INSTRUCTION);

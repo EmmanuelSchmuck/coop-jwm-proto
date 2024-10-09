@@ -23,7 +23,7 @@ public class BotController : MonoBehaviour
 
     void OnStimulusDisplayed(RoundInfo roundInfo)
 	{
-        JWMGameConfig gameConfig = roundInfo.gameConfig;
+        GameConfig gameConfig = roundInfo.gameConfig;
 
         playerB_indices = new int[gameConfig.sequenceLength];
         playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
@@ -124,7 +124,7 @@ public class BotController : MonoBehaviour
 
     private IEnumerator CoinBettingRoutine(RoundInfo roundInfo)
 	{
-        JWMGameConfig gameConfig = roundInfo.gameConfig;
+        GameConfig gameConfig = roundInfo.gameConfig;
 
         int[] playerB_indices = new int[gameConfig.sequenceLength];
         float[] playerB_coinAmountSequenceFloat = new float[gameConfig.sequenceLength];
