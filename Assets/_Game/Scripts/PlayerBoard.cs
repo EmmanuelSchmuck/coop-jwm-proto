@@ -18,7 +18,7 @@ public class PlayerBoard : MonoBehaviour
     [SerializeField] private TMPro.TextMeshProUGUI playerNameText;
     [SerializeField] private Image avatarImage;
     [SerializeField] private GameObject validateButton;
-    [SerializeField] private GameObject startRoundButton;
+    
     [SerializeField] private GameObject activePlayerIndicator;
     [SerializeField] private Coin bronzeCoinPrefab, silverCoinPrefab, goldCoinPrefab;
 
@@ -32,7 +32,6 @@ public class PlayerBoard : MonoBehaviour
     public GameConfig GameConfig { get; private set; }
     public int? SelectedSymbolIndex => symbolKeyboard.SelectedSymbolIndex;
 
-    public event System.Action StartRoundButtonClicked;
     public event System.Action<RoundInfo> RoundStarted;
     public event System.Action<RoundInfo> StimulusDisplayed;
     public event System.Action<RoundInfo> ResponsePhaseStarted; // rename: symbol pick phase started
@@ -69,7 +68,9 @@ public class PlayerBoard : MonoBehaviour
         symbolKeyboard.Initialize(symbolPoolSize);
         SetScore(0, animate: false);
         SetInstructionText(EMPTY);
-        
+
+        responsePanel.Initialize(0, this);
+
         SetCoinReposVisible(false);
         symbolKeyboard.SetVisible(false);
 
@@ -146,12 +147,6 @@ public class PlayerBoard : MonoBehaviour
             coinRepo.Interacted += OnCoinRepoClicked;
         }
 
-
-        if (isMainPlayer)
-		{
-            SetStartRoundButtonVisible(true);
-        }
-
         SetInteractable(false);
 
         RoundStarted?.Invoke(roundInfo);
@@ -182,29 +177,7 @@ public class PlayerBoard : MonoBehaviour
 
     }
 
-    private void SetStartRoundButtonVisible(bool visible)
-    {
-        if (startRoundButton == null) return;
 
-        if (visible)
-		{
-            startRoundButton.gameObject.SetActive(true);
-            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
-            {
-                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(t, .3f);
-                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(t, .3f);
-            }));
-		}
-        else
-		{
-            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
-            {
-                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(1 - t, .3f);
-                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(1 - t, .3f);
-            }, onFinish: () => startRoundButton.gameObject.SetActive(false)));
-        }
-        
-    }
 
     public void OnStimulusDisplayStart()
     {
@@ -442,15 +415,6 @@ public class PlayerBoard : MonoBehaviour
         }
 
         return round_score;
-    }
-
-    public void WIP_OnStartRoundButtonClick()
-    {
-        SetStartRoundButtonVisible(false);
-
-        SoundManager.Instance.PlaySound(SoundType.GenericClick);
-
-        StartRoundButtonClicked?.Invoke();
     }
     
     public void OnResponseSymbolPickAttempted(ResponseColumn column) // rename this !

@@ -150,12 +150,6 @@ public class ResponsePanel : MonoBehaviour
 		}
 	}
 
-	public void OnStartRoundButtonClick()
-	{
-		board.WIP_OnStartRoundButtonClick();
-	}
-
-
 	//public void ShowCorrectFeedback(int[] correctIndices)
 	//{
 	//	for(int i = 0;i<columns.Count;i++)

@@ -19,6 +19,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
     [SerializeField] private PlayerBoard playerB_Board;
     [SerializeField] private StimulusDisplay stimulusDisplay;
     [SerializeField] private TMPro.TextMeshProUGUI gameModeText;
+    [SerializeField] private GameObject startRoundButton;
+    [SerializeField] private GameObject instructionWindow;
 
     private bool roundStarted;
     private TimelineConfig timeline;
@@ -43,6 +45,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
     private void Start()
     {
+        SetInstructionWindowVisible(false, false);
+        SetStartRoundButtonVisible(false, false);
         //gameConfig = gameConfig; // WIP;
 
         //gameConfig.recallCurve = staticConfig.recallCurve; // WIP
@@ -50,6 +54,8 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         firstPlayer = playerA_Board; // WIP
 
         timeline = AppState.Timeline ?? debugTimeline;
+
+        Debug.Log(JsonUtility.ToJson(timeline));
 
         lastSequenceLengthStaircaseValue = null;
 
@@ -60,16 +66,49 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
         playerA_Board.Initialize(GameConfig.SYMBOL_POOL_SIZE, humanPlayerInfo.playerName, humanPlayerInfo.playerAvatar.avatarPortrait);
         playerB_Board.Initialize(GameConfig.SYMBOL_POOL_SIZE, botPlayerInfo.playerName, botPlayerInfo.playerAvatar.avatarPortrait);
 
-        playerA_Board.StartRoundButtonClicked += CheckForRoundStart;
-
         stimulusDisplay.SetVisible(false);
 
-        OnBlockStart(timeline.blockConfigs[0]);
-
+        StartCoroutine(OnBlockStart(timeline.blockConfigs[0]));
         
     }
 
-    private void OnBlockStart(BlockConfig blockConfig)
+    public void StartButtonClicked()
+	{
+        roundStarted = true;
+	}
+
+    private void SetInstructionWindowVisible(bool visible, bool animate = true)
+	{
+        instructionWindow.SetActive(visible);
+	}
+
+    private void SetStartRoundButtonVisible(bool visible, bool animate = true)
+    {
+        if(!animate)
+		{
+            startRoundButton.gameObject.SetActive(visible);
+        }
+        else if (visible)
+        {
+            startRoundButton.gameObject.SetActive(true);
+            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
+            {
+                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(t, .3f);
+                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(t, .3f);
+            }));
+        }
+        else
+        {
+            StartCoroutine(CoroutineTools.Tween01(0.3f, t =>
+            {
+                //startRoundButton.transform.localScale = Vector3.one * Mathf.Pow(1 - t, .3f);
+                startRoundButton.GetComponent<CanvasGroup>().alpha = Mathf.Pow(1 - t, .3f);
+            }, onFinish: () => startRoundButton.gameObject.SetActive(false)));
+        }
+
+    }
+
+    private IEnumerator OnBlockStart(BlockConfig blockConfig)
 	{
         Debug.Log($"BlockStart {blockIndex}");
         gameConfig.sequenceLength = blockConfig.sequenceLength;
@@ -91,10 +130,22 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         trialIndex = 0;
 
+        yield return null;
+
+        roundStarted = false;
+
+        SetInstructionWindowVisible(true);
+
+        yield return new WaitUntil(() => roundStarted);
+
+        SetInstructionWindowVisible(false);
+
         StartCoroutine(StartRound());
     }
-    private void OnBlockEnd()
+    private IEnumerator OnBlockEnd()
 	{
+        yield return null;
+
         if (gameConfig.enable2Up1DDownStaircase)
 		{
             lastSequenceLengthStaircaseValue = gameConfig.sequenceLength;
@@ -104,7 +155,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         if(blockIndex < timeline.blockConfigs.Length)
 		{
-            OnBlockStart(timeline.blockConfigs[blockIndex]);
+            StartCoroutine(OnBlockStart(timeline.blockConfigs[blockIndex]));
 		}
         else
 		{
@@ -172,12 +223,18 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         stimulusDisplay.Initialize(correctIndexSequence);
 
+        SetStartRoundButtonVisible(true);
+
         if (true)
 		{
             roundStarted = false;
 
             yield return new WaitUntil(() => roundStarted); // wait for human player to click on the start button
         }
+
+        SetStartRoundButtonVisible(false);
+
+        yield return new WaitForSeconds(1f);
 
         yield return stimulusDisplay.AnimateVisible(true);
 
@@ -321,7 +378,7 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
 
         if(trialIndex >= blockTrialCount)
 		{
-            OnBlockEnd();
+            StartCoroutine(OnBlockEnd());
 		}
         else
 		{
@@ -400,15 +457,5 @@ public class JWMGameController : MonoBehaviourSingleton<JWMGameController>
             },
             _ => throw new System.NotImplementedException()
         };
-    }
-
-    public void CheckForRoundStart()
-    {
-        bool readyToStart = true; // to do: check for both players to be ready;
-
-        if(readyToStart)
-		{
-            roundStarted = true;
-        }  
     }
 }
