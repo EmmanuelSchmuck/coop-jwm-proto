@@ -1408,9 +1408,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   avatarInfos:
+  - {fileID: 11400000, guid: 02c947f922d068444ad1d6c2b7ef7871, type: 2}
   - {fileID: 11400000, guid: 0f106a7da5e32b34f9749c696cc27150, type: 2}
   - {fileID: 11400000, guid: a43c9bef8d92d124cb36d5c01859212a, type: 2}
   - {fileID: 11400000, guid: 612686b58e3adc8478bd44fb8de8ec56, type: 2}
+  - {fileID: 11400000, guid: f08f50a2230f9c443b12749ccab2b585, type: 2}
+  - {fileID: 11400000, guid: b98963446c81d424585f94886a9bc0f9, type: 2}
+  - {fileID: 11400000, guid: cf6f9f1ca227710458050d4aa2de19f1, type: 2}
+  - {fileID: 11400000, guid: cf88b66f5def135479b70b83fad47515, type: 2}
+  - {fileID: 11400000, guid: 74497493dc6dd1e439ca7e6e8ee9d7af, type: 2}
+  - {fileID: 11400000, guid: 866abd40711d9524ca49a76b8d601efd, type: 2}
+  - {fileID: 11400000, guid: ce612ff5e95c04c4cbdab2082a6ead9d, type: 2}
+  - {fileID: 11400000, guid: d9b8406180eb76d4581a5a1b6dd69aad, type: 2}
   optionGrid: {fileID: 9200843527520471042}
   characterContainer: {fileID: 8564227871545060825}
   animController: {fileID: 9100000, guid: 6a72d1259c3ad554d8e9d94cbd090d5a, type: 2}

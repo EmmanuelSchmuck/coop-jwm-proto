@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 995899e26394f3a4c9e00eb05b202824, type: 3}
+  m_Name: AvatarInfo 0
+  m_EditorClassIdentifier: 
+  avatarPortrait: {fileID: 21300000, guid: db8c719315114474c8ab5d2e5998c5f4, type: 3}
+  avatarCharacter: {fileID: 5031362958470963644, guid: ee53b3b3fe585544399d2691d9496bb0, type: 3}
+  avatarName: Cyber

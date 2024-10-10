@@ -7,7 +7,7 @@ using NaughtyAttributes;
 
 namespace PlayerProfileSystem.PortraitGeneration
 {
-    public class PortraitGenerator : MonoBehaviour
+    public class AvatarInfoSetup : MonoBehaviour
     {
         [SerializeField] private PlayerAvatarInfo[] avatarInfos;
         [SerializeField] private int avatarIndex;
@@ -19,6 +19,25 @@ namespace PlayerProfileSystem.PortraitGeneration
         [SerializeField] private RenderTexture renderTexture;
         private string assetPath => Path.Combine(Application.dataPath, portraitFolder);
         private string localFolderPath => Path.Combine("Assets", portraitFolder);
+        private GameObject currentCharacter;
+        [Button("Setup All AvatarInfos")]
+        public void SetupAllAvatarInfos()
+		{
+            foreach (var character in characterContainer.GetComponentsInChildren<Animator>(includeInactive: true))
+            {
+                character.gameObject.SetActive(false);
+            }
+
+            for (int i = 0; i<avatarInfos.Length;i++)
+			{
+                currentCharacter = characterContainer.GetChild(i).gameObject;
+                currentCharacter.SetActive(true);
+                avatarIndex = i;
+                TakePortraitPicture();
+                currentCharacter.SetActive(false);
+            }
+		}
+
         [Button("UpdateCharacterFromIndex")]
         public void UpdateCharacterFromIndex()
 		{
@@ -26,6 +45,7 @@ namespace PlayerProfileSystem.PortraitGeneration
             foreach(var character in characterContainer.GetComponentsInChildren<Animator>(includeInactive: true))
 			{
                 character.gameObject.SetActive(i == avatarIndex);
+                if (i == avatarIndex) currentCharacter = character.gameObject;
                 i++;
             }
 		}
@@ -66,6 +86,8 @@ namespace PlayerProfileSystem.PortraitGeneration
             Sprite newSprite = AssetDatabase.LoadAssetAtPath(localPath, typeof(Sprite)) as Sprite;
             avatarInfos[avatarIndex].avatarPortrait = newSprite;
             Debug.Log($"Assigned new sprite : {newSprite}, at path {localPath}");
+
+            avatarInfos[avatarIndex].avatarCharacter = PrefabUtility.GetCorrespondingObjectFromSource<GameObject>(currentCharacter);
 
             AssetDatabase.Refresh();
         }
